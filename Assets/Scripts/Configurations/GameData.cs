@@ -304,6 +304,8 @@ public class GameData : MonoBehaviour
             charactersDBSO.GenerateFantasyName(),
             charactersDBSO.GenerateFantasyName()
         };
+        SerializedDictionary<int, CharacterData.CharacterItem> bag = new SerializedDictionary<int, CharacterData.CharacterItem>();
+        for (int i = 0; i < 10; i++) bag.Add(i, new CharacterData.CharacterItem());
         return new GameDataSlot
         {
             isUse = true,
@@ -318,6 +320,7 @@ public class GameData : MonoBehaviour
                         level = 1,
                         characterId = 0,
                         characterSkinId = 0,
+                        bag = bag,
                         statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
                         {
                             { CharacterData.TypeStatistic.Hp, new CharacterData.Statistic() { baseValue = 100, aptitudeValue = 100 } },

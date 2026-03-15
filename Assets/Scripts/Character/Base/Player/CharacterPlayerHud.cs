@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using AYellowpaper.SerializedCollections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +9,7 @@ public class CharacterPlayerHud : MonoBehaviour
 {
     public CharacterPlayer characterPlayer;
     public CharacterUI characterUI;
+    public Animator characterInventoryAnim;
     public async Awaitable ChangeCharacterPortrait()
     {
         try
@@ -40,10 +43,42 @@ public class CharacterPlayerHud : MonoBehaviour
             Debug.LogError($"Error changing character portrait: {ex.Message}");
         }
     }
+    public async Awaitable RefreshCharacterInventory()
+    {
+        try
+        {
+            foreach (Transform child in characterUI.characterBag.bagContainer)
+            {
+                Destroy(child.gameObject);
+            }
+            int index = 0;
+            characterUI.characterBag.inventorySlots.Clear();
+            foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag)
+            {
+                InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
+                bagSlotPrefab.InitializeSlot(bagSlot.Value);
+                characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
+                index++;
+            }
+            foreach (KeyValuePair<CharacterData.TypeCharacterItem, CharacterData.CharacterItem> item in characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items){
+                characterUI.items[item.Key].InitializeSlot(item.Value);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+    }
+    public async Awaitable ToggleCharacterInventory()
+    {
+        characterInventoryAnim.SetBool("isOpen", !characterInventoryAnim.GetBool("isOpen"));
+    }
     [Serializable]
     public class CharacterUI
     {
         public CharacterPortrait[] characterPortraits;
+        public CharacterBag characterBag;
+        public SerializedDictionary<CharacterData.TypeCharacterItem, InventorySlot> items = new SerializedDictionary<CharacterData.TypeCharacterItem, InventorySlot>();
     }
     [Serializable]
     public class CharacterPortrait
@@ -52,5 +87,11 @@ public class CharacterPlayerHud : MonoBehaviour
         public Image characterSprite;
         public Image characterCounter;
         public TMP_Text characterCounterText;
+    }
+    [Serializable]
+    public class CharacterBag
+    {
+        public Transform bagContainer;
+        public SerializedDictionary<int, InventorySlot> inventorySlots;
     }
 }

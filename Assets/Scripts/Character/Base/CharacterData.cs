@@ -19,9 +19,12 @@ public class CharacterData
         {TypeCharacterItem.Pendant, null},
         {TypeCharacterItem.Ring, null},
         {TypeCharacterItem.Weapon, null},
+        {TypeCharacterItem.Utility, null},
         {TypeCharacterItem.Object1, null},
         {TypeCharacterItem.Object2, null},
+        {TypeCharacterItem.Object3, null},
     };
+    public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>> skills = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>>();
     public int characterId;
     public int characterSkinId;
@@ -130,8 +133,10 @@ public class CharacterData
         Pendant = 6,
         Ring = 7,
         Weapon = 8,
-        Object1 = 9,
-        Object2 = 10,
+        Utility = 9,
+        Object1 = 10,
+        Object2 = 11,
+        Object3 = 12,
     }
     public enum TypeStatistic
     {
@@ -146,6 +151,7 @@ public class CharacterData
         Spd = 8,
         Exp = 9,
         Crtv = 10,
-        Crtd = 11
+        Crtd = 11,
+        BagSpace = 12
     }
 }

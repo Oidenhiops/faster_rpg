@@ -12,6 +12,7 @@ public class CharacterPlayer : CharacterBase
         inputActions = new InputSystem_Actions();
         inputActions.Enable();
         inputActions.Player.ChangeCharacter.performed += OnHandleChangeCharacter;
+        inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
     }
     public async override Awaitable InitializeCharacter()
     {
@@ -50,6 +51,7 @@ public class CharacterPlayer : CharacterBase
                     characterPlayerHud.characterUI.characterPortraits[i].portraitObject.SetActive(false);
                 }
             }
+            await characterPlayerHud.RefreshCharacterInventory();
             await InitializeAnimations();
             isInitialize = true;
         }
@@ -66,7 +68,12 @@ public class CharacterPlayer : CharacterBase
             characterIndex = (int)context.ReadValue<float>();
             _ = InitializeAnimations();
             _ = ChangeCharacterAction();
+            _ = characterPlayerHud.RefreshCharacterInventory();
         }
+    }
+    void OnHandleToggleInventory(InputAction.CallbackContext context)
+    {
+        _ = characterPlayerHud.ToggleCharacterInventory();
     }
     async Awaitable ChangeCharacterAction()
     {

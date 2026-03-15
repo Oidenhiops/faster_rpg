@@ -1,0 +1,15 @@
+﻿<Solution>
+  <Project Path="Febucci.TextAnimator.Runtime.csproj" />
+  <Project Path="NaughtyAttributes.Core.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="NaughtyAttributes.Editor.csproj" />
+  <Project Path="AYellowpaper.SerializedCollections.csproj" />
+  <Project Path="NaughtyAttributes.Test.csproj" />
+  <Project Path="Febucci.TextAnimator.Editor.csproj" />
+  <Project Path="Febucci.Attributes.Editor.csproj" />
+  <Project Path="AYellowpaper.SerializedCollections.Editor.csproj" />
+  <Project Path="Febucci.TextAnimator.TMP.Runtime.csproj" />
+  <Project Path="Assembly-CSharp-firstpass.csproj" />
+  <Project Path="Febucci.TextAnimator.Demo.Runtime.csproj" />
+  <Project Path="Febucci.Attributes.Runtime.csproj" />
+</Solution>

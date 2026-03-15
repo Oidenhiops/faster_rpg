@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CharacterBase : MonoBehaviour
 {
@@ -36,21 +34,6 @@ public class CharacterBase : MonoBehaviour
             MoveCharacter();
         }
     }
-    // [NaughtyAttributes.Button]
-    // public void ChangeSkin()
-    // {
-    //     characterData.characterSkinId++;
-    //     if (characterData.characterSkinId > GameData.Instance.charactersSkinDBSO.data[initialDataSO.id].Count - 1)
-    //     {
-    //         characterData.characterSkinId = 0;
-    //     }
-    //     characterData.characterSkinData = new CharacterData.CharacterSkinData
-    //     {
-    //         atlas = GameData.Instance.charactersSkinDBSO.data[initialDataSO.id][characterData.characterSkinId].atlas,
-    //         atlasHands = GameData.Instance.charactersSkinDBSO.data[initialDataSO.id][characterData.characterSkinId].atlasHands
-    //     };
-    //     _ = InitializeAnimations();
-    // }
     public virtual void OnEnableHandle() { }
     public async virtual Awaitable InitializeCharacter() { }
     protected async Awaitable InitializeAnimations()
