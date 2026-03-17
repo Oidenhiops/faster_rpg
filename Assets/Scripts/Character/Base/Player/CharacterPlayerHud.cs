@@ -60,7 +60,7 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
                 index++;
             }
-            foreach (KeyValuePair<CharacterData.TypeCharacterItem, CharacterData.CharacterItem> item in characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items){
+            foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> item in characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items){
                 characterUI.items[item.Key].InitializeSlot(item.Value);
             }
         }
@@ -78,7 +78,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public CharacterPortrait[] characterPortraits;
         public CharacterBag characterBag;
-        public SerializedDictionary<CharacterData.TypeCharacterItem, InventorySlot> items = new SerializedDictionary<CharacterData.TypeCharacterItem, InventorySlot>();
+        public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> items = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
     }
     [Serializable]
     public class CharacterPortrait

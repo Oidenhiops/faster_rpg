@@ -21,9 +21,9 @@ public class InventorySlot : MonoBehaviour
         Front = 6,
         Pants = 7,
         Boots = 9,
-        Object1 = 10,
-        Object2 = 11,
-        Object3 = 12,
+        Item1 = 10,
+        Item2 = 11,
+        Item3 = 12,
         Utility = 13,
         Bag = 14
     }

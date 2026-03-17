@@ -9,21 +9,19 @@ public class CharacterData
     public int level;
     public string name;
     public SerializedDictionary<TypeStatistic, Statistic> statistics = new SerializedDictionary<TypeStatistic, Statistic>();
-    public SerializedDictionary<TypeCharacterItem, CharacterItem> items = new SerializedDictionary<TypeCharacterItem, CharacterItem>
+    public SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem> items = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem>
     {
-        {TypeCharacterItem.Helmet, null},
-        {TypeCharacterItem.Front, null},
-        {TypeCharacterItem.Pants, null},
-        {TypeCharacterItem.Boots, null},
-        {TypeCharacterItem.Gloves, null},
-        {TypeCharacterItem.Pendant, null},
-        {TypeCharacterItem.Ring, null},
-        {TypeCharacterItem.Weapon, null},
-        {TypeCharacterItem.Utility, null},
-        {TypeCharacterItem.Object1, null},
-        {TypeCharacterItem.Object2, null},
-        {TypeCharacterItem.Object3, null},
+        {ItemBaseSO.TypeObject.Helmet, null},
+        {ItemBaseSO.TypeObject.Front, null},
+        {ItemBaseSO.TypeObject.Pants, null},
+        {ItemBaseSO.TypeObject.Boots, null},
+        {ItemBaseSO.TypeObject.Gloves, null},
+        {ItemBaseSO.TypeObject.Pendant, null},
+        {ItemBaseSO.TypeObject.Ring, null},
+        {ItemBaseSO.TypeObject.Weapon, null},
+        {ItemBaseSO.TypeObject.Utility, null},
     };
+    public SerializedDictionary<int, CharacterItem> consumable = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>> skills = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>>();
     public int characterId;
@@ -55,7 +53,7 @@ public class CharacterData
     }
     public bool GetCurrentWeapon(out CharacterItem weapon)
     {
-        if (items.TryGetValue(TypeCharacterItem.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
+        if (items.TryGetValue(ItemBaseSO.TypeObject.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
         {
             weapon = currentWeapon;
             return true;
@@ -121,22 +119,6 @@ public class CharacterData
         B = 5,
         A = 6,
         S = 7
-    }
-    public enum TypeCharacterItem
-    {
-        None = 0,
-        Helmet = 1,
-        Front = 2,
-        Pants = 3,
-        Boots = 4,
-        Gloves = 5,
-        Pendant = 6,
-        Ring = 7,
-        Weapon = 8,
-        Utility = 9,
-        Object1 = 10,
-        Object2 = 11,
-        Object3 = 12,
     }
     public enum TypeStatistic
     {

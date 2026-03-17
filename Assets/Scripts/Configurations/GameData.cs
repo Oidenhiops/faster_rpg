@@ -88,7 +88,7 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.selectedCharacters)
             {
-                foreach (KeyValuePair<CharacterData.TypeCharacterItem, CharacterData.CharacterItem> item in characterData.Value.items)
+                foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> item in characterData.Value.items)
                 {
                     if (item.Value.itemId != 0)
                     {

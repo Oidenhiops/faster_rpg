@@ -8,8 +8,6 @@ public class ItemBaseSO : ScriptableObject
     public Sprite icon;
     public TypeObject typeObject;
     public TypeWeapon typeWeapon;
-    public Vector3Int[] positionsToAttack;
-    public int attackRadius = 5;
     public string animationName;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
@@ -17,9 +15,16 @@ public class ItemBaseSO : ScriptableObject
     public enum TypeObject
     {
         None = 0,
-        Weapon = 1,
-        Item = 2,
-        Consumable = 3
+        Helmet = 1,
+        Front = 2,
+        Pants = 3,
+        Boots = 4,
+        Gloves = 5,
+        Pendant = 6,
+        Ring = 7,
+        Weapon = 8,
+        Utility = 9,
+        Item = 10,
     }
     public enum TypeWeapon
     {
