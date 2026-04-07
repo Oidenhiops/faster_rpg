@@ -1,3 +1,6 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "EquipableItem", menuName = "ScriptableObjects/Items/EquipableItem", order = 1)]
 public class EquipableItemSO : ItemBaseSO
 {
     public override void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem)

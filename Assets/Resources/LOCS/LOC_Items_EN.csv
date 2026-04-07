@@ -1,0 +1,12 @@
+﻿ID;Text;Description;
+1;Stamina potion;Recover {0}% of max stamina;
+2;Mana potion;Recover {0}% of max mana;
+3;Heal potion;Heals {0}% of max life;
+4;Simple boot;An old boots;
+5;Simple front;An old front;
+6;Simple gloves;An old gloves;
+7;Simple helmet;An old helmet;
+8;Simple pants;An old pants;
+9;Simple pendient;An old pendient;
+10;Simple ring;An old ring;
+11;Simple shield;An old shield;

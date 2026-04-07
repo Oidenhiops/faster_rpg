@@ -12,9 +12,9 @@ public class ItemsDBSO : ScriptableObject
     {
         for (int i = 0; i < itemsToAdd.Length; i++)
         {
-            data[ItemBaseSO.TypeObject.None].Add(itemsToAdd[i].id, itemsToAdd[i]);
             data[itemsToAdd[i].typeObject].Add(itemsToAdd[i].id, itemsToAdd[i]);
         }
+        itemsToAdd = new ItemBaseSO[0];
     }
     [NaughtyAttributes.Button]
     public void SortItems()
@@ -26,5 +26,19 @@ public class ItemsDBSO : ScriptableObject
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
             );
         }
+    }
+    public CharacterData.CharacterItem GenerateItem(ItemBaseSO.TypeObject typeObject, int id)
+    {
+        if (data.ContainsKey(typeObject) && data[typeObject].ContainsKey(id))
+        {
+            return new CharacterData.CharacterItem
+            {
+                itemId = data[typeObject][id].id,
+                itemBaseSO = data[typeObject][id],
+                itemStatistics = data[typeObject][id].itemStatistics
+            };
+        }
+        Debug.LogError($"Item with TypeObject: {typeObject} and ID: {id} not found in ItemsDBSO.");
+        return null;
     }
 }

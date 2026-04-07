@@ -7,13 +7,12 @@ using UnityEngine.UI;
 
 public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public CharacterPlayerHud characterPlayerHud;
     public Image itemImage;
     public TypeInventorySlot typeInventorySlot;
-    public RectTransform descriptionTextTransform;
-    public RectTransform descriptionTextBannerTransform;
     public bool showingText;
+    public bool isUsingSlot;
     public int test;
-    public AnchorPreset currentPreset;
     public Dictionary<AnchorPreset, (Vector2 min, Vector2 max)> anchorPresets = new Dictionary<AnchorPreset, (Vector2, Vector2)>()
     {
         { AnchorPreset.TopLeft, (new Vector2(0, 1), new Vector2(0, 1)) },
@@ -40,13 +39,26 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     };
     public void InitializeSlot(CharacterData.CharacterItem item)
     {
-        if (item.itemBaseSO?.icon) itemImage.sprite = item.itemBaseSO.icon;
-        else itemImage.enabled = false;
+        if (item.itemBaseSO?.icon)
+        {
+            itemImage.sprite = item.itemBaseSO.icon;
+            itemImage.enabled = true;
+            isUsingSlot = true;
+        }
+        else
+        {
+            itemImage.sprite = null;
+            itemImage.enabled = false;
+            isUsingSlot = false;
+        }
     }
     #region Adjusting description text position
     void FixedUpdate()
     {
-        AdjustDescriptionContent();
+        if (isUsingSlot)
+        {
+            AdjustDescriptionContent();
+        }
     }
     public void AdjustDescriptionContent()
     {
@@ -54,24 +66,15 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         if (test == 0)
         {
-            if (currentPreset != AnchorPreset.MiddleLeft)
-            {
-                currentPreset = AnchorPreset.MiddleLeft;
-
-                SetAnchorPreset(descriptionTextTransform, AnchorPreset.MiddleLeft);
-                SetAnchorPreset(descriptionTextBannerTransform, AnchorPreset.MiddleRight);
-            }
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.MiddleRight);
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextTransform, AnchorPreset.MiddleLeft);
         }
         else if (test == 1)
         {
-            if (currentPreset != AnchorPreset.MiddleRight)
-            {
-                currentPreset = AnchorPreset.MiddleRight;
-
-                SetAnchorPreset(descriptionTextTransform, AnchorPreset.MiddleRight);
-                SetAnchorPreset(descriptionTextBannerTransform, AnchorPreset.MiddleLeft);
-            }
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextTransform, AnchorPreset.MiddleRight);
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.MiddleLeft);
         }
+        characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.gameObject.SetActive(true);
     }
     public void SetAnchorPreset(RectTransform rect, AnchorPreset preset)
     {
@@ -97,16 +100,28 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     #endregion
     public void OnPointerEnter(PointerEventData eventData)
     {
-        StartCoroutine(WaitForShowText());
-    }
-    public IEnumerator WaitForShowText()
-    {
-        yield return new WaitForSeconds(0.5f);
-        showingText = true;
+        if (isUsingSlot)
+        {
+            EnableSlot();
+        }
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        if (isUsingSlot)
+        {
+            DisableSlot();
+        }
+    }
+    void EnableSlot()
+    {
+        showingText = true;
+        characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.SetParent(transform);
+        characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.localPosition = Vector2.zero;
+    }
+    void DisableSlot()
+    {
+        showingText = false;
+        characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.gameObject.SetActive(false);
     }
     public enum TypeInventorySlot
     {

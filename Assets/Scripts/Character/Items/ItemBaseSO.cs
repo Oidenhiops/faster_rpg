@@ -24,7 +24,7 @@ public class ItemBaseSO : ScriptableObject
         Ring = 7,
         Weapon = 8,
         Utility = 9,
-        Item = 10,
+        Consumable = 10,
     }
     public enum TypeWeapon
     {

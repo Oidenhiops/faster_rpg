@@ -51,7 +51,7 @@ public class CharacterPlayer : CharacterBase
                     characterPlayerHud.characterUI.characterPortraits[i].portraitObject.SetActive(false);
                 }
             }
-            await characterPlayerHud.RefreshCharacterInventory();
+            await characterPlayerHud.InitializeInventory();
             await InitializeAnimations();
             isInitialize = true;
         }

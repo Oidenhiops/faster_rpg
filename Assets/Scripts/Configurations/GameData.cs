@@ -10,7 +10,7 @@ public class GameData : MonoBehaviour
     public GameDataInfo gameDataInfo = new GameDataInfo();
     public SystemDataInfo systemDataInfo = new SystemDataInfo();
     public List<ResolutionsInfo> allResolutions = new List<ResolutionsInfo>();
-    public Dictionary<TypeLOCS, Dictionary<string, string[]>> locs = new Dictionary<TypeLOCS, Dictionary<string, string[]>>();
+    public Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, string[]>>> locs = new Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, string[]>>>();
     public CharactersDBSO charactersDBSO;
     public CharactersSkinDBSO charactersSkinDBSO;
     public ItemsDBSO itemsDBSO;
@@ -150,42 +150,42 @@ public class GameData : MonoBehaviour
     {
         try
         {
-            TextAsset locsSystem = Resources.Load<TextAsset>("LOCS/LOC_System");
-            locs.Add(TypeLOCS.System, TransformCSV(locsSystem));
+            TextAsset locsSystemEN = Resources.Load<TextAsset>("LOCS/LOC_System_EN");
+            locs.Add(TypeLOCS.System, TransformCSV(TypeLanguage.English,locsSystemEN));
         }
         catch
         {
-            Debug.LogError("No se encontro el archivo LOC_System");
+            Debug.LogError("No se encontro el archivo LOC_System_EN");
         }
         try
         {
-            TextAsset locsItems = Resources.Load<TextAsset>("LOCS/LOC_Items");
-            locs.Add(TypeLOCS.Items, TransformCSV(locsItems));
+            TextAsset locsItems = Resources.Load<TextAsset>("LOCS/LOC_Items_EN");
+            locs.Add(TypeLOCS.Items, TransformCSV(TypeLanguage.English, locsItems));
         }
         catch
         {
-            Debug.LogError("No se encontro el archivo LOC_Items");
+            Debug.LogError("No se encontro el archivo LOC_Items_EN");
         }
         try
         {
-            TextAsset locsSkills = Resources.Load<TextAsset>("LOCS/LOC_Skills");
-            locs.Add(TypeLOCS.Skills, TransformCSV(locsSkills));
+            TextAsset locsSkills = Resources.Load<TextAsset>("LOCS/LOC_Skills_EN");
+            locs.Add(TypeLOCS.Skills, TransformCSV(TypeLanguage.English, locsSkills));
         }
         catch
         {
-            Debug.LogError("No se encontro el archivo LOC_Skills");
+            Debug.LogError("No se encontro el archivo LOC_Skills_EN");
         }
         try
         {
-            TextAsset locsDialogs = Resources.Load<TextAsset>("LOCS/LOC_Dialogs");
-            locs.Add(TypeLOCS.Dialogs, TransformCSV(locsDialogs));
+            TextAsset locsDialogs = Resources.Load<TextAsset>("LOCS/LOC_Dialogs_EN");
+            locs.Add(TypeLOCS.Dialogs, TransformCSV(TypeLanguage.English, locsDialogs));
         }
         catch
         {
-            Debug.LogError("No se encontro el archivo LOC_Dialogs");
+            Debug.LogError("No se encontro el archivo LOC_Dialogs_EN");
         }
     }
-    Dictionary<string, string[]> TransformCSV(TextAsset textAsset)
+    Dictionary<TypeLanguage, Dictionary<string, string[]>> TransformCSV(TypeLanguage language, TextAsset textAsset)
     {
         string[] lines = textAsset.text.Split('\n');
         List<string[]> textData = new List<string[]>();
@@ -194,21 +194,24 @@ public class GameData : MonoBehaviour
             string[] columns = line.Split(';');
             textData.Add(columns);
         }
-        Dictionary<string, string[]> data = new Dictionary<string, string[]>();
+        Dictionary<TypeLanguage, Dictionary<string, string[]>> data = new Dictionary<TypeLanguage, Dictionary<string, string[]>>
+        {
+            { language, new Dictionary<string, string[]>() }
+        };
         foreach (string[] text in textData)
         {
-            data.Add(text[0], text);
+            data[language].Add(text[0], text);
         }
         return data;
     }
     public DialogData GetDialog(string id, TypeLOCS typeLOCS)
     {
-        if (locs.TryGetValue(typeLOCS, out Dictionary<string, string[]> dialogs) && dialogs.ContainsKey(id))
+        if (locs.TryGetValue(typeLOCS, out Dictionary<TypeLanguage, Dictionary<string, string[]>> dialogs) && dialogs[systemDataInfo.configurationsInfo.currentLanguage].ContainsKey(id))
         {
             int languageIndex = 0;
-            for (int i = 0; i < dialogs["ID"].Length; i++)
+            for (int i = 0; i < dialogs[systemDataInfo.configurationsInfo.currentLanguage]["ID"].Length; i++)
             {
-                if (dialogs["ID"][i] == systemDataInfo.configurationsInfo.currentLanguage.ToString())
+                if (dialogs[systemDataInfo.configurationsInfo.currentLanguage]["ID"][i] == systemDataInfo.configurationsInfo.currentLanguage.ToString())
                 {
                     languageIndex = i;
                     break;
@@ -216,8 +219,8 @@ public class GameData : MonoBehaviour
             }
             return new DialogData
             {
-                description = dialogs[id][languageIndex + 1],
-                dialog = dialogs[id][languageIndex]
+                description = dialogs[systemDataInfo.configurationsInfo.currentLanguage][id][languageIndex + 1],
+                dialog = dialogs[systemDataInfo.configurationsInfo.currentLanguage][id][languageIndex]
             };
         }
         return new DialogData
@@ -306,6 +309,9 @@ public class GameData : MonoBehaviour
         };
         SerializedDictionary<int, CharacterData.CharacterItem> bag = new SerializedDictionary<int, CharacterData.CharacterItem>();
         for (int i = 0; i < 10; i++) bag.Add(i, new CharacterData.CharacterItem());
+        bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 0);
+        bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1);
+        bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2);
         return new GameDataSlot
         {
             isUse = true,
@@ -321,6 +327,24 @@ public class GameData : MonoBehaviour
                         characterId = 0,
                         characterSkinId = 0,
                         bag = bag,
+                        items = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterData.CharacterItem>()
+                        {
+                            { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 0) },
+                            { ItemBaseSO.TypeObject.Front, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Front, 0) },
+                            { ItemBaseSO.TypeObject.Gloves, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Gloves, 0) },
+                            { ItemBaseSO.TypeObject.Helmet, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Helmet, 0) },
+                            { ItemBaseSO.TypeObject.Pants, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pants, 0) },
+                            { ItemBaseSO.TypeObject.Pendant, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pendant, 0) },
+                            { ItemBaseSO.TypeObject.Ring, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Ring, 0) },
+                            { ItemBaseSO.TypeObject.Utility, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Utility, 0) },
+                            { ItemBaseSO.TypeObject.Weapon, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 0) },
+                        },
+                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        {
+                            { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 0) },
+                            { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1) },
+                            { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2) },
+                        },
                         statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
                         {
                             { CharacterData.TypeStatistic.Hp, new CharacterData.Statistic() { baseValue = 100, aptitudeValue = 100 } },
@@ -356,7 +380,13 @@ public class GameData : MonoBehaviour
                             { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        }
+                        },
+                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        {
+                            { 0, new CharacterData.CharacterItem() },
+                            { 1, new CharacterData.CharacterItem() },
+                            { 2, new CharacterData.CharacterItem() },
+                        },
                     }
                 },
                 { randomNames[2], new CharacterData()
@@ -378,7 +408,13 @@ public class GameData : MonoBehaviour
                             { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        }
+                        },
+                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        {
+                            { 0, new CharacterData.CharacterItem() },
+                            { 1, new CharacterData.CharacterItem() },
+                            { 2, new CharacterData.CharacterItem() },
+                        },
                     }
                 },
                 { randomNames[3], new CharacterData()
@@ -400,7 +436,13 @@ public class GameData : MonoBehaviour
                             { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        }
+                        },
+                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        {
+                            { 0, new CharacterData.CharacterItem() },
+                            { 1, new CharacterData.CharacterItem() },
+                            { 2, new CharacterData.CharacterItem() },
+                        },
                     }
                 },
             }

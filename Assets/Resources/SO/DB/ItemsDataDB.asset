@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94c84434195a11a4c8c73d820cb79da0, type: 3}
+  m_Name: ItemsDataDB
+  m_EditorClassIdentifier: Assembly-CSharp::ItemsDBSO
+  data:
+    _serializedList:
+    - Key: 1
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: 1c9e59ed573ff624aa85269b9fe76a88, type: 2}
+    - Key: 2
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: 99949dac959f56c4b8d65db1cf7eb8f4, type: 2}
+    - Key: 3
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: 138887797a717e84fa9d3fb29a367323, type: 2}
+    - Key: 4
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: 351f4dd1a6707e8469352f6866727939, type: 2}
+    - Key: 5
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: e8fbf84e4c1858448aae21813a2c79cc, type: 2}
+    - Key: 6
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: 8df7251d560e4ca448836abcffb6a267, type: 2}
+    - Key: 7
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: a6054177be09c024cb7f304d8431d9d3, type: 2}
+    - Key: 8
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: f70cace27b6db4848850d8592cdea39a, type: 2}
+    - Key: 9
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: 4e9a7e2a91004c84c8bbf0f404cd04cd, type: 2}
+    - Key: 10
+      Value:
+        _serializedList:
+        - Key: 0
+          Value: {fileID: 11400000, guid: e1bd4fd8031bbcc47a02f16d2676d50c, type: 2}
+        - Key: 1
+          Value: {fileID: 11400000, guid: 7fbdfc9e986326a44aaebfb8d8a16910, type: 2}
+        - Key: 2
+          Value: {fileID: 11400000, guid: d4967a33d065c9f4598efcba3147a9d9, type: 2}
+  itemsToAdd: []

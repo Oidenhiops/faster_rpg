@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4654136877274413278
 CanvasRenderer:
@@ -134,8 +134,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2165fd5b4f25db44826ca327d13efc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
+  characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 5866423273924199184}
-  typeInventorySlot: 11
+  typeInventorySlot: 14
+  showingText: 0
+  isUsingSlot: 0
+  test: 0
+  currentPreset: 0
 --- !u!1 &4481361992163376204
 GameObject:
   m_ObjectHideFlags: 0

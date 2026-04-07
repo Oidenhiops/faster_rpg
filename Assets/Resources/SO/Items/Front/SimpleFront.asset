@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 277fea691be463341a7f71a22c600ae9, type: 3}
+  m_Name: SimpleFront
+  m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
+  id: 0
+  idText: 5
+  icon: {fileID: 274081581, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
+  typeObject: 2
+  typeWeapon: 0
+  animationName: 
+  itemStatistics:
+    _serializedList: []
