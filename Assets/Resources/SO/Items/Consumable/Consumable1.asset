@@ -12,11 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 277fea691be463341a7f71a22c600ae9, type: 3}
   m_Name: Consumable1
   m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
-  id: 0
+  id: 1
   idText: 1
   icon: {fileID: 1544862734, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 10
   typeWeapon: 0
   animationName: 
   itemStatistics:
-    _serializedList: []
+    _serializedList:
+    - Key: 1
+      Value:
+        baseValue: 0
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 10
+    - Key: 2
+      Value:
+        baseValue: 0
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 5

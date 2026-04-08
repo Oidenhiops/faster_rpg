@@ -34,6 +34,7 @@ public class ItemsDBSO : ScriptableObject
             return new CharacterData.CharacterItem
             {
                 itemId = data[typeObject][id].id,
+                typeObject = typeObject,
                 itemBaseSO = data[typeObject][id],
                 itemStatistics = data[typeObject][id].itemStatistics
             };

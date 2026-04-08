@@ -35,10 +35,7 @@ public class CharacterPlayer : CharacterBase
                 }
             }
             charactersData = charactersDataList.ToArray();
-            foreach (CharactersData character in charactersData)
-            {
-                character.characterData.InitializeStatistics();
-            }
+            await InitializeStatistics();
             for (int i = 0; i < 4; i++)
             {
                 if (i <= charactersData.Length - 1)
@@ -62,7 +59,7 @@ public class CharacterPlayer : CharacterBase
     }
     void OnHandleChangeCharacter(InputAction.CallbackContext context)
     {
-        if (!isChangingCharacter &&charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
+        if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
         {
             isChangingCharacter = true;
             characterIndex = (int)context.ReadValue<float>();
@@ -79,5 +76,19 @@ public class CharacterPlayer : CharacterBase
     {
         await characterPlayerHud.ChangeCharacterPortrait();
         isChangingCharacter = false;
+    }
+    async Awaitable InitializeStatistics()
+    {
+        foreach (CharactersData character in charactersData)
+        {
+            character.characterData.InitializeStatistics();
+        }
+    }
+    async Awaitable InitializeItems()
+    {
+        foreach (CharactersData character in charactersData)
+        {
+            character.characterData.InitializeItems();
+        }
     }
 }

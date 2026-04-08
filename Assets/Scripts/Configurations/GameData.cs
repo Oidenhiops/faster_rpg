@@ -10,7 +10,7 @@ public class GameData : MonoBehaviour
     public GameDataInfo gameDataInfo = new GameDataInfo();
     public SystemDataInfo systemDataInfo = new SystemDataInfo();
     public List<ResolutionsInfo> allResolutions = new List<ResolutionsInfo>();
-    public Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, string[]>>> locs = new Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, string[]>>>();
+    public Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>> locs = new Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>>();
     public CharactersDBSO charactersDBSO;
     public CharactersSkinDBSO charactersSkinDBSO;
     public ItemsDBSO itemsDBSO;
@@ -92,7 +92,7 @@ public class GameData : MonoBehaviour
                 {
                     if (item.Value.itemId != 0)
                     {
-                        item.Value.itemBaseSO = itemsDBSO.data[ItemBaseSO.TypeObject.None][item.Value.itemId];
+                        item.Value.itemBaseSO = itemsDBSO.data[item.Value.typeObject][item.Value.itemId];
                     }
                 }
             }
@@ -185,42 +185,34 @@ public class GameData : MonoBehaviour
             Debug.LogError("No se encontro el archivo LOC_Dialogs_EN");
         }
     }
-    Dictionary<TypeLanguage, Dictionary<string, string[]>> TransformCSV(TypeLanguage language, TextAsset textAsset)
+    Dictionary<TypeLanguage, Dictionary<string, DialogData>> TransformCSV(TypeLanguage language, TextAsset textAsset)
     {
         string[] lines = textAsset.text.Split('\n');
         List<string[]> textData = new List<string[]>();
         foreach (string line in lines)
         {
-            string[] columns = line.Split(';');
-            textData.Add(columns);
+            List<string> columns = new List<string>(line.Split(';'));
+            columns.RemoveAt(columns.Count - 1);
+            textData.Add(columns.ToArray());
         }
-        Dictionary<TypeLanguage, Dictionary<string, string[]>> data = new Dictionary<TypeLanguage, Dictionary<string, string[]>>
+        Dictionary<TypeLanguage, Dictionary<string, DialogData>> data = new Dictionary<TypeLanguage, Dictionary<string, DialogData>>
         {
-            { language, new Dictionary<string, string[]>() }
+            { language, new Dictionary<string, DialogData>() }
         };
         foreach (string[] text in textData)
         {
-            data[language].Add(text[0], text);
+            data[language].Add(text[0], new DialogData { dialog = text[1], description = text[2] });
         }
         return data;
     }
     public DialogData GetDialog(string id, TypeLOCS typeLOCS)
     {
-        if (locs.TryGetValue(typeLOCS, out Dictionary<TypeLanguage, Dictionary<string, string[]>> dialogs) && dialogs[systemDataInfo.configurationsInfo.currentLanguage].ContainsKey(id))
+        if (locs.ContainsKey(typeLOCS) && locs[typeLOCS].ContainsKey(systemDataInfo.configurationsInfo.currentLanguage) && locs[typeLOCS][systemDataInfo.configurationsInfo.currentLanguage].ContainsKey(id))
         {
-            int languageIndex = 0;
-            for (int i = 0; i < dialogs[systemDataInfo.configurationsInfo.currentLanguage]["ID"].Length; i++)
-            {
-                if (dialogs[systemDataInfo.configurationsInfo.currentLanguage]["ID"][i] == systemDataInfo.configurationsInfo.currentLanguage.ToString())
-                {
-                    languageIndex = i;
-                    break;
-                }
-            }
             return new DialogData
             {
-                description = dialogs[systemDataInfo.configurationsInfo.currentLanguage][id][languageIndex + 1],
-                dialog = dialogs[systemDataInfo.configurationsInfo.currentLanguage][id][languageIndex]
+                dialog = locs[typeLOCS][systemDataInfo.configurationsInfo.currentLanguage][id].dialog,
+                description = locs[typeLOCS][systemDataInfo.configurationsInfo.currentLanguage][id].description
             };
         }
         return new DialogData
@@ -309,9 +301,9 @@ public class GameData : MonoBehaviour
         };
         SerializedDictionary<int, CharacterData.CharacterItem> bag = new SerializedDictionary<int, CharacterData.CharacterItem>();
         for (int i = 0; i < 10; i++) bag.Add(i, new CharacterData.CharacterItem());
-        bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 0);
-        bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1);
-        bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2);
+        bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1);
+        bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2);
+        bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3);
         return new GameDataSlot
         {
             isUse = true,
@@ -329,21 +321,21 @@ public class GameData : MonoBehaviour
                         bag = bag,
                         items = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterData.CharacterItem>()
                         {
-                            { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 0) },
-                            { ItemBaseSO.TypeObject.Front, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Front, 0) },
-                            { ItemBaseSO.TypeObject.Gloves, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Gloves, 0) },
-                            { ItemBaseSO.TypeObject.Helmet, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Helmet, 0) },
-                            { ItemBaseSO.TypeObject.Pants, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pants, 0) },
-                            { ItemBaseSO.TypeObject.Pendant, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pendant, 0) },
-                            { ItemBaseSO.TypeObject.Ring, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Ring, 0) },
-                            { ItemBaseSO.TypeObject.Utility, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Utility, 0) },
-                            { ItemBaseSO.TypeObject.Weapon, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 0) },
+                            { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 1) },
+                            { ItemBaseSO.TypeObject.Front, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Front, 1) },
+                            { ItemBaseSO.TypeObject.Gloves, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Gloves, 1) },
+                            { ItemBaseSO.TypeObject.Helmet, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Helmet, 1) },
+                            { ItemBaseSO.TypeObject.Pants, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pants, 1) },
+                            { ItemBaseSO.TypeObject.Pendant, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pendant, 1) },
+                            { ItemBaseSO.TypeObject.Ring, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Ring, 1) },
+                            { ItemBaseSO.TypeObject.Utility, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Utility, 1) },
+                            { ItemBaseSO.TypeObject.Weapon, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 1) },
                         },
                         consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
-                            { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 0) },
-                            { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1) },
-                            { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2) },
+                            { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1) },
+                            { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2) },
+                            { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3) },
                         },
                         statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
                         {
@@ -616,8 +608,8 @@ public class GameData : MonoBehaviour
     }
     public class DialogData
     {
-        public string description;
         public string dialog;
+        public string description;
     }
     public enum TypeLanguage
     {

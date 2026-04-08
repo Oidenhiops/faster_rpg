@@ -10,6 +10,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public CharacterPlayerHud characterPlayerHud;
     public Image itemImage;
     public TypeInventorySlot typeInventorySlot;
+    public CharacterData.CharacterItem characterItem;
     public bool showingText;
     public bool isUsingSlot;
     public int test;
@@ -66,15 +67,14 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         if (test == 0)
         {
-            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.MiddleRight);
-            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextTransform, AnchorPreset.MiddleLeft);
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.TopRight);
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextTransform, AnchorPreset.TopLeft);
         }
         else if (test == 1)
         {
-            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextTransform, AnchorPreset.MiddleRight);
-            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.MiddleLeft);
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextTransform, AnchorPreset.TopRight);
+            SetAnchorPreset(characterPlayerHud.characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.TopLeft);
         }
-        characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.gameObject.SetActive(true);
     }
     public void SetAnchorPreset(RectTransform rect, AnchorPreset preset)
     {
@@ -102,7 +102,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (isUsingSlot)
         {
-            EnableSlot();
+            _ = EnableSlot();
         }
     }
     public void OnPointerExit(PointerEventData eventData)
@@ -112,16 +112,20 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             DisableSlot();
         }
     }
-    void EnableSlot()
+    async Awaitable EnableSlot()
     {
-        showingText = true;
+        characterPlayerHud.SetDescripitionData(characterItem.itemBaseSO);
         characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.SetParent(transform);
         characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.localPosition = Vector2.zero;
+        showingText = true;
+        await Awaitable.NextFrameAsync();
+        characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 1;
     }
+
     void DisableSlot()
     {
         showingText = false;
-        characterPlayerHud.characterUI.itemDescription.descriptionTextTransform.gameObject.SetActive(false);
+        characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
     }
     public enum TypeInventorySlot
     {

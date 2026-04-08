@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using AYellowpaper.SerializedCollections;
 using TMPro;
 using UnityEngine;
@@ -71,16 +73,19 @@ public class CharacterPlayerHud : MonoBehaviour
             {
                 InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
                 bagSlotPrefab.characterPlayerHud = this;
+                bagSlotPrefab.characterItem = bagSlot.Value;
                 bagSlotPrefab.InitializeSlot(bagSlot.Value);
                 characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
                 index++;
             }
             foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.items)
             {
+                characterUI.items[item.Key].characterItem = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items[item.Key];
                 characterUI.items[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items[item.Key]);
             }
             foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
             {
+                characterUI.consumables[consumable.Key].characterItem = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[consumable.Key];
                 characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[consumable.Key]);
             }
             await Awaitable.NextFrameAsync();
@@ -93,13 +98,28 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     void ResetDescription()
     {
-        characterUI.itemDescription.descriptionTextTransform.gameObject.SetActive(false);
-        characterUI.itemDescription.descriptionTextTransform.SetParent(characterUI.itemDescription.descriptionContainer);
+        characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
+        characterUI.itemDescription.descriptionTextTransform.SetParent(characterUI.itemDescription.panelToResetSelect);
         characterUI.itemDescription.descriptionTextTransform.localPosition = Vector2.zero;
     }
     public async Awaitable ToggleCharacterInventory()
     {
         characterInventoryAnim.SetBool("isOpen", !characterInventoryAnim.GetBool("isOpen"));
+    }
+    public void SetDescripitionData(ItemBaseSO itemBaseSO)
+    {
+        characterUI.itemDescription.itemIcon.sprite = itemBaseSO.icon;
+        characterUI.itemDescription.itemName.text = GameData.Instance.GetDialog(itemBaseSO.idText, GameData.TypeLOCS.Items).dialog;
+        string description = GameData.Instance.GetDialog(itemBaseSO.idText, GameData.TypeLOCS.Items).description;
+        if (Regex.IsMatch(description, @"\{\d+\}"))
+        {
+            List<CharacterData.Statistic> itemStats = itemBaseSO.itemStatistics.Values.ToList();
+            for (int i = 0; i < itemStats.Count; i++)
+            {
+                description = description.Replace($"{{{i}}}", itemStats[i].maxValue.ToString());
+            }
+        }
+        characterUI.itemDescription.itemDescription.text = description;
     }
     [Serializable]
     public class CharacterUI
@@ -114,9 +134,13 @@ public class CharacterPlayerHud : MonoBehaviour
     [Serializable]
     public class ItemDescription
     {
+        public CanvasGroup descriptionCanvasGroup;
         public RectTransform descriptionTextTransform;
         public RectTransform descriptionTextBannerTransform;
-        public RectTransform descriptionContainer;
+        public Image itemIcon;
+        public TMP_Text itemName;
+        public TMP_Text itemDescription;
+        public RectTransform panelToResetSelect;
     }
     [Serializable]
     public class CharacterPortrait

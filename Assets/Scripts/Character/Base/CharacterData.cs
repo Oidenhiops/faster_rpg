@@ -34,6 +34,16 @@ public class CharacterData
             statistic.Value.SetMaxValue();
         }
     }
+    public void InitializeItems()
+    {
+        foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterItem> item in items)
+        {
+            if (item.Value.itemId != 0)
+            {
+                item.Value.itemBaseSO = GameData.Instance.itemsDBSO.data[item.Value.typeObject][item.Value.itemId];
+            }
+        }
+    }
     public void LevelUp()
     {
         level++;
@@ -90,6 +100,7 @@ public class CharacterData
     public class CharacterItem
     {
         public int itemId;
+        public ItemBaseSO.TypeObject typeObject;
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
     }

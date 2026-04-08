@@ -1,7 +1,6 @@
-﻿ID;Text;Description;
-1;Stamina potion;Recover {0}% of max stamina;
-2;Mana potion;Recover {0}% of max mana;
-3;Heal potion;Heals {0}% of max life;
+﻿1;General potion;Recover {0}% of max life and {1}% of max mana;
+2;Heal potion;Heals {0}% of max life;
+3;Mana potion;Recover {0}% of max mana;
 4;Simple boot;An old boots;
 5;Simple front;An old front;
 6;Simple gloves;An old gloves;
