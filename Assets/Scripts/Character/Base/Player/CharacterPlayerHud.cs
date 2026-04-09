@@ -12,6 +12,19 @@ public class CharacterPlayerHud : MonoBehaviour
     public CharacterPlayer characterPlayer;
     public CharacterUI characterUI;
     public Animator characterInventoryAnim;
+    public async Awaitable InitializeInventory()
+    {
+        foreach (var item in characterUI.items)
+        {
+            item.Value.characterPlayerHud = this;
+        }
+        foreach (var consumable in characterUI.consumables)
+        {
+            consumable.Value.characterPlayerHud = this;
+        }
+        SelectFastItem();
+        await RefreshCharacterInventory();
+    }
     public async Awaitable ChangeCharacterPortrait()
     {
         try
@@ -45,18 +58,6 @@ public class CharacterPlayerHud : MonoBehaviour
             Debug.LogError($"Error changing character portrait: {ex.Message}");
         }
     }
-    public async Awaitable InitializeInventory()
-    {
-        foreach (var item in characterUI.items)
-        {
-            item.Value.characterPlayerHud = this;
-        }
-        foreach (var consumable in characterUI.consumables)
-        {
-            consumable.Value.characterPlayerHud = this;
-        }
-        await RefreshCharacterInventory();
-    }
     public async Awaitable RefreshCharacterInventory()
     {
         try
@@ -88,12 +89,48 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.consumables[consumable.Key].characterItem = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[consumable.Key];
                 characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[consumable.Key]);
             }
+            UpdateFastItems();
             await Awaitable.NextFrameAsync();
             characterUI.panelToResetSelect.gameObject.SetActive(false);
         }
         catch (Exception e)
         {
             Debug.LogError(e);
+        }
+    }
+    void UpdateFastItems()
+    {
+        foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
+        {
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].itemBaseSO != null)
+            {
+                characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 1;
+                characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = true;
+                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].itemBaseSO.icon;
+                characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
+                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].amount.ToString() : "";
+            }
+            else
+            {
+                characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = false;
+                characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 0.5f;
+                characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = false;
+                characterUI.fastItems[fastItem.Key].fastItemAmount.text = "";
+            }
+        }
+    }
+    public void SelectFastItem()
+    {
+        foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
+        {
+            if (fastItem.Key == characterPlayer.currentFastItemIndex)
+            {
+                characterUI.fastItems[fastItem.Key].fastItemBg.color = Color.yellow;
+            }
+            else
+            {
+                characterUI.fastItems[fastItem.Key].fastItemBg.color = Color.white;
+            }
         }
     }
     void ResetDescription()
@@ -105,6 +142,10 @@ public class CharacterPlayerHud : MonoBehaviour
     public async Awaitable ToggleCharacterInventory()
     {
         characterInventoryAnim.SetBool("isOpen", !characterInventoryAnim.GetBool("isOpen"));
+        if (!characterInventoryAnim.GetBool("isOpen"))
+        {
+            UpdateFastItems();
+        }
     }
     public void SetDescripitionData(ItemBaseSO itemBaseSO)
     {
@@ -128,8 +169,17 @@ public class CharacterPlayerHud : MonoBehaviour
         public CharacterBag characterBag;
         public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> items = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
+        public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public ItemDescription itemDescription;
         public Transform panelToResetSelect;
+    }
+    [Serializable]
+    public class FastItem
+    {
+        public CanvasGroup fastItemCanvasGroup;
+        public Image fastItemBg;
+        public Image fastItemIcon;
+        public TMP_Text fastItemAmount;
     }
     [Serializable]
     public class ItemDescription
@@ -146,6 +196,7 @@ public class CharacterPlayerHud : MonoBehaviour
     public class CharacterPortrait
     {
         public GameObject portraitObject;
+        public Image characterBg;
         public Image characterSprite;
         public Image characterCounter;
         public TMP_Text characterCounterText;

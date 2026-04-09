@@ -1,6 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using AYellowpaper.SerializedCollections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,6 +8,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 {
     public CharacterPlayerHud characterPlayerHud;
     public Image itemImage;
+    public TMP_Text itemAmount;
     public TypeInventorySlot typeInventorySlot;
     public CharacterData.CharacterItem characterItem;
     public bool showingText;
@@ -45,12 +45,16 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             itemImage.sprite = item.itemBaseSO.icon;
             itemImage.enabled = true;
             isUsingSlot = true;
+            itemAmount.enabled = true;
+            itemAmount.text = item.amount > 1 ? item.amount.ToString() : "";
         }
         else
         {
             itemImage.sprite = null;
             itemImage.enabled = false;
             isUsingSlot = false;
+            itemAmount.enabled = false;
+            itemAmount.text = "";
         }
     }
     #region Adjusting description text position

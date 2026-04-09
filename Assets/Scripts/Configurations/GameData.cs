@@ -301,9 +301,9 @@ public class GameData : MonoBehaviour
         };
         SerializedDictionary<int, CharacterData.CharacterItem> bag = new SerializedDictionary<int, CharacterData.CharacterItem>();
         for (int i = 0; i < 10; i++) bag.Add(i, new CharacterData.CharacterItem());
-        bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1);
-        bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2);
-        bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3);
+        bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 1);
+        bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
+        bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 3);
         return new GameDataSlot
         {
             isUse = true,
@@ -333,9 +333,9 @@ public class GameData : MonoBehaviour
                         },
                         consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
-                            { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1) },
-                            { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2) },
-                            { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3) },
+                            { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3) },
+                            { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2) },
+                            { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
                         },
                         statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
                         {

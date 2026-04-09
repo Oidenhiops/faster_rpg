@@ -9,6 +9,7 @@ public class CharacterBase : MonoBehaviour
     public CharacterModel characterModel;
     public CharactersData[] charactersData;
     public int characterIndex;
+    public int currentFastItemIndex;
     public Vector3Int directionAnimation = new Vector3Int();
     [NonSerialized] public Vector3 characterScale;
     public GameObject floatingTextPrefab;

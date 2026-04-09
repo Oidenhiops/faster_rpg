@@ -27,7 +27,7 @@ public class ItemsDBSO : ScriptableObject
             );
         }
     }
-    public CharacterData.CharacterItem GenerateItem(ItemBaseSO.TypeObject typeObject, int id)
+    public CharacterData.CharacterItem GenerateItem(ItemBaseSO.TypeObject typeObject, int id, int amountItems = 1)
     {
         if (data.ContainsKey(typeObject) && data[typeObject].ContainsKey(id))
         {
@@ -36,7 +36,8 @@ public class ItemsDBSO : ScriptableObject
                 itemId = data[typeObject][id].id,
                 typeObject = typeObject,
                 itemBaseSO = data[typeObject][id],
-                itemStatistics = data[typeObject][id].itemStatistics
+                itemStatistics = data[typeObject][id].itemStatistics,
+                amount = amountItems
             };
         }
         Debug.LogError($"Item with TypeObject: {typeObject} and ID: {id} not found in ItemsDBSO.");

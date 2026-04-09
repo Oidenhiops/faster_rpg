@@ -103,6 +103,7 @@ public class CharacterData
         public ItemBaseSO.TypeObject typeObject;
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
+        public int amount;
     }
     [Serializable]
     public class CharacterMasteryInfo

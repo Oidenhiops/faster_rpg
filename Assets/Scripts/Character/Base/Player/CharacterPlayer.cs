@@ -13,6 +13,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Enable();
         inputActions.Player.ChangeCharacter.performed += OnHandleChangeCharacter;
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
+        inputActions.Player.ChangeItem.performed += OnHandleChangeItem;
     }
     public async override Awaitable InitializeCharacter()
     {
@@ -48,6 +49,7 @@ public class CharacterPlayer : CharacterBase
                     characterPlayerHud.characterUI.characterPortraits[i].portraitObject.SetActive(false);
                 }
             }
+            characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
             await characterPlayerHud.InitializeInventory();
             await InitializeAnimations();
             isInitialize = true;
@@ -62,7 +64,9 @@ public class CharacterPlayer : CharacterBase
         if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
         {
             isChangingCharacter = true;
+            characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.white;
             characterIndex = (int)context.ReadValue<float>();
+            characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
             _ = InitializeAnimations();
             _ = ChangeCharacterAction();
             _ = characterPlayerHud.RefreshCharacterInventory();
@@ -71,6 +75,13 @@ public class CharacterPlayer : CharacterBase
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {
         _ = characterPlayerHud.ToggleCharacterInventory();
+    }
+    void OnHandleChangeItem(InputAction.CallbackContext context)
+    {
+        currentFastItemIndex += (int)context.ReadValue<float>();
+        if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
+        else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
+        characterPlayerHud.SelectFastItem();
     }
     async Awaitable ChangeCharacterAction()
     {
