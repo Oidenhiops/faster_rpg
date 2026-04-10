@@ -6,12 +6,19 @@ public class ItemBaseSO : ScriptableObject
     public int id;
     public string idText;
     public Sprite icon;
+    public GeneralTypeObject generalTypeObject;
     public TypeObject typeObject;
     public TypeWeapon typeWeapon;
     public string animationName;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
     public virtual void DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }
+    public enum GeneralTypeObject
+    {
+        None = 0,
+        Equipment = 1,
+        Consumables = 2
+    }
     public enum TypeObject
     {
         None = 0,

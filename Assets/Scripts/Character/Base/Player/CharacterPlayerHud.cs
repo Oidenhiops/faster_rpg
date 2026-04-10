@@ -90,6 +90,7 @@ public class CharacterPlayerHud : MonoBehaviour
             }
             foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
             {
+                characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
                 characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[consumable.Key]);
             }
             UpdateFastItems();
@@ -100,48 +101,6 @@ public class CharacterPlayerHud : MonoBehaviour
         {
             Debug.LogError(e);
         }
-    }
-    public void ChangeSlotPosition()
-    {
-        int lastSelectedSlotIndex = lastSelectedSlot.slotIndex;
-        int draggedSlotIndex = inventoryDraggedSlot.itemDraged.slotIndex;
-
-        if (lastSelectedSlot == inventoryDraggedSlot.itemDraged) return;
-
-        if (lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag && inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
-            ChangeSlotBagToBag(lastSelectedSlotIndex, draggedSlotIndex);            
-    }
-
-    private void ChangeSlotItemToItem(int lastSelectedSlotIndex, int draggedSlotIndex)
-    {
-        throw new NotImplementedException();
-    }
-    public void DropItem()
-    {
-        int draggedSlotIndex = inventoryDraggedSlot.itemDraged.slotIndex;
-        if (inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
-        {
-            characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[draggedSlotIndex] = new CharacterData.CharacterItem();
-            GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
-        }
-    }
-    InventorySlot GetBagSlotByIndex(int index)
-    {
-        if (characterUI.characterBag.inventorySlots.TryGetValue(index, out InventorySlot bagSlot))
-        {
-            return bagSlot;
-        }
-        return null;
-    }
-    void ChangeSlotBagToBag(int BagSlot, int DraggedBagSlot)
-    {
-        CharacterData.CharacterItem bagSlotTemp = new CharacterData.CharacterItem(GetBagSlotByIndex(BagSlot).characterItem);
-        CharacterData.CharacterItem draggedBagSlotTemp = new CharacterData.CharacterItem(GetBagSlotByIndex(DraggedBagSlot).characterItem);
-
-        characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[BagSlot] = draggedBagSlotTemp;
-        characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[DraggedBagSlot] = bagSlotTemp;
-        GetBagSlotByIndex(BagSlot).InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[BagSlot]);
-        GetBagSlotByIndex(DraggedBagSlot).InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[DraggedBagSlot]);
     }
     void UpdateFastItems()
     {
@@ -163,6 +122,22 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.fastItems[fastItem.Key].fastItemAmount.text = "";
             }
         }
+    }
+    public InventorySlot GetBagSlotByIndex(int index)
+    {
+        if (characterUI.characterBag.inventorySlots.TryGetValue(index, out InventorySlot bagSlot))
+        {
+            return bagSlot;
+        }
+        return null;
+    }
+    public InventorySlot GetConsumableSlotByIndex(int index)
+    {
+        if (characterUI.consumables.TryGetValue(index, out InventorySlot consumableSlot))
+        {
+            return consumableSlot;
+        }
+        return null;
     }
     public void SelectFastItem()
     {

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -168,16 +167,15 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         isDragging = false;
         if (characterPlayerHud.lastSelectedSlot != null)
         {
-            characterPlayerHud.ChangeSlotPosition();
+            characterPlayerHud.characterPlayer.ChangeObjectPosition();
         }
         else
         {
-            characterPlayerHud.DropItem();
+            characterPlayerHud.characterPlayer.DropItem();
         }
         characterPlayerHud.lastSelectedSlot = null;
         Destroy(characterPlayerHud.inventoryDraggedSlot.gameObject);
     }
-
     public enum TypeInventorySlot
     {
         None = 0,
@@ -189,9 +187,9 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         Front = 6,
         Pants = 7,
         Boots = 9,
-        Item1 = 10,
-        Item2 = 11,
-        Item3 = 12,
+        Consumable1 = 10,
+        Consumable2 = 11,
+        Consumable3 = 12,
         Utility = 13,
         Bag = 14
     }

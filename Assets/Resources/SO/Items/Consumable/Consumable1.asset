@@ -15,6 +15,7 @@ MonoBehaviour:
   id: 1
   idText: 1
   icon: {fileID: 1544862734, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
+  generalTypeObject: 2
   typeObject: 10
   typeWeapon: 0
   animationName: 
