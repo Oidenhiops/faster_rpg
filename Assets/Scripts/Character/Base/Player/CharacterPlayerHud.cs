@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using AYellowpaper.SerializedCollections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class CharacterPlayerHud : MonoBehaviour
@@ -12,6 +13,10 @@ public class CharacterPlayerHud : MonoBehaviour
     public CharacterPlayer characterPlayer;
     public CharacterUI characterUI;
     public Animator characterInventoryAnim;
+    public InventorySlot lastSelectedSlot;
+    public InventoryDraggedSlot inventoryDraggedSlot;
+    public Transform hudTransform;
+    public bool isDraggingItem;
     public async Awaitable InitializeInventory()
     {
         foreach (var item in characterUI.items)
@@ -74,20 +79,18 @@ public class CharacterPlayerHud : MonoBehaviour
             {
                 InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
                 bagSlotPrefab.characterPlayerHud = this;
-                bagSlotPrefab.characterItem = bagSlot.Value;
+                bagSlotPrefab.slotIndex = bagSlot.Key;
                 bagSlotPrefab.InitializeSlot(bagSlot.Value);
                 characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
                 index++;
             }
             foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.items)
             {
-                characterUI.items[item.Key].characterItem = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items[item.Key];
                 characterUI.items[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items[item.Key]);
             }
             foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
             {
-                characterUI.consumables[consumable.Key].characterItem = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[consumable.Key];
-                characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[consumable.Key]);
+                characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[consumable.Key]);
             }
             UpdateFastItems();
             await Awaitable.NextFrameAsync();
@@ -98,17 +101,59 @@ public class CharacterPlayerHud : MonoBehaviour
             Debug.LogError(e);
         }
     }
+    public void ChangeSlotPosition()
+    {
+        int lastSelectedSlotIndex = lastSelectedSlot.slotIndex;
+        int draggedSlotIndex = inventoryDraggedSlot.itemDraged.slotIndex;
+
+        if (lastSelectedSlot == inventoryDraggedSlot.itemDraged) return;
+
+        if (lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag && inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
+            ChangeSlotBagToBag(lastSelectedSlotIndex, draggedSlotIndex);            
+    }
+
+    private void ChangeSlotItemToItem(int lastSelectedSlotIndex, int draggedSlotIndex)
+    {
+        throw new NotImplementedException();
+    }
+    public void DropItem()
+    {
+        int draggedSlotIndex = inventoryDraggedSlot.itemDraged.slotIndex;
+        if (inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
+        {
+            characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[draggedSlotIndex] = new CharacterData.CharacterItem();
+            GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
+        }
+    }
+    InventorySlot GetBagSlotByIndex(int index)
+    {
+        if (characterUI.characterBag.inventorySlots.TryGetValue(index, out InventorySlot bagSlot))
+        {
+            return bagSlot;
+        }
+        return null;
+    }
+    void ChangeSlotBagToBag(int BagSlot, int DraggedBagSlot)
+    {
+        CharacterData.CharacterItem bagSlotTemp = new CharacterData.CharacterItem(GetBagSlotByIndex(BagSlot).characterItem);
+        CharacterData.CharacterItem draggedBagSlotTemp = new CharacterData.CharacterItem(GetBagSlotByIndex(DraggedBagSlot).characterItem);
+
+        characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[BagSlot] = draggedBagSlotTemp;
+        characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[DraggedBagSlot] = bagSlotTemp;
+        GetBagSlotByIndex(BagSlot).InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[BagSlot]);
+        GetBagSlotByIndex(DraggedBagSlot).InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag[DraggedBagSlot]);
+    }
     void UpdateFastItems()
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].itemBaseSO != null)
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].itemBaseSO != null)
             {
                 characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 1;
                 characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].itemBaseSO.icon;
+                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].itemBaseSO.icon;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumable[fastItem.Key].amount.ToString() : "";
+                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].amount.ToString() : "";
             }
             else
             {
@@ -133,7 +178,7 @@ public class CharacterPlayerHud : MonoBehaviour
             }
         }
     }
-    void ResetDescription()
+    public void ResetDescription()
     {
         characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
         characterUI.itemDescription.descriptionTextTransform.SetParent(characterUI.itemDescription.panelToResetSelect);

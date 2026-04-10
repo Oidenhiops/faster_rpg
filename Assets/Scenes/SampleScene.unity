@@ -257,6 +257,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1198660664}
   itemAmount: {fileID: 661393304}
+  rectTransform: {fileID: 6562627}
   typeInventorySlot: 13
   characterItem:
     itemId: 0
@@ -265,8 +266,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &11379221
 GameObject:
@@ -484,6 +488,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1566902571}
   itemAmount: {fileID: 1237524389}
+  rectTransform: {fileID: 26773788}
   typeInventorySlot: 2
   characterItem:
     itemId: 0
@@ -492,8 +497,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &78992854
 GameObject:
@@ -1361,6 +1369,9 @@ MonoBehaviour:
       panelToResetSelect: {fileID: 1965871530}
     panelToResetSelect: {fileID: 1965871530}
   characterInventoryAnim: {fileID: 95493900}
+  lastSelectedSlot: {fileID: 0}
+  hudTransform: {fileID: 78992855}
+  isDraggingItem: 0
 --- !u!1 &238986933
 GameObject:
   m_ObjectHideFlags: 0
@@ -1912,7 +1923,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5.4
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3440,6 +3451,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1865548621}
   itemAmount: {fileID: 469363916}
+  rectTransform: {fileID: 510341177}
   typeInventorySlot: 11
   characterItem:
     itemId: 0
@@ -3448,8 +3460,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &512003387
 GameObject:
@@ -3589,6 +3604,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1756201655}
   itemAmount: {fileID: 1044520045}
+  rectTransform: {fileID: 512003388}
   typeInventorySlot: 6
   characterItem:
     itemId: 0
@@ -3597,8 +3613,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &515325219
 GameObject:
@@ -4525,6 +4544,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 667200900}
   itemAmount: {fileID: 519715966}
+  rectTransform: {fileID: 624810254}
   typeInventorySlot: 12
   characterItem:
     itemId: 0
@@ -4533,8 +4553,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &635429703
 GameObject:
@@ -5728,6 +5751,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 158510640}
   itemAmount: {fileID: 635429705}
+  rectTransform: {fileID: 823545608}
   typeInventorySlot: 9
   characterItem:
     itemId: 0
@@ -5736,8 +5760,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &832575517
 GameObject:
@@ -7541,6 +7568,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 953202268}
   itemAmount: {fileID: 1653096513}
+  rectTransform: {fileID: 1177914134}
   typeInventorySlot: 10
   characterItem:
     itemId: 0
@@ -7549,8 +7577,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &1198660662
 GameObject:
@@ -8494,6 +8525,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1499037855}
   itemAmount: {fileID: 1733097063}
+  rectTransform: {fileID: 1365449645}
   typeInventorySlot: 3
   characterItem:
     itemId: 0
@@ -8502,8 +8534,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &1366799619
 GameObject:
@@ -8793,6 +8828,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1414554294}
   itemAmount: {fileID: 1156855655}
+  rectTransform: {fileID: 1387120159}
   typeInventorySlot: 4
   characterItem:
     itemId: 0
@@ -8801,8 +8837,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &1408136768
 GameObject:
@@ -9948,6 +9987,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1756176664}
   itemAmount: {fileID: 238986935}
+  rectTransform: {fileID: 1592614219}
   typeInventorySlot: 1
   characterItem:
     itemId: 0
@@ -9956,8 +9996,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &1629071861
 GameObject:
@@ -11637,6 +11680,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 488772817}
   itemAmount: {fileID: 1778983518}
+  rectTransform: {fileID: 1954795742}
   typeInventorySlot: 7
   characterItem:
     itemId: 0
@@ -11645,8 +11689,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1 &1965871529
 GameObject:
@@ -12355,6 +12402,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 1213183567}
   itemAmount: {fileID: 518728230}
+  rectTransform: {fileID: 2131347807}
   typeInventorySlot: 5
   characterItem:
     itemId: 0
@@ -12363,8 +12411,11 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
+  dragedSlot: {fileID: 0}
   showingText: 0
+  slotIndex: 0
   isUsingSlot: 0
+  isDragging: 0
   test: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

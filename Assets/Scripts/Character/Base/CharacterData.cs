@@ -21,7 +21,7 @@ public class CharacterData
         {ItemBaseSO.TypeObject.Weapon, null},
         {ItemBaseSO.TypeObject.Utility, null},
     };
-    public SerializedDictionary<int, CharacterItem> consumable = new SerializedDictionary<int, CharacterItem>();
+    public SerializedDictionary<int, CharacterItem> consumables = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>> skills = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>>();
     public int characterId;
@@ -104,6 +104,15 @@ public class CharacterData
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
         public int amount;
+        public CharacterItem() { }
+        public CharacterItem(CharacterItem characterItem)
+        {
+            itemId = characterItem.itemId;
+            typeObject = characterItem.typeObject;
+            itemBaseSO = characterItem.itemBaseSO;
+            itemStatistics = characterItem.itemStatistics;
+            amount = characterItem.amount;
+        }
     }
     [Serializable]
     public class CharacterMasteryInfo

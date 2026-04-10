@@ -1,18 +1,22 @@
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CharacterPlayerHud characterPlayerHud;
     public Image itemImage;
     public TMP_Text itemAmount;
+    public RectTransform rectTransform;
     public TypeInventorySlot typeInventorySlot;
     public CharacterData.CharacterItem characterItem;
     public bool showingText;
+    public int slotIndex;
     public bool isUsingSlot;
+    public bool isDragging;
     public int test;
     public Dictionary<AnchorPreset, (Vector2 min, Vector2 max)> anchorPresets = new Dictionary<AnchorPreset, (Vector2, Vector2)>()
     {
@@ -47,6 +51,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             isUsingSlot = true;
             itemAmount.enabled = true;
             itemAmount.text = item.amount > 1 ? item.amount.ToString() : "";
+            characterItem = item;
         }
         else
         {
@@ -55,6 +60,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             isUsingSlot = false;
             itemAmount.enabled = false;
             itemAmount.text = "";
+            characterItem = new CharacterData.CharacterItem();
         }
     }
     #region Adjusting description text position
@@ -104,17 +110,19 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     #endregion
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (isUsingSlot)
+        if (isUsingSlot && !characterPlayerHud.isDraggingItem)
         {
             _ = EnableSlot();
         }
+        characterPlayerHud.lastSelectedSlot = this;
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (isUsingSlot)
+        if (isUsingSlot && !characterPlayerHud.isDraggingItem)
         {
             DisableSlot();
         }
+        characterPlayerHud.lastSelectedSlot = null;
     }
     async Awaitable EnableSlot()
     {
@@ -125,12 +133,51 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         await Awaitable.NextFrameAsync();
         characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 1;
     }
-
     void DisableSlot()
     {
         showingText = false;
         characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
     }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (isUsingSlot)
+        {
+            showingText = false;
+            isDragging = true;
+            characterPlayerHud.inventoryDraggedSlot = Instantiate(Resources.Load<GameObject>("Prefabs/DraggedSlot/DraggedSlot"), eventData.position, Quaternion.identity, characterPlayerHud.hudTransform).GetComponent<InventoryDraggedSlot>();
+            characterPlayerHud.inventoryDraggedSlot.InitializeDraggedSlot(characterItem);
+            characterPlayerHud.inventoryDraggedSlot.itemDraged = this;
+            characterPlayerHud.inventoryDraggedSlot.rectTransform.sizeDelta = Vector2.one * 100;
+            characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 0.5f;
+            characterPlayerHud.isDraggingItem = true;
+            characterPlayerHud.ResetDescription();
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (isUsingSlot && characterPlayerHud.inventoryDraggedSlot != null) characterPlayerHud.inventoryDraggedSlot.transform.position = eventData.position;        
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (!isUsingSlot) return;
+        characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 1;
+        characterPlayerHud.isDraggingItem = false;
+        isDragging = false;
+        if (characterPlayerHud.lastSelectedSlot != null)
+        {
+            characterPlayerHud.ChangeSlotPosition();
+        }
+        else
+        {
+            characterPlayerHud.DropItem();
+        }
+        characterPlayerHud.lastSelectedSlot = null;
+        Destroy(characterPlayerHud.inventoryDraggedSlot.gameObject);
+    }
+
     public enum TypeInventorySlot
     {
         None = 0,

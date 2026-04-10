@@ -50,19 +50,27 @@ public class GameData : MonoBehaviour
     {
         try
         {
-            InitializeBagItems();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error cargando items del inventario: {e}");
-        }
-        try
-        {
             InitializeCharacterItems();
         }
         catch (Exception e)
         {
             Debug.LogError($"Error cargando items de los personajes: {e}");
+        }
+        try
+        {
+            InitializeCharacterConsumables();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error cargando consumibles de los personajes: {e}");
+        }
+        try
+        {
+            InitializeCharacterBag();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error cargando el inventario de los personajes: {e}");
         }
         try
         {
@@ -86,7 +94,7 @@ public class GameData : MonoBehaviour
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.selectedCharacters)
+            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
                 foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> item in characterData.Value.items)
                 {
@@ -98,11 +106,43 @@ public class GameData : MonoBehaviour
             }
         }
     }
+    void InitializeCharacterConsumables()
+    {
+        foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
+        {
+            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            {
+                foreach (KeyValuePair<int, CharacterData.CharacterItem> consumable in characterData.Value.consumables)
+                {
+                    if (consumable.Value.itemId != 0)
+                    {
+                        consumable.Value.itemBaseSO = itemsDBSO.data[consumable.Value.typeObject][consumable.Value.itemId];
+                    }
+                }
+            }
+        }
+    }
+    void InitializeCharacterBag()
+    {
+        foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
+        {
+            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            {
+                foreach (KeyValuePair<int, CharacterData.CharacterItem> bagItem in characterData.Value.bag)
+                {
+                    if (bagItem.Value.itemId != 0)
+                    {
+                        bagItem.Value.itemBaseSO = itemsDBSO.data[bagItem.Value.typeObject][bagItem.Value.itemId];
+                    }
+                }
+            }
+        }
+    }
     void InitializeCharacterSkills()
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.selectedCharacters)
+            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
                 foreach (KeyValuePair<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterData.CharacterSkillInfo>> item in characterData.Value.skills)
                 {
@@ -113,19 +153,6 @@ public class GameData : MonoBehaviour
                             skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
                         }
                     }
-                }
-            }
-        }
-    }
-    void InitializeBagItems()
-    {
-        foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
-        {
-            foreach (KeyValuePair<int, CharacterData.CharacterItem> item in gameDataSlot.bagItems)
-            {
-                if (item.Value.itemId != 0)
-                {
-                    item.Value.itemBaseSO = itemsDBSO.data[ItemBaseSO.TypeObject.None][item.Value.itemId];
                 }
             }
         }
@@ -310,7 +337,7 @@ public class GameData : MonoBehaviour
             createdDate = DateTime.Now.ToString(),
             lastSaveDate = DateTime.Now.ToString(),
             currentZone = GameManager.TypeScene.CityScene,
-            selectedCharacters = new SerializedDictionary<string, CharacterData>()
+            characters = new SerializedDictionary<string, CharacterData>()
             {
                 { randomNames[0], new CharacterData()
                     {
@@ -331,7 +358,7 @@ public class GameData : MonoBehaviour
                             { ItemBaseSO.TypeObject.Utility, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Utility, 1) },
                             { ItemBaseSO.TypeObject.Weapon, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 1) },
                         },
-                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3) },
                             { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2) },
@@ -373,7 +400,7 @@ public class GameData : MonoBehaviour
                             { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
                         },
-                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
@@ -401,7 +428,7 @@ public class GameData : MonoBehaviour
                             { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
                         },
-                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
@@ -429,7 +456,7 @@ public class GameData : MonoBehaviour
                             { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
                             { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
                         },
-                        consumable = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
@@ -550,9 +577,7 @@ public class GameData : MonoBehaviour
         public GameManager.TypeScene currentZone;
         public SerializedDictionary<string, Vector3Int> positionsSave = new SerializedDictionary<string, Vector3Int>();
         public SerializedDictionary<int, CharacterData.CharacterItem> bagItems = new SerializedDictionary<int, CharacterData.CharacterItem>();
-        public SerializedDictionary<string, CharacterData> selectedCharacters = new SerializedDictionary<string, CharacterData>();
-        public SerializedDictionary<string, CharacterData> bagCharacters = new SerializedDictionary<string, CharacterData>();
-        public SerializedDictionary<string, CharacterData> dieCharacters = new SerializedDictionary<string, CharacterData>();
+        public SerializedDictionary<string, CharacterData> characters = new SerializedDictionary<string, CharacterData>();
         // public SerializedDictionary<string, InitialBGMSoundsConfigSO.BGMScenesData> bgmSceneData = new SerializedDictionary<string, InitialBGMSoundsConfigSO.BGMScenesData>();
     }
     [Serializable]

@@ -20,7 +20,7 @@ public class CharacterPlayer : CharacterBase
         try
         {
             List<CharactersData> charactersDataList = new List<CharactersData>();
-            foreach (var characterData in GameData.Instance.gameDataInfo.gameDataSlots[GameData.Instance.systemDataInfo.currentGameDataIndex].selectedCharacters)
+            foreach (var characterData in GameData.Instance.gameDataInfo.gameDataSlots[GameData.Instance.systemDataInfo.currentGameDataIndex].characters)
             {
                 if (GameData.Instance.charactersSkinDBSO.data.ContainsKey(characterData.Value.characterId))
                 {
