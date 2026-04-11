@@ -74,6 +74,7 @@ public class CharacterBase : MonoBehaviour
     {
         characterMovement.HandleMovement();
     }
+    public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
     protected bool SetGrounded()
     {
         return Physics.OverlapBox

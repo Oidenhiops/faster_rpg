@@ -8,9 +8,11 @@ public class CharacterPlayer : CharacterBase
 {
     public InputSystem_Actions inputActions;
     public CharacterPlayerHud characterPlayerHud;
+    public GameObject interactableBannerPrefab;
     public float dropLaunchForce = 4f;
     public float dropUpForce = 2f;
-    public SerializedDictionary<ItemDropped, CharacterData.CharacterItem> droppedItems = new SerializedDictionary<ItemDropped, CharacterData.CharacterItem>();
+    public SerializedDictionary<InteractableBase, GameObject> interactables = new SerializedDictionary<InteractableBase, GameObject>();
+    public Action OnShowItemsToPickUp;
     public bool isChangingCharacter;
     public override void OnEnableHandle()
     {
@@ -19,6 +21,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.ChangeCharacter.performed += OnHandleChangeCharacter;
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
         inputActions.Player.ChangeItem.performed += OnHandleChangeItem;
+        OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
     {
@@ -268,5 +271,33 @@ public class CharacterPlayer : CharacterBase
         directionFromCamera.Normalize();
         itemDropped.rb.linearVelocity = Vector3.zero;
         itemDropped.rb.AddForce(directionFromCamera * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
+    }
+    public void OnHandleShowItemsToPickUp()
+    {
+        characterPlayerHud.ShowItemsToPickUp();
+    }
+    public override void OnHandlePickUpItem(ItemDropped itemDropped)
+    {
+        if (FindEmptyBagSlot(out int bagIndex))
+        {
+            charactersData[characterIndex].characterData.bag[bagIndex] = itemDropped.itemData;
+            characterPlayerHud.GetBagSlotByIndex(bagIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagIndex]);
+            Destroy(itemDropped.gameObject);
+            interactables.Remove(itemDropped);
+            OnShowItemsToPickUp?.Invoke();
+        }
+    }
+    public bool FindEmptyBagSlot(out int bagIndex)
+    {
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].characterData.bag)
+        {
+            if (bagSlot.Value.itemBaseSO == null)
+            {
+                bagIndex = bagSlot.Key;
+                return true;
+            }
+        }
+        bagIndex = 0;
+        return false;
     }
 }

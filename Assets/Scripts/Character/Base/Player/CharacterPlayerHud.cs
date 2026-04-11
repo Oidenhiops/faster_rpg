@@ -190,6 +190,30 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         characterUI.itemDescription.itemDescription.text = description;
     }
+
+    internal void ShowItemsToPickUp()
+    {
+        foreach (Transform child in characterUI.interactables.container)
+        {
+            Destroy(child.gameObject);
+        }
+        if (characterPlayer.interactables.Count > 0)
+        {
+            characterUI.interactables.interactablesPanel.SetActive(true);
+            foreach (KeyValuePair<InteractableBase, GameObject> interactable in characterPlayer.interactables)
+            {
+                InteractableBanner interactablePrefab = Instantiate(characterPlayer.interactableBannerPrefab, characterUI.interactables.container).GetComponent<InteractableBanner>();
+                interactablePrefab.interactable = interactable.Key;
+                interactablePrefab.character = characterPlayer;
+                interactablePrefab.InitializeBanner(interactable.Key);
+            }
+        }
+        else
+        {
+            characterUI.interactables.interactablesPanel.SetActive(false);
+        }
+    }
+
     [Serializable]
     public class CharacterUI
     {
@@ -198,6 +222,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> equipments = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
+        public InteractableUI interactables;
         public ItemDescription itemDescription;
         public Transform panelToResetSelect;
     }
@@ -234,5 +259,11 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public Transform bagContainer;
         public SerializedDictionary<int, InventorySlot> inventorySlots;
+    }
+    [Serializable]
+    public class InteractableUI
+    {
+        public GameObject interactablesPanel;
+        public Transform container;
     }
 }

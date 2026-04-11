@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemDropped : MonoBehaviour
+public class ItemDropped : InteractableBase
 {
     public float amplitude = 0.05f;
     public float frequency = 3f;
@@ -36,11 +36,6 @@ public class ItemDropped : MonoBehaviour
     {
         bounceTransform.localPosition = startLocalPos + Vector3.up * Mathf.Sin(Time.time * frequency) * amplitude;
     }
-    [NaughtyAttributes.Button]
-    public void Test()
-    {
-        InitializeDropItem(itemData);
-    }
     public void InitializeDropItem(CharacterData.CharacterItem itemData, bool startCountToPickUp = false)
     {
         this.itemData = itemData;
@@ -48,13 +43,23 @@ public class ItemDropped : MonoBehaviour
         SetTextureFromAtlas(itemData.itemBaseSO.icon, itemMeshRenderer);
         if (startCountToPickUp) _ = StartCountToPickUp();
     }
-
     private async Awaitable StartCountToPickUp()
     {
         await Awaitable.WaitForSecondsAsync(1f);
         canBePickedUp = true;
     }
-
+    public override void Interact(CharacterBase characterBase)
+    {
+        characterBase.OnHandlePickUpItem(this);
+    }
+    public override Sprite GetInteractIcon()
+    {
+        return itemData.itemBaseSO.icon;
+    }
+    public override string GetInteractText()
+    {
+        return GameData.Instance.GetDialog(itemData.itemBaseSO.idText, GameData.TypeLOCS.Items).dialog;
+    }
     void SetTextureFromAtlas(Sprite spriteFromAtlas, MeshRenderer meshRenderer)
     {
         Vector2[] uvs = originalMesh.uv;
@@ -74,9 +79,10 @@ public class ItemDropped : MonoBehaviour
         {
             if (other.TryGetComponent(out CharacterPlayer characterPlayer))
             {
-                if (!characterPlayer.droppedItems.ContainsKey(this))
+                if (!characterPlayer.interactables.ContainsKey(this))
                 {
-                    characterPlayer.droppedItems.Add(this, itemData);
+                    characterPlayer.interactables.Add(this, gameObject);
+                    characterPlayer.OnShowItemsToPickUp?.Invoke();
                 }
             }
         }
@@ -87,9 +93,10 @@ public class ItemDropped : MonoBehaviour
         {
             if (other.TryGetComponent(out CharacterPlayer characterPlayer))
             {
-                if (characterPlayer.droppedItems.ContainsKey(this))
+                if (characterPlayer.interactables.ContainsKey(this))
                 {
-                    characterPlayer.droppedItems.Remove(this);
+                    characterPlayer.interactables.Remove(this);
+                    characterPlayer.OnShowItemsToPickUp?.Invoke();
                 }
             }
         }
