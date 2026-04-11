@@ -112,29 +112,31 @@ public class CharacterPlayer : CharacterBase
         if (characterPlayerHud.lastSelectedSlot == characterPlayerHud.inventoryDraggedSlot.itemDraged) return;
 
         if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
-            ChangeItemBagToBag(lastSelectedSlotIndex, draggedSlotIndex);
+            ChangeBagAndBag(lastSelectedSlotIndex, draggedSlotIndex);
         else if (
             characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag &&
             characterPlayerHud.lastSelectedSlot.typeInventorySlot != InventorySlot.TypeInventorySlot.Bag)
         {
             if (characterPlayerHud.lastSelectedSlot.characterItem.itemBaseSO == null)
             {
-                if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
+                if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment &&
+                    characterPlayerHud.lastSelectedSlot.typeInventorySlot != InventorySlot.TypeInventorySlot.Consumables)
                 {
-                    // ChangeSlotBagToEquipment(lastSelectedSlotIndex, draggedSlotIndex);
+                    ChangeEquipmentAndBag(ConvertTypeIntoTypeObject((int)characterPlayerHud.lastSelectedSlot.typeInventorySlot), draggedSlotIndex);
                 }
-                else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
+                else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables &&
+                         characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Consumables)
                 {
-                    ChangeSlotBagToConsumable(draggedSlotIndex, lastSelectedSlotIndex);
+                    ChangeBagAndConsumable(draggedSlotIndex, lastSelectedSlotIndex);
                 }
             }
             else if (characterPlayerHud.lastSelectedSlot.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
             {
-                // ChangeSlotEquipmentToBag(lastSelectedSlotIndex, draggedSlotIndex);
+                ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, draggedSlotIndex);
             }
             else if (characterPlayerHud.lastSelectedSlot.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
             {
-                ChangeSlotBagToConsumable(draggedSlotIndex, lastSelectedSlotIndex);
+                ChangeBagAndConsumable(draggedSlotIndex, lastSelectedSlotIndex);
             }
         }
         else if (
@@ -143,33 +145,47 @@ public class CharacterPlayer : CharacterBase
         {
             if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
             {
-                // ChangeSlotEquipmentToBag(lastSelectedSlotIndex, draggedSlotIndex);
+                ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, lastSelectedSlotIndex);
             }
             else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
             {
-                ChangeSlotBagToConsumable(lastSelectedSlotIndex, draggedSlotIndex);
+                ChangeBagAndConsumable(lastSelectedSlotIndex, draggedSlotIndex);
             }
         }
     }
-    void ChangeItemBagToBag(int bagSlot, int draggedBagSlot)
+    void ChangeBagAndBag(int bagSlotIndex, int draggedBagSlotIndex)
     {
-        CharacterData.CharacterItem bagItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlot));
-        CharacterData.CharacterItem draggedItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(draggedBagSlot));
+        CharacterData.CharacterItem bagItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlotIndex));
+        CharacterData.CharacterItem draggedItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(draggedBagSlotIndex));
 
-        charactersData[characterIndex].characterData.bag[draggedBagSlot] = bagItemTemp;
-        charactersData[characterIndex].characterData.bag[bagSlot] = draggedItemTemp;
-        characterPlayerHud.GetBagSlotByIndex(bagSlot).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlot]);
-        characterPlayerHud.GetBagSlotByIndex(draggedBagSlot).InitializeSlot(charactersData[characterIndex].characterData.bag[draggedBagSlot]);
+        charactersData[characterIndex].characterData.bag[draggedBagSlotIndex] = bagItemTemp;
+        charactersData[characterIndex].characterData.bag[bagSlotIndex] = draggedItemTemp;
+        characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+        characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[draggedBagSlotIndex]);
     }
-    private void ChangeSlotBagToConsumable(int bagSlot, int draggedBagSlot)
+    private void ChangeBagAndConsumable(int bagSlotIndex, int consumableSlotIndex)
     {
-        CharacterData.CharacterItem bagSlotTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlot));
-        CharacterData.CharacterItem consumableItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(draggedBagSlot));
+        CharacterData.CharacterItem bagSlotTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlotIndex));
+        CharacterData.CharacterItem consumableItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(consumableSlotIndex));
 
-        charactersData[characterIndex].characterData.bag[bagSlot] = consumableItemTemp;
-        charactersData[characterIndex].characterData.consumables[draggedBagSlot] = bagSlotTemp;
-        characterPlayerHud.GetBagSlotByIndex(bagSlot).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlot]);
-        characterPlayerHud.GetConsumableSlotByIndex(draggedBagSlot).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedBagSlot]);
+        charactersData[characterIndex].characterData.bag[bagSlotIndex] = consumableItemTemp;
+        charactersData[characterIndex].characterData.consumables[consumableSlotIndex] = bagSlotTemp;
+        characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+        characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
+    }
+    private void ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
+    {
+        if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.typeObject == equipmentIndex ||
+            charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO == null)
+        {
+            CharacterData.CharacterItem bagItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlotIndex));
+            CharacterData.CharacterItem equipmentItemTemp = new CharacterData.CharacterItem(GetEquipmentItemByIndex(equipmentIndex));
+
+            charactersData[characterIndex].characterData.equipments[equipmentIndex] = bagItemTemp;
+            charactersData[characterIndex].characterData.bag[bagSlotIndex] = equipmentItemTemp;
+            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+            characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].characterData.equipments[equipmentIndex]);
+        }
     }
     public CharacterData.CharacterItem GetBagItemByIndex(int index)
     {
@@ -186,6 +202,30 @@ public class CharacterPlayer : CharacterBase
             return consumableItem;
         }
         return new CharacterData.CharacterItem();
+    }
+    public CharacterData.CharacterItem GetEquipmentItemByIndex(ItemBaseSO.TypeObject index)
+    {
+        if (charactersData[characterIndex].characterData.equipments.TryGetValue(index, out CharacterData.CharacterItem equipmentItem))
+        {
+            return equipmentItem;
+        }
+        return new CharacterData.CharacterItem();
+    }
+    public ItemBaseSO.TypeObject ConvertTypeIntoTypeObject(int typeObjectInt)
+    {
+        return typeObjectInt switch
+        {
+            1 => ItemBaseSO.TypeObject.Helmet,
+            2 => ItemBaseSO.TypeObject.Front,
+            3 => ItemBaseSO.TypeObject.Pants,
+            4 => ItemBaseSO.TypeObject.Boots,
+            5 => ItemBaseSO.TypeObject.Gloves,
+            6 => ItemBaseSO.TypeObject.Pendant,
+            7 => ItemBaseSO.TypeObject.Ring,
+            8 => ItemBaseSO.TypeObject.Weapon,
+            9 => ItemBaseSO.TypeObject.Utility,
+            _ => ItemBaseSO.TypeObject.None,
+        };
     }
     public void DropItem()
     {

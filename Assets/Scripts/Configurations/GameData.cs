@@ -96,7 +96,7 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
-                foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> item in characterData.Value.items)
+                foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> item in characterData.Value.equipments)
                 {
                     if (item.Value.itemId != 0)
                     {
@@ -331,6 +331,7 @@ public class GameData : MonoBehaviour
         bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 1);
         bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
         bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 3);
+        bag[3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
         return new GameDataSlot
         {
             isUse = true,
@@ -346,7 +347,7 @@ public class GameData : MonoBehaviour
                         characterId = 0,
                         characterSkinId = 0,
                         bag = bag,
-                        items = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterData.CharacterItem>()
+                        equipments = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterData.CharacterItem>()
                         {
                             { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 1) },
                             { ItemBaseSO.TypeObject.Front, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Front, 1) },

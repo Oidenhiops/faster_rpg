@@ -9,7 +9,7 @@ public class CharacterData
     public int level;
     public string name;
     public SerializedDictionary<TypeStatistic, Statistic> statistics = new SerializedDictionary<TypeStatistic, Statistic>();
-    public SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem> items = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem>
+    public SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem> equipments = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem>
     {
         {ItemBaseSO.TypeObject.Helmet, null},
         {ItemBaseSO.TypeObject.Front, null},
@@ -36,7 +36,7 @@ public class CharacterData
     }
     public void InitializeItems()
     {
-        foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterItem> item in items)
+        foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterItem> item in equipments)
         {
             if (item.Value.itemId != 0)
             {
@@ -63,7 +63,7 @@ public class CharacterData
     }
     public bool GetCurrentWeapon(out CharacterItem weapon)
     {
-        if (items.TryGetValue(ItemBaseSO.TypeObject.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
+        if (equipments.TryGetValue(ItemBaseSO.TypeObject.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
         {
             weapon = currentWeapon;
             return true;

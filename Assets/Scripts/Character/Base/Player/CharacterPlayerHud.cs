@@ -19,7 +19,7 @@ public class CharacterPlayerHud : MonoBehaviour
     public bool isDraggingItem;
     public async Awaitable InitializeInventory()
     {
-        foreach (var item in characterUI.items)
+        foreach (var item in characterUI.equipments)
         {
             item.Value.characterPlayerHud = this;
         }
@@ -84,9 +84,9 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
                 index++;
             }
-            foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.items)
+            foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.equipments)
             {
-                characterUI.items[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.items[item.Key]);
+                characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.equipments[item.Key]);
             }
             foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
             {
@@ -139,6 +139,14 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         return null;
     }
+    public InventorySlot GetEquipmentSlotByIndex(ItemBaseSO.TypeObject index)
+    {
+        if (characterUI.equipments.TryGetValue(index, out InventorySlot equipmentSlot))
+        {
+            return equipmentSlot;
+        }
+        return null;
+    }
     public void SelectFastItem()
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
@@ -187,7 +195,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public CharacterPortrait[] characterPortraits;
         public CharacterBag characterBag;
-        public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> items = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
+        public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> equipments = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public ItemDescription itemDescription;

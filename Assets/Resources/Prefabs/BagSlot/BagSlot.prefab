@@ -138,7 +138,8 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 0}
   itemImage: {fileID: 5866423273924199184}
   itemAmount: {fileID: 3212399250952459714}
-  typeInventorySlot: 14
+  rectTransform: {fileID: 7961849716215116752}
+  typeInventorySlot: 11
   characterItem:
     itemId: 0
     typeObject: 0
@@ -146,8 +147,6 @@ MonoBehaviour:
     itemStatistics:
       _serializedList: []
     amount: 0
-  dragedSlot: {fileID: 0}
-  rectTransform: {fileID: 7961849716215116752}
   showingText: 0
   slotIndex: 0
   isUsingSlot: 0

@@ -179,19 +179,17 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public enum TypeInventorySlot
     {
         None = 0,
-        Pendant = 1,
-        Gloves = 2,
-        Ring = 3,
-        Weapon = 4,
-        Helmet = 5,
-        Front = 6,
-        Pants = 7,
-        Boots = 9,
-        Consumable1 = 10,
-        Consumable2 = 11,
-        Consumable3 = 12,
-        Utility = 13,
-        Bag = 14
+        Helmet = 1,
+        Front = 2,
+        Pants = 3,
+        Boots = 4,
+        Gloves = 5,
+        Pendant = 6,
+        Ring = 7,
+        Weapon = 8,
+        Utility = 9,
+        Consumables = 10,
+        Bag = 11
     }
     public enum AnchorPreset
     {
