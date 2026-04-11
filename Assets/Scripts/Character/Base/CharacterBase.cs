@@ -14,6 +14,7 @@ public class CharacterBase : MonoBehaviour
     [NonSerialized] public Vector3 characterScale;
     public GameObject floatingTextPrefab;
     public GameObject dieEffectPrefab;
+    public GameObject itempDroppedPrefab;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
     public bool isGrounded => SetGrounded();

@@ -1108,9 +1108,9 @@ GameObject:
   - component: {fileID: 211714506}
   - component: {fileID: 211714509}
   - component: {fileID: 211714511}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CharacterPlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1269,6 +1269,9 @@ MonoBehaviour:
   characterAnimations: {fileID: 211714503}
   isDashing: 0
   characterPlayerHud: {fileID: 211714511}
+  itempDroppedPrefab: {fileID: 5039564025520718109, guid: ef92ee4a6e7ecff41b4381680dd28c07, type: 3}
+  dropLaunchForce: 4
+  dropUpForce: 2
   isChangingCharacter: 0
 --- !u!114 &211714511
 MonoBehaviour:

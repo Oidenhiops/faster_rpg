@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,6 +8,9 @@ public class CharacterPlayer : CharacterBase
 {
     public InputSystem_Actions inputActions;
     public CharacterPlayerHud characterPlayerHud;
+    public float dropLaunchForce = 4f;
+    public float dropUpForce = 2f;
+    public SerializedDictionary<ItemDropped, CharacterData.CharacterItem> droppedItems = new SerializedDictionary<ItemDropped, CharacterData.CharacterItem>();
     public bool isChangingCharacter;
     public override void OnEnableHandle()
     {
@@ -232,8 +236,37 @@ public class CharacterPlayer : CharacterBase
         int draggedSlotIndex = characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex;
         if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
         {
+            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
+            itemDropped.InitializeDropItem(GetBagItemByIndex(draggedSlotIndex), true);
+            LaunchDropItem(itemDropped);
             charactersData[characterIndex].characterData.bag[draggedSlotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
         }
+        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
+        {
+            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
+            itemDropped.InitializeDropItem(GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), true);
+            LaunchDropItem(itemDropped);
+            charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
+            characterPlayerHud.GetEquipmentSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject).InitializeSlot(new CharacterData.CharacterItem());
+        }
+        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
+        {
+            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
+            itemDropped.InitializeDropItem(GetConsumableItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex), true);
+            LaunchDropItem(itemDropped);
+            charactersData[characterIndex].characterData.consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
+            characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
+        }
+    }
+    void LaunchDropItem(ItemDropped itemDropped)
+    {
+        CameraInfo.Instance.CamDirection(new Vector3(directionAnimation.x, 0, directionAnimation.z), out Vector3 directionFromCamera);
+        if (directionFromCamera == Vector3.zero)
+            return;
+
+        directionFromCamera.Normalize();
+        itemDropped.rb.linearVelocity = Vector3.zero;
+        itemDropped.rb.AddForce(directionFromCamera * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
     }
 }
