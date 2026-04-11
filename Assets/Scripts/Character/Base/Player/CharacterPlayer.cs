@@ -111,6 +111,21 @@ public class CharacterPlayer : CharacterBase
             character.characterData.InitializeItems();
         }
     }
+    public void FastEquipItem(int slotIndex)
+    {
+        if (charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO?.typeObject != ItemBaseSO.TypeObject.Consumable)
+        {
+            if (GetEquipmentItemByIndex(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
+            {
+                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+            }
+            else
+            {
+                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+            }
+        }
+        _ = characterPlayerHud.ResetInventoryTarget();
+    }
     public void ChangeObjectPosition()
     {
         int lastSelectedSlotIndex = characterPlayerHud.lastSelectedSlot.slotIndex;
@@ -159,6 +174,7 @@ public class CharacterPlayer : CharacterBase
                 ChangeBagAndConsumable(lastSelectedSlotIndex, draggedSlotIndex);
             }
         }
+        _ = characterPlayerHud.ResetInventoryTarget();
     }
     void ChangeBagAndBag(int bagSlotIndex, int draggedBagSlotIndex)
     {

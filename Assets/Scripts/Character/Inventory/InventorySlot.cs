@@ -176,6 +176,13 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         characterPlayerHud.lastSelectedSlot = null;
         Destroy(characterPlayerHud.inventoryDraggedSlot.gameObject);
     }
+    public void FastEquipItem()
+    {
+        if (isUsingSlot)
+        {
+            characterPlayerHud.characterPlayer.FastEquipItem(slotIndex);
+        }
+    }
     public enum TypeInventorySlot
     {
         None = 0,

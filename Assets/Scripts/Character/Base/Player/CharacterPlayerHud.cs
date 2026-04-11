@@ -102,6 +102,13 @@ public class CharacterPlayerHud : MonoBehaviour
             Debug.LogError(e);
         }
     }
+    public async Awaitable ResetInventoryTarget()
+    {
+        ResetDescription();
+        characterUI.panelToResetSelect.gameObject.SetActive(true);
+        await Awaitable.NextFrameAsync();
+        characterUI.panelToResetSelect.gameObject.SetActive(false);
+    }
     void UpdateFastItems()
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
