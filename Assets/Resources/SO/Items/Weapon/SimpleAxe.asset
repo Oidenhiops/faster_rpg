@@ -19,5 +19,6 @@ MonoBehaviour:
   typeObject: 8
   typeWeapon: 5
   animationName: 
+  maxStack: 1
   itemStatistics:
     _serializedList: []

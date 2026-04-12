@@ -13,10 +13,50 @@ public class CharacterPlayerHud : MonoBehaviour
     public CharacterPlayer characterPlayer;
     public CharacterUI characterUI;
     public Animator characterInventoryAnim;
-    public InventorySlot lastSelectedSlot;
+    public InventorySlot _lastSelectedSlot;
+    public InventorySlot lastSelectedSlot
+    {
+        get => _lastSelectedSlot;
+        set
+        {
+            _lastSelectedSlot = value;
+            if (_lastSelectedSlot?.characterItem.itemBaseSO != null)
+            {
+                SetDescripitionData();
+            }
+            else
+            {
+                ResetDescription();
+            }
+        }
+    }
     public InventoryDraggedSlot inventoryDraggedSlot;
     public Transform hudTransform;
     public bool isDraggingItem;
+    public Dictionary<AnchorPreset, (Vector2 min, Vector2 max)> anchorPresets = new Dictionary<AnchorPreset, (Vector2, Vector2)>()
+        {
+            { AnchorPreset.TopLeft, (new Vector2(0, 1), new Vector2(0, 1)) },
+            { AnchorPreset.TopCenter, (new Vector2(0.5f, 1), new Vector2(0.5f, 1)) },
+            { AnchorPreset.TopRight, (new Vector2(1, 1), new Vector2(1, 1)) },
+
+            { AnchorPreset.MiddleLeft, (new Vector2(0, 0.5f), new Vector2(0, 0.5f)) },
+            { AnchorPreset.MiddleCenter, (new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)) },
+            { AnchorPreset.MiddleRight, (new Vector2(1, 0.5f), new Vector2(1, 0.5f)) },
+
+            { AnchorPreset.BottomLeft, (new Vector2(0, 0), new Vector2(0, 0)) },
+            { AnchorPreset.BottomCenter, (new Vector2(0.5f, 0), new Vector2(0.5f, 0)) },
+            { AnchorPreset.BottomRight, (new Vector2(1, 0), new Vector2(1, 0)) },
+
+            { AnchorPreset.StretchHorizontalTop, (new Vector2(0, 1), new Vector2(1, 1)) },
+            { AnchorPreset.StretchHorizontalMiddle, (new Vector2(0, 0.5f), new Vector2(1, 0.5f)) },
+            { AnchorPreset.StretchHorizontalBottom, (new Vector2(0, 0), new Vector2(1, 0)) },
+
+            { AnchorPreset.StretchVerticalLeft, (new Vector2(0, 0), new Vector2(0, 1)) },
+            { AnchorPreset.StretchVerticalCenter, (new Vector2(0.5f, 0), new Vector2(0.5f, 1)) },
+            { AnchorPreset.StretchVerticalRight, (new Vector2(1, 0), new Vector2(1, 1)) },
+
+            { AnchorPreset.StretchFull, (new Vector2(0, 0), new Vector2(1, 1)) },
+        };
     public async Awaitable InitializeInventory()
     {
         foreach (var item in characterUI.equipments)
@@ -29,6 +69,14 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         SelectFastItem();
         await RefreshCharacterInventory();
+    }
+    public async Awaitable ToggleCharacterInventory()
+    {
+        characterInventoryAnim.SetBool("isOpen", !characterInventoryAnim.GetBool("isOpen"));
+        if (!characterInventoryAnim.GetBool("isOpen"))
+        {
+            UpdateFastItems();
+        }
     }
     public async Awaitable ChangeCharacterPortrait()
     {
@@ -168,36 +216,53 @@ public class CharacterPlayerHud : MonoBehaviour
             }
         }
     }
-    public void ResetDescription()
+    public void SetDescripitionData()
     {
-        characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
-        characterUI.itemDescription.descriptionTextTransform.SetParent(characterUI.itemDescription.panelToResetSelect);
+        characterUI.itemDescription.descriptionTextTransform.SetParent(lastSelectedSlot.transform);
         characterUI.itemDescription.descriptionTextTransform.localPosition = Vector2.zero;
-    }
-    public async Awaitable ToggleCharacterInventory()
-    {
-        characterInventoryAnim.SetBool("isOpen", !characterInventoryAnim.GetBool("isOpen"));
-        if (!characterInventoryAnim.GetBool("isOpen"))
-        {
-            UpdateFastItems();
-        }
-    }
-    public void SetDescripitionData(ItemBaseSO itemBaseSO)
-    {
-        characterUI.itemDescription.itemIcon.sprite = itemBaseSO.icon;
-        characterUI.itemDescription.itemName.text = GameData.Instance.GetDialog(itemBaseSO.idText, GameData.TypeLOCS.Items).dialog;
-        string description = GameData.Instance.GetDialog(itemBaseSO.idText, GameData.TypeLOCS.Items).description;
+        characterUI.itemDescription.itemIcon.sprite = lastSelectedSlot.characterItem.itemBaseSO.icon;
+        characterUI.itemDescription.itemName.text = GameData.Instance.GetDialog(lastSelectedSlot.characterItem.itemBaseSO.idText, GameData.TypeLOCS.Items).dialog;
+        string description = GameData.Instance.GetDialog(lastSelectedSlot.characterItem.itemBaseSO.idText, GameData.TypeLOCS.Items).description;
         if (Regex.IsMatch(description, @"\{\d+\}"))
         {
-            List<CharacterData.Statistic> itemStats = itemBaseSO.itemStatistics.Values.ToList();
+            List<CharacterData.Statistic> itemStats = lastSelectedSlot.characterItem.itemBaseSO.itemStatistics.Values.ToList();
             for (int i = 0; i < itemStats.Count; i++)
             {
                 description = description.Replace($"{{{i}}}", itemStats[i].maxValue.ToString());
             }
         }
         characterUI.itemDescription.itemDescription.text = description;
+        characterUI.itemDescription.descriptionCanvasGroup.alpha = 1;
+        SetAnchorPreset(characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.TopRight);
+        SetAnchorPreset(characterUI.itemDescription.descriptionTextTransform, AnchorPreset.TopLeft);
     }
+    public void ResetDescription()
+    {
+        characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
+        characterUI.itemDescription.descriptionTextTransform.SetParent(characterUI.itemDescription.panelToResetSelect);
+        characterUI.itemDescription.descriptionTextTransform.localPosition = Vector2.zero;
+    }
+    void SetAnchorPreset(RectTransform rect, AnchorPreset preset)
+    {
+        var data = anchorPresets[preset];
 
+        rect.anchorMin = data.min;
+        rect.anchorMax = data.max;
+
+        Vector2 pivot = new Vector2(
+            GetPivotValue(data.min.x, data.max.x),
+            GetPivotValue(data.min.y, data.max.y)
+        );
+
+        rect.pivot = pivot;
+
+        rect.anchoredPosition = Vector2.zero;
+    }
+    float GetPivotValue(float min, float max)
+    {
+        if (min != max) return 0.5f;
+        return min;
+    }
     internal void ShowItemsToPickUp()
     {
         foreach (Transform child in characterUI.interactables.container)
@@ -272,5 +337,29 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public GameObject interactablesPanel;
         public Transform container;
+    }
+    public enum AnchorPreset
+    {
+        TopLeft,
+        TopCenter,
+        TopRight,
+
+        MiddleLeft,
+        MiddleCenter,
+        MiddleRight,
+
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
+
+        StretchHorizontalTop,
+        StretchHorizontalMiddle,
+        StretchHorizontalBottom,
+
+        StretchVerticalLeft,
+        StretchVerticalCenter,
+        StretchVerticalRight,
+
+        StretchFull
     }
 }

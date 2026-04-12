@@ -10,6 +10,7 @@ public class ItemBaseSO : ScriptableObject
     public TypeObject typeObject;
     public TypeWeapon typeWeapon;
     public string animationName;
+    public int maxStack;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
     public virtual void DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }

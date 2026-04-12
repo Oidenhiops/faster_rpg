@@ -124,6 +124,25 @@ public class CharacterPlayer : CharacterBase
                 ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
             }
         }
+        else
+        {
+            if (FindEmptyConsumableSlot(out int consumableIndex))
+            {
+                ChangeBagAndConsumable(slotIndex, consumableIndex);
+            }
+            else if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
+            {
+                FindConsumableAmountToAppend(slotIndex, similarConsumableIndex, out int amountToAppend);
+                charactersData[characterIndex].characterData.bag[slotIndex].amount -= amountToAppend;
+                charactersData[characterIndex].characterData.consumables[similarConsumableIndex].amount += amountToAppend;
+                characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[similarConsumableIndex]);
+                if (charactersData[characterIndex].characterData.bag[slotIndex].amount <= 0)
+                {
+                    charactersData[characterIndex].characterData.bag[slotIndex] = new CharacterData.CharacterItem();
+                }
+                characterPlayerHud.GetBagSlotByIndex(slotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[slotIndex]);
+            }
+        }
         _ = characterPlayerHud.ResetInventoryTarget();
     }
     public void ChangeObjectPosition()
@@ -315,5 +334,42 @@ public class CharacterPlayer : CharacterBase
         }
         bagIndex = 0;
         return false;
+    }
+    public bool FindEmptyConsumableSlot(out int bagIndex)
+    {
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].characterData.consumables)
+        {
+            if (bagSlot.Value.itemBaseSO == null)
+            {
+                bagIndex = bagSlot.Key;
+                return true;
+            }
+        }
+        bagIndex = 0;
+        return false;
+    }
+    public bool FindSimilarConsumableSlot(int bagIndex, out int consumableIndex)
+    {
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> consumableSlot in charactersData[characterIndex].characterData.consumables)
+        {
+            if (consumableSlot.Value.itemBaseSO != null && consumableSlot.Value.itemBaseSO.id == charactersData[characterIndex].characterData.bag[bagIndex].itemBaseSO.id && consumableSlot.Value.amount < consumableSlot.Value.itemBaseSO.maxStack)
+            {
+                consumableIndex = consumableSlot.Key;
+                return true;
+            }
+        }
+        consumableIndex = 0;
+        return false;
+    }
+    public void FindConsumableAmountToAppend(int bagIndex, int consumableIndex, out int amountToAppend)
+    {
+        if (charactersData[characterIndex].characterData.bag[bagIndex].amount + charactersData[characterIndex].characterData.consumables[consumableIndex].amount <= charactersData[characterIndex].characterData.consumables[consumableIndex].itemBaseSO.maxStack)
+        {
+            amountToAppend = charactersData[characterIndex].characterData.bag[bagIndex].amount;
+        }
+        else
+        {
+            amountToAppend = charactersData[characterIndex].characterData.consumables[consumableIndex].itemBaseSO.maxStack - charactersData[characterIndex].characterData.consumables[consumableIndex].amount;
+        }
     }
 }
