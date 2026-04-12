@@ -25,6 +25,7 @@ public class CharacterData
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>> skills = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>>();
     public int characterId;
+    public int characterEvolutionId;
     public int characterSkinId;
     public void InitializeStatistics()
     {
@@ -104,6 +105,14 @@ public class CharacterData
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
         public int amount;
+        public void ResetItem()
+        {
+            itemId = 0;
+            typeObject = default;
+            itemBaseSO = null;
+            itemStatistics.Clear();
+            amount = 0;
+        }
         public CharacterItem() { }
         public CharacterItem(CharacterItem characterItem)
         {

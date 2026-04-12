@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 277fea691be463341a7f71a22c600ae9, type: 3}
-  m_Name: Consumable2
-  m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
+  m_Script: {fileID: 11500000, guid: 160f0c11bcad4fb4b98016af2cfea0d1, type: 3}
+  m_Name: ConsumableItem2
+  m_EditorClassIdentifier: Assembly-CSharp::ConsumableItemSO
   id: 2
   idText: 2
   icon: {fileID: -73980206, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
@@ -24,10 +24,11 @@ MonoBehaviour:
     _serializedList:
     - Key: 1
       Value:
-        baseValue: 0
+        baseValue: 20
         aptitudeValue: 0
         itemValue: 0
         buffValue:
           _serializedList: []
         currentValue: 0
-        maxValue: 10
+        maxValue: 0
+  useEffectPrefab: {fileID: 2420060085027401915, guid: 8a92c508061bf4048a50f0ef97c9cbf1, type: 3}

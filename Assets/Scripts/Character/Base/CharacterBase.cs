@@ -15,6 +15,7 @@ public class CharacterBase : MonoBehaviour
     public GameObject floatingTextPrefab;
     public GameObject dieEffectPrefab;
     public GameObject itempDroppedPrefab;
+    public CharacterPlayerHud characterPlayerHud;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
     public bool isGrounded => SetGrounded();
@@ -75,6 +76,8 @@ public class CharacterBase : MonoBehaviour
         characterMovement.HandleMovement();
     }
     public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
+    public virtual void UseItem() { }
+    public virtual void UseItem(int bagSlotIndex) { }
     protected bool SetGrounded()
     {
         return Physics.OverlapBox
@@ -196,7 +199,7 @@ public class CharacterBase : MonoBehaviour
         public Transform rightHand;
         public Mesh originalMesh;
     }
-        [Serializable]
+    [Serializable]
     public class CharacterSkinData
     {
     public Texture2D atlas;

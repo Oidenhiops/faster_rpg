@@ -97,13 +97,22 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ChangeItem",
+                    "name": "ChangeFastItem",
                     "type": "Value",
                     "id": "2dbd2b88-57fc-42a5-a1ac-1deebcf0c51f",
                     "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "UseFastItem",
+                    "type": "Button",
+                    "id": "36c4a88f-1746-4dac-b11f-3e3e98dbb798",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -510,7 +519,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ChangeItem",
+                    "action": "ChangeFastItem",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -521,7 +530,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ChangeItem",
+                    "action": "ChangeFastItem",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -532,9 +541,20 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ChangeItem",
+                    "action": "ChangeFastItem",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "a4bcb46d-81fc-452f-a129-3ebfe5243f00",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UseFastItem",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

@@ -228,7 +228,7 @@ public class CharacterPlayerHud : MonoBehaviour
             List<CharacterData.Statistic> itemStats = lastSelectedSlot.characterItem.itemBaseSO.itemStatistics.Values.ToList();
             for (int i = 0; i < itemStats.Count; i++)
             {
-                description = description.Replace($"{{{i}}}", itemStats[i].maxValue.ToString());
+                description = description.Replace($"{{{i}}}", itemStats[i].baseValue.ToString());
             }
         }
         characterUI.itemDescription.itemDescription.text = description;

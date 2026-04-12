@@ -326,12 +326,46 @@ public class GameData : MonoBehaviour
             charactersDBSO.GenerateFantasyName(),
             charactersDBSO.GenerateFantasyName()
         };
-        SerializedDictionary<int, CharacterData.CharacterItem> bag = new SerializedDictionary<int, CharacterData.CharacterItem>();
-        for (int i = 0; i < 10; i++) bag.Add(i, new CharacterData.CharacterItem());
-        bag[0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 1);
-        bag[1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
-        bag[2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 3);
-        bag[3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
+
+        List<SerializedDictionary<int, CharacterData.CharacterItem>> bags = new List<SerializedDictionary<int, CharacterData.CharacterItem>>
+        {
+            new SerializedDictionary<int, CharacterData.CharacterItem>(),
+            new SerializedDictionary<int, CharacterData.CharacterItem>(),
+            new SerializedDictionary<int, CharacterData.CharacterItem>(),
+            new SerializedDictionary<int, CharacterData.CharacterItem>()
+        };
+        List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> characterStatistics = new List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>
+        {
+            charactersDBSO.data[0][0].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[0][1].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[0][2].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[0][3].initialDataSO.CloneStatistics()
+        };
+        foreach (SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> stats in characterStatistics)
+        {
+            foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in stats)
+            {
+                if (statistic.Key != CharacterData.TypeStatistic.Exp)
+                {
+                    statistic.Value.RefreshValue();
+                    statistic.Value.SetMaxValue();
+                }
+            }
+        }
+        int bagIndex = 0;
+        foreach (SerializedDictionary<int, CharacterData.CharacterItem> bag in bags)
+        {
+            for (int i = 0; i < characterStatistics[bagIndex][CharacterData.TypeStatistic.BagSpace].currentValue; i++)
+            {
+                bag.Add(i, new CharacterData.CharacterItem());
+            }
+            bagIndex++;
+        }
+
+        bags[0][0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3);
+        bags[0][1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
+        bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
+
         return new GameDataSlot
         {
             isUse = true,
@@ -342,11 +376,9 @@ public class GameData : MonoBehaviour
             {
                 { randomNames[0], new CharacterData()
                     {
-                        name = randomNames[0],
                         level = 1,
-                        characterId = 0,
-                        characterSkinId = 0,
-                        bag = bag,
+                        name = randomNames[0],
+                        statistics = characterStatistics[0],
                         equipments = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterData.CharacterItem>()
                         {
                             { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 1) },
@@ -365,104 +397,61 @@ public class GameData : MonoBehaviour
                             { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2) },
                             { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
                         },
-                        statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
-                        {
-                            { CharacterData.TypeStatistic.Hp, new CharacterData.Statistic() { baseValue = 100, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Sp, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Atk, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Hit, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Int, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Def, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Res, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Spd, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        }
+                        bag = bags[0],
+                        characterId = 0,
+                        characterEvolutionId = 0,
+                        characterSkinId = 0,
                     }
                 },
                 { randomNames[1], new CharacterData()
                     {
-                        name = randomNames[1],
                         level = 1,
-                        characterId = 0,
-                        characterSkinId = 1,
-                        statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
-                        {
-                            { CharacterData.TypeStatistic.Hp, new CharacterData.Statistic() { baseValue = 100, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Sp, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Atk, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Hit, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Int, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Def, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Res, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Spd, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        },
+                        name = randomNames[1],
+                        statistics = characterStatistics[1],
                         consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
                             { 2, new CharacterData.CharacterItem() },
                         },
+                        bag = bags[1],
+                        characterId = 0,
+                        characterEvolutionId = 1,
+                        characterSkinId = 1,
                     }
                 },
                 { randomNames[2], new CharacterData()
                     {
-                        name = randomNames[2],
                         level = 1,
-                        characterId = 0,
-                        characterSkinId = 2,
-                        statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
-                        {
-                            { CharacterData.TypeStatistic.Hp, new CharacterData.Statistic() { baseValue = 100, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Sp, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Atk, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Hit, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Int, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Def, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Res, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Spd, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        },
+                        name = randomNames[2],
+                        statistics = characterStatistics[2],
                         consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
                             { 2, new CharacterData.CharacterItem() },
                         },
+                        bag = bags[2],
+                        characterId = 0,
+                        characterEvolutionId = 2,
+                        characterSkinId = 2,
                     }
                 },
                 { randomNames[3], new CharacterData()
                     {
-                        name = randomNames[3],
                         level = 1,
-                        characterId = 0,
-                        characterSkinId = 3,
-                        statistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>()
-                        {
-                            { CharacterData.TypeStatistic.Hp, new CharacterData.Statistic() { baseValue = 100, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Sp, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Atk, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Hit, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Int, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Def, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Res, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Spd, new CharacterData.Statistic() { baseValue = 10, aptitudeValue = 100 } },
-                            { CharacterData.TypeStatistic.Exp, new CharacterData.Statistic() { baseValue = 0, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic() { baseValue = 5, aptitudeValue = 0 } },
-                            { CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic() { baseValue = 50, aptitudeValue = 0 } },
-                        },
+                        name = randomNames[3],
+                        statistics = characterStatistics[3],
                         consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
                             { 2, new CharacterData.CharacterItem() },
                         },
+                        bag = bags[3],
+                        characterId = 0,
+                        characterEvolutionId = 3,
+                        characterSkinId = 3,
                     }
                 },
             }

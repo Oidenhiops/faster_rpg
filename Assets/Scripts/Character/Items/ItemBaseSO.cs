@@ -14,6 +14,7 @@ public class ItemBaseSO : ScriptableObject
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
     public virtual void DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }
+    public virtual void UseItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("UseItem not implemented"); }
     public enum GeneralTypeObject
     {
         None = 0,

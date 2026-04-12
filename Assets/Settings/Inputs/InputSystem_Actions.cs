@@ -183,13 +183,22 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ChangeItem"",
+                    ""name"": ""ChangeFastItem"",
                     ""type"": ""Value"",
                     ""id"": ""2dbd2b88-57fc-42a5-a1ac-1deebcf0c51f"",
                     ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""UseFastItem"",
+                    ""type"": ""Button"",
+                    ""id"": ""36c4a88f-1746-4dac-b11f-3e3e98dbb798"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -596,7 +605,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ChangeItem"",
+                    ""action"": ""ChangeFastItem"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -607,7 +616,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ChangeItem"",
+                    ""action"": ""ChangeFastItem"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -618,9 +627,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ChangeItem"",
+                    ""action"": ""ChangeFastItem"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a4bcb46d-81fc-452f-a129-3ebfe5243f00"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UseFastItem"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1216,7 +1236,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_ChangeCharacter = m_Player.FindAction("ChangeCharacter", throwIfNotFound: true);
         m_Player_ToggleInventory = m_Player.FindAction("ToggleInventory", throwIfNotFound: true);
-        m_Player_ChangeItem = m_Player.FindAction("ChangeItem", throwIfNotFound: true);
+        m_Player_ChangeFastItem = m_Player.FindAction("ChangeFastItem", throwIfNotFound: true);
+        m_Player_UseFastItem = m_Player.FindAction("UseFastItem", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1320,7 +1341,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_ChangeCharacter;
     private readonly InputAction m_Player_ToggleInventory;
-    private readonly InputAction m_Player_ChangeItem;
+    private readonly InputAction m_Player_ChangeFastItem;
+    private readonly InputAction m_Player_UseFastItem;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1373,9 +1395,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @ToggleInventory => m_Wrapper.m_Player_ToggleInventory;
         /// <summary>
-        /// Provides access to the underlying input action "Player/ChangeItem".
+        /// Provides access to the underlying input action "Player/ChangeFastItem".
         /// </summary>
-        public InputAction @ChangeItem => m_Wrapper.m_Player_ChangeItem;
+        public InputAction @ChangeFastItem => m_Wrapper.m_Player_ChangeFastItem;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/UseFastItem".
+        /// </summary>
+        public InputAction @UseFastItem => m_Wrapper.m_Player_UseFastItem;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1432,9 +1458,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ToggleInventory.started += instance.OnToggleInventory;
             @ToggleInventory.performed += instance.OnToggleInventory;
             @ToggleInventory.canceled += instance.OnToggleInventory;
-            @ChangeItem.started += instance.OnChangeItem;
-            @ChangeItem.performed += instance.OnChangeItem;
-            @ChangeItem.canceled += instance.OnChangeItem;
+            @ChangeFastItem.started += instance.OnChangeFastItem;
+            @ChangeFastItem.performed += instance.OnChangeFastItem;
+            @ChangeFastItem.canceled += instance.OnChangeFastItem;
+            @UseFastItem.started += instance.OnUseFastItem;
+            @UseFastItem.performed += instance.OnUseFastItem;
+            @UseFastItem.canceled += instance.OnUseFastItem;
         }
 
         /// <summary>
@@ -1476,9 +1505,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ToggleInventory.started -= instance.OnToggleInventory;
             @ToggleInventory.performed -= instance.OnToggleInventory;
             @ToggleInventory.canceled -= instance.OnToggleInventory;
-            @ChangeItem.started -= instance.OnChangeItem;
-            @ChangeItem.performed -= instance.OnChangeItem;
-            @ChangeItem.canceled -= instance.OnChangeItem;
+            @ChangeFastItem.started -= instance.OnChangeFastItem;
+            @ChangeFastItem.performed -= instance.OnChangeFastItem;
+            @ChangeFastItem.canceled -= instance.OnChangeFastItem;
+            @UseFastItem.started -= instance.OnUseFastItem;
+            @UseFastItem.performed -= instance.OnUseFastItem;
+            @UseFastItem.canceled -= instance.OnUseFastItem;
         }
 
         /// <summary>
@@ -1850,12 +1882,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleInventory(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ChangeItem" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "ChangeFastItem" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnChangeItem(InputAction.CallbackContext context);
+        void OnChangeFastItem(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "UseFastItem" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnUseFastItem(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

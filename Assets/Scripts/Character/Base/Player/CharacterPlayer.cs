@@ -7,10 +7,9 @@ using UnityEngine.InputSystem;
 public class CharacterPlayer : CharacterBase
 {
     public InputSystem_Actions inputActions;
-    public CharacterPlayerHud characterPlayerHud;
     public GameObject interactableBannerPrefab;
-    public float dropLaunchForce = 4f;
-    public float dropUpForce = 2f;
+    private float dropLaunchForce = 4f;
+    private float dropUpForce = 2f;
     public SerializedDictionary<InteractableBase, GameObject> interactables = new SerializedDictionary<InteractableBase, GameObject>();
     public Action OnShowItemsToPickUp;
     public bool isChangingCharacter;
@@ -20,7 +19,8 @@ public class CharacterPlayer : CharacterBase
         inputActions.Enable();
         inputActions.Player.ChangeCharacter.performed += OnHandleChangeCharacter;
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
-        inputActions.Player.ChangeItem.performed += OnHandleChangeItem;
+        inputActions.Player.ChangeFastItem.performed += OnHandleChangeItem;
+        inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -44,7 +44,6 @@ public class CharacterPlayer : CharacterBase
                 }
             }
             charactersData = charactersDataList.ToArray();
-            await InitializeStatistics();
             await InitializeItems();
             for (int i = 0; i < 4; i++)
             {
@@ -97,13 +96,6 @@ public class CharacterPlayer : CharacterBase
         await characterPlayerHud.ChangeCharacterPortrait();
         isChangingCharacter = false;
     }
-    async Awaitable InitializeStatistics()
-    {
-        foreach (CharactersData character in charactersData)
-        {
-            character.characterData.InitializeStatistics();
-        }
-    }
     async Awaitable InitializeItems()
     {
         foreach (CharactersData character in charactersData)
@@ -113,6 +105,7 @@ public class CharacterPlayer : CharacterBase
     }
     public void FastEquipItem(int slotIndex)
     {
+        if (characterPlayerHud.isDraggingItem) return;
         if (charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO?.typeObject != ItemBaseSO.TypeObject.Consumable)
         {
             if (GetEquipmentItemByIndex(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
@@ -126,11 +119,7 @@ public class CharacterPlayer : CharacterBase
         }
         else
         {
-            if (FindEmptyConsumableSlot(out int consumableIndex))
-            {
-                ChangeBagAndConsumable(slotIndex, consumableIndex);
-            }
-            else if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
+            if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
             {
                 FindConsumableAmountToAppend(slotIndex, similarConsumableIndex, out int amountToAppend);
                 charactersData[characterIndex].characterData.bag[slotIndex].amount -= amountToAppend;
@@ -141,6 +130,10 @@ public class CharacterPlayer : CharacterBase
                     charactersData[characterIndex].characterData.bag[slotIndex] = new CharacterData.CharacterItem();
                 }
                 characterPlayerHud.GetBagSlotByIndex(slotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[slotIndex]);
+            }
+            else if (FindEmptyConsumableSlot(out int consumableIndex))
+            {
+                ChangeBagAndConsumable(slotIndex, consumableIndex);
             }
         }
         _ = characterPlayerHud.ResetInventoryTarget();
@@ -306,6 +299,18 @@ public class CharacterPlayer : CharacterBase
         directionFromCamera.Normalize();
         itemDropped.rb.linearVelocity = Vector3.zero;
         itemDropped.rb.AddForce(directionFromCamera * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
+    }
+    public void OnHandleUseFastItem(InputAction.CallbackContext context)
+    {
+        UseItem();
+    }
+    public override void UseItem()
+    {
+        charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
+    }
+    public override void UseItem(int bagSlotIndex)
+    {
+        charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
     }
     public void OnHandleShowItemsToPickUp()
     {
