@@ -365,6 +365,7 @@ public class GameData : MonoBehaviour
         bags[0][0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3);
         bags[0][1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
         bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
+        bags[0][3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
 
         return new GameDataSlot
         {
