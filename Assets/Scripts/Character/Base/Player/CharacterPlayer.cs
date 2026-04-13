@@ -67,6 +67,13 @@ public class CharacterPlayer : CharacterBase
             Debug.LogError($"Error initializing character: {ex.Message}");
         }
     }
+    async Awaitable InitializeItems()
+    {
+        foreach (CharactersData character in charactersData)
+        {
+            character.characterData.InitializeItems();
+        }
+    }
     void OnHandleChangeCharacter(InputAction.CallbackContext context)
     {
         if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
@@ -80,9 +87,41 @@ public class CharacterPlayer : CharacterBase
             _ = characterPlayerHud.RefreshCharacterInventory();
         }
     }
+    async Awaitable ChangeCharacterAction()
+    {
+        await characterPlayerHud.ChangeCharacterPortrait();
+        isChangingCharacter = false;
+    }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {
         _ = characterPlayerHud.ToggleCharacterInventory();
+    }
+    public void OnHandleUseFastItem(InputAction.CallbackContext context)
+    {
+        UseItem();
+    }
+    public override void UseItem()
+    {
+        charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
+    }
+    public override void UseItem(int bagSlotIndex)
+    {
+        charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+    }
+    public void OnHandleShowItemsToPickUp()
+    {
+        characterPlayerHud.ShowItemsToPickUp();
+    }
+    public override void OnHandlePickUpItem(ItemDropped itemDropped)
+    {
+        if (FindEmptyBagSlot(out int bagIndex))
+        {
+            charactersData[characterIndex].characterData.bag[bagIndex] = itemDropped.itemData;
+            characterPlayerHud.GetBagSlotByIndex(bagIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagIndex]);
+            Destroy(itemDropped.gameObject);
+            interactables.Remove(itemDropped);
+            OnShowItemsToPickUp?.Invoke();
+        }
     }
     void OnHandleChangeItem(InputAction.CallbackContext context)
     {
@@ -90,53 +129,6 @@ public class CharacterPlayer : CharacterBase
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
         characterPlayerHud.SelectFastItem();
-    }
-    async Awaitable ChangeCharacterAction()
-    {
-        await characterPlayerHud.ChangeCharacterPortrait();
-        isChangingCharacter = false;
-    }
-    async Awaitable InitializeItems()
-    {
-        foreach (CharactersData character in charactersData)
-        {
-            character.characterData.InitializeItems();
-        }
-    }
-    public void FastEquipItem(int slotIndex)
-    {
-        if (characterPlayerHud.isDraggingItem) return;
-        if (charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO?.typeObject != ItemBaseSO.TypeObject.Consumable)
-        {
-            if (GetEquipmentItemByIndex(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
-            {
-                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
-            }
-            else
-            {
-                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
-            }
-        }
-        else
-        {
-            if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
-            {
-                FindAmountToAppend(charactersData[characterIndex].characterData.bag[slotIndex], charactersData[characterIndex].characterData.consumables[similarConsumableIndex], out int amountToAppend);
-                charactersData[characterIndex].characterData.bag[slotIndex].amount -= amountToAppend;
-                charactersData[characterIndex].characterData.consumables[similarConsumableIndex].amount += amountToAppend;
-                characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[similarConsumableIndex]);
-                if (charactersData[characterIndex].characterData.bag[slotIndex].amount <= 0)
-                {
-                    charactersData[characterIndex].characterData.bag[slotIndex] = new CharacterData.CharacterItem();
-                }
-                characterPlayerHud.GetBagSlotByIndex(slotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[slotIndex]);
-            }
-            else if (FindEmptyConsumableSlot(out int consumableIndex))
-            {
-                ChangeBagAndConsumable(slotIndex, consumableIndex, true);
-            }
-        }
-        _ = characterPlayerHud.ResetInventoryTarget();
     }
     public void ChangeObjectPosition()
     {
@@ -308,95 +300,6 @@ public class CharacterPlayer : CharacterBase
         characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
         characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
     }
-    public CharacterData.CharacterItem GetBagItemByIndex(int index)
-    {
-        if (charactersData[characterIndex].characterData.bag.TryGetValue(index, out CharacterData.CharacterItem bagItem))
-        {
-            return bagItem;
-        }
-        return new CharacterData.CharacterItem();
-    }
-    public CharacterData.CharacterItem GetConsumableItemByIndex(int index)
-    {
-        if (charactersData[characterIndex].characterData.consumables.TryGetValue(index, out CharacterData.CharacterItem consumableItem))
-        {
-            return consumableItem;
-        }
-        return new CharacterData.CharacterItem();
-    }
-    public CharacterData.CharacterItem GetEquipmentItemByIndex(ItemBaseSO.TypeObject index)
-    {
-        if (charactersData[characterIndex].characterData.equipments.TryGetValue(index, out CharacterData.CharacterItem equipmentItem))
-        {
-            return equipmentItem;
-        }
-        return new CharacterData.CharacterItem();
-    }
-    public void DropItem()
-    {
-        int draggedSlotIndex = characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex;
-        if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
-        {
-            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
-            itemDropped.InitializeDropItem(GetBagItemByIndex(draggedSlotIndex), true);
-            LaunchDropItem(itemDropped);
-            charactersData[characterIndex].characterData.bag[draggedSlotIndex] = new CharacterData.CharacterItem();
-            characterPlayerHud.GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
-        }
-        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
-        {
-            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
-            itemDropped.InitializeDropItem(GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), true);
-            LaunchDropItem(itemDropped);
-            charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
-            characterPlayerHud.GetEquipmentSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject).InitializeSlot(new CharacterData.CharacterItem());
-        }
-        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
-        {
-            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
-            itemDropped.InitializeDropItem(GetConsumableItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex), true);
-            LaunchDropItem(itemDropped);
-            charactersData[characterIndex].characterData.consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
-            characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
-        }
-    }
-    void LaunchDropItem(ItemDropped itemDropped)
-    {
-        CameraInfo.Instance.CamDirection(new Vector3(directionAnimation.x, 0, directionAnimation.z), out Vector3 directionFromCamera);
-        if (directionFromCamera == Vector3.zero)
-            return;
-
-        directionFromCamera.Normalize();
-        itemDropped.rb.linearVelocity = Vector3.zero;
-        itemDropped.rb.AddForce(directionFromCamera * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
-    }
-    public void OnHandleUseFastItem(InputAction.CallbackContext context)
-    {
-        UseItem();
-    }
-    public override void UseItem()
-    {
-        charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
-    }
-    public override void UseItem(int bagSlotIndex)
-    {
-        charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
-    }
-    public void OnHandleShowItemsToPickUp()
-    {
-        characterPlayerHud.ShowItemsToPickUp();
-    }
-    public override void OnHandlePickUpItem(ItemDropped itemDropped)
-    {
-        if (FindEmptyBagSlot(out int bagIndex))
-        {
-            charactersData[characterIndex].characterData.bag[bagIndex] = itemDropped.itemData;
-            characterPlayerHud.GetBagSlotByIndex(bagIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagIndex]);
-            Destroy(itemDropped.gameObject);
-            interactables.Remove(itemDropped);
-            OnShowItemsToPickUp?.Invoke();
-        }
-    }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
         foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].characterData.bag)
@@ -446,5 +349,102 @@ public class CharacterPlayer : CharacterBase
         {
             amountToAppend = toAppend.itemBaseSO.maxStack - toAppend.amount;
         }
+    }
+    public CharacterData.CharacterItem GetBagItemByIndex(int index)
+    {
+        if (charactersData[characterIndex].characterData.bag.TryGetValue(index, out CharacterData.CharacterItem bagItem))
+        {
+            return bagItem;
+        }
+        return new CharacterData.CharacterItem();
+    }
+    public CharacterData.CharacterItem GetConsumableItemByIndex(int index)
+    {
+        if (charactersData[characterIndex].characterData.consumables.TryGetValue(index, out CharacterData.CharacterItem consumableItem))
+        {
+            return consumableItem;
+        }
+        return new CharacterData.CharacterItem();
+    }
+    public CharacterData.CharacterItem GetEquipmentItemByIndex(ItemBaseSO.TypeObject index)
+    {
+        if (charactersData[characterIndex].characterData.equipments.TryGetValue(index, out CharacterData.CharacterItem equipmentItem))
+        {
+            return equipmentItem;
+        }
+        return new CharacterData.CharacterItem();
+    }
+    public void FastEquipItem(int slotIndex)
+    {
+        if (characterPlayerHud.isDraggingItem) return;
+        if (charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO?.typeObject != ItemBaseSO.TypeObject.Consumable)
+        {
+            if (GetEquipmentItemByIndex(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
+            {
+                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+            }
+            else
+            {
+                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+            }
+        }
+        else
+        {
+            if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
+            {
+                FindAmountToAppend(charactersData[characterIndex].characterData.bag[slotIndex], charactersData[characterIndex].characterData.consumables[similarConsumableIndex], out int amountToAppend);
+                charactersData[characterIndex].characterData.bag[slotIndex].amount -= amountToAppend;
+                charactersData[characterIndex].characterData.consumables[similarConsumableIndex].amount += amountToAppend;
+                characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[similarConsumableIndex]);
+                if (charactersData[characterIndex].characterData.bag[slotIndex].amount <= 0)
+                {
+                    charactersData[characterIndex].characterData.bag[slotIndex] = new CharacterData.CharacterItem();
+                }
+                characterPlayerHud.GetBagSlotByIndex(slotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[slotIndex]);
+            }
+            else if (FindEmptyConsumableSlot(out int consumableIndex))
+            {
+                ChangeBagAndConsumable(slotIndex, consumableIndex, true);
+            }
+        }
+        _ = characterPlayerHud.ResetInventoryTarget();
+    }
+    public void DropItem()
+    {
+        int draggedSlotIndex = characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex;
+        if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
+        {
+            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
+            itemDropped.InitializeDropItem(GetBagItemByIndex(draggedSlotIndex), true);
+            LaunchDropItem(itemDropped);
+            charactersData[characterIndex].characterData.bag[draggedSlotIndex] = new CharacterData.CharacterItem();
+            characterPlayerHud.GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
+        }
+        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
+        {
+            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
+            itemDropped.InitializeDropItem(GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), true);
+            LaunchDropItem(itemDropped);
+            charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
+            characterPlayerHud.GetEquipmentSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject).InitializeSlot(new CharacterData.CharacterItem());
+        }
+        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
+        {
+            ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
+            itemDropped.InitializeDropItem(GetConsumableItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex), true);
+            LaunchDropItem(itemDropped);
+            charactersData[characterIndex].characterData.consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
+            characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
+        }
+    }
+    void LaunchDropItem(ItemDropped itemDropped)
+    {
+        CameraInfo.Instance.CamDirection(new Vector3(directionAnimation.x, 0, directionAnimation.z), out Vector3 directionFromCamera);
+        if (directionFromCamera == Vector3.zero)
+            return;
+
+        directionFromCamera.Normalize();
+        itemDropped.rb.linearVelocity = Vector3.zero;
+        itemDropped.rb.AddForce(directionFromCamera * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
     }
 }

@@ -143,6 +143,7 @@ public class CharacterPlayerHud : MonoBehaviour
             }
             UpdateFastItems();
             await Awaitable.NextFrameAsync();
+            if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
             characterUI.panelToResetSelect.gameObject.SetActive(false);
         }
         catch (Exception e)
