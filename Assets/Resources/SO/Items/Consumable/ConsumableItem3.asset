@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 160f0c11bcad4fb4b98016af2cfea0d1, type: 3}
   m_Name: ConsumableItem3
   m_EditorClassIdentifier: Assembly-CSharp::ConsumableItemSO
-  id: 2
-  idText: 2
+  id: 3
+  idText: 3
   icon: {fileID: 1062106936, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   generalTypeObject: 2
   typeObject: 10

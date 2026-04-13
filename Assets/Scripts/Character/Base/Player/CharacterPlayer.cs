@@ -121,7 +121,7 @@ public class CharacterPlayer : CharacterBase
         {
             if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
             {
-                FindConsumableAmountToAppend(slotIndex, similarConsumableIndex, out int amountToAppend);
+                FindAmountToAppend(charactersData[characterIndex].characterData.bag[slotIndex], charactersData[characterIndex].characterData.consumables[similarConsumableIndex], out int amountToAppend);
                 charactersData[characterIndex].characterData.bag[slotIndex].amount -= amountToAppend;
                 charactersData[characterIndex].characterData.consumables[similarConsumableIndex].amount += amountToAppend;
                 characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[similarConsumableIndex]);
@@ -146,7 +146,13 @@ public class CharacterPlayer : CharacterBase
         if (characterPlayerHud.lastSelectedSlot == characterPlayerHud.inventoryDraggedSlot.itemDraged) return;
 
         if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
+        {
             ChangeBagAndBag(lastSelectedSlotIndex, draggedSlotIndex);
+        }
+        if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Consumables && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Consumables)
+        {
+            ChangeConsumableToConsumable(lastSelectedSlotIndex, draggedSlotIndex);
+        }
         else if (
             characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag &&
             characterPlayerHud.lastSelectedSlot.typeInventorySlot != InventorySlot.TypeInventorySlot.Bag)
@@ -197,6 +203,34 @@ public class CharacterPlayer : CharacterBase
         charactersData[characterIndex].characterData.bag[bagSlotIndex] = draggedItemTemp;
         characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
         characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[draggedBagSlotIndex]);
+    }
+    void ChangeConsumableToConsumable(int consumableSlotIndex, int draggedConsumableSlotIndex)
+    {
+        if (charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO != null &&
+            charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex].itemBaseSO &&
+            charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount < charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO.maxStack)
+        {
+            FindAmountToAppend(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex], charactersData[characterIndex].characterData.consumables[consumableSlotIndex], out int amountToAppend);
+            charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount += amountToAppend;
+            charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex].amount -= amountToAppend;
+            characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
+            characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex]);
+            if (charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex].amount <= 0)
+            {
+                charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex] = new CharacterData.CharacterItem();
+                characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex]);
+            }
+        }
+        else
+        {
+            CharacterData.CharacterItem consumableItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(consumableSlotIndex));
+            CharacterData.CharacterItem draggedItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(draggedConsumableSlotIndex));
+
+            charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex] = consumableItemTemp;
+            charactersData[characterIndex].characterData.consumables[consumableSlotIndex] = draggedItemTemp;
+            characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
+            characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex]);
+        }
     }
     private void ChangeBagAndConsumable(int bagSlotIndex, int consumableSlotIndex)
     {
@@ -366,15 +400,15 @@ public class CharacterPlayer : CharacterBase
         consumableIndex = 0;
         return false;
     }
-    public void FindConsumableAmountToAppend(int bagIndex, int consumableIndex, out int amountToAppend)
+    public void FindAmountToAppend(CharacterData.CharacterItem forAppend, CharacterData.CharacterItem toAppend, out int amountToAppend)
     {
-        if (charactersData[characterIndex].characterData.bag[bagIndex].amount + charactersData[characterIndex].characterData.consumables[consumableIndex].amount <= charactersData[characterIndex].characterData.consumables[consumableIndex].itemBaseSO.maxStack)
+        if (forAppend.amount + toAppend.amount <= toAppend.itemBaseSO.maxStack)
         {
-            amountToAppend = charactersData[characterIndex].characterData.bag[bagIndex].amount;
+            amountToAppend = forAppend.amount;
         }
         else
         {
-            amountToAppend = charactersData[characterIndex].characterData.consumables[consumableIndex].itemBaseSO.maxStack - charactersData[characterIndex].characterData.consumables[consumableIndex].amount;
+            amountToAppend = toAppend.itemBaseSO.maxStack - toAppend.amount;
         }
     }
 }
