@@ -72,11 +72,7 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     public async Awaitable ToggleCharacterInventory()
     {
-        characterInventoryAnim.SetBool("isOpen", !characterInventoryAnim.GetBool("isOpen"));
-        if (!characterInventoryAnim.GetBool("isOpen"))
-        {
-            UpdateFastItems();
-        }
+        characterInventoryAnim.SetBool("isOpen", characterPlayer.isInventoryOpen);
     }
     public async Awaitable ChangeCharacterPortrait()
     {
@@ -158,7 +154,7 @@ public class CharacterPlayerHud : MonoBehaviour
         await Awaitable.NextFrameAsync();
         characterUI.panelToResetSelect.gameObject.SetActive(false);
     }
-    void UpdateFastItems()
+    public void UpdateFastItems()
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {

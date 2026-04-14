@@ -55,7 +55,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ApplyOutline: 1
+    - _ApplyOutline: 0
     - _DissolveAmount: 0
     - _DissolveScale: 0
     - _DisssolveColor: 0.02

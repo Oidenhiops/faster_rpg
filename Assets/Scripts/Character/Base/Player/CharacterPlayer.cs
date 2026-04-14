@@ -13,13 +13,14 @@ public class CharacterPlayer : CharacterBase
     public SerializedDictionary<InteractableBase, GameObject> interactables = new SerializedDictionary<InteractableBase, GameObject>();
     public Action OnShowItemsToPickUp;
     public bool isChangingCharacter;
+    public bool isInventoryOpen;
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
         inputActions.Enable();
         inputActions.Player.ChangeCharacter.performed += OnHandleChangeCharacter;
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
-        inputActions.Player.ChangeFastItem.performed += OnHandleChangeItem;
+        inputActions.Player.ChangeFastItem.performed += OnHandleChangeFastItem;
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
@@ -94,6 +95,7 @@ public class CharacterPlayer : CharacterBase
     }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {
+        isInventoryOpen = !isInventoryOpen;
         _ = characterPlayerHud.ToggleCharacterInventory();
     }
     public void OnHandleUseFastItem(InputAction.CallbackContext context)
@@ -102,10 +104,12 @@ public class CharacterPlayer : CharacterBase
     }
     public override void UseItem()
     {
+        if (isInventoryOpen) return;
         charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
     }
     public override void UseItem(int bagSlotIndex)
     {
+        if (isInventoryOpen) return;
         charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
     }
     public void OnHandleShowItemsToPickUp()
@@ -123,8 +127,9 @@ public class CharacterPlayer : CharacterBase
             OnShowItemsToPickUp?.Invoke();
         }
     }
-    void OnHandleChangeItem(InputAction.CallbackContext context)
+    void OnHandleChangeFastItem(InputAction.CallbackContext context)
     {
+        if (isInventoryOpen) return;
         currentFastItemIndex += (int)context.ReadValue<float>();
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
@@ -230,6 +235,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
             characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex]);
         }
+        characterPlayerHud.UpdateFastItems();
     }
     private void ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
     {
@@ -289,6 +295,7 @@ public class CharacterPlayer : CharacterBase
                 DiferentBagAndConsumable(bagSlotIndex, consumableSlotIndex);
             }
         }
+        characterPlayerHud.UpdateFastItems();
     }
     void DiferentBagAndConsumable(int bagSlotIndex, int consumableSlotIndex)
     {
@@ -299,6 +306,7 @@ public class CharacterPlayer : CharacterBase
         charactersData[characterIndex].characterData.consumables[consumableSlotIndex] = bagSlotTemp;
         characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
         characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
+        characterPlayerHud.UpdateFastItems();
     }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
@@ -406,6 +414,7 @@ public class CharacterPlayer : CharacterBase
             {
                 ChangeBagAndConsumable(slotIndex, consumableIndex, true);
             }
+            characterPlayerHud.UpdateFastItems();
         }
         _ = characterPlayerHud.ResetInventoryTarget();
     }
