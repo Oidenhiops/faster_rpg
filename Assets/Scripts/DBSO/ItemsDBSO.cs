@@ -36,7 +36,7 @@ public class ItemsDBSO : ScriptableObject
                 itemId = data[typeObject][id].id,
                 typeObject = typeObject,
                 itemBaseSO = data[typeObject][id],
-                itemStatistics = data[typeObject][id].itemStatistics,
+                itemStatistics = data[typeObject][id].CloneStatistics(),
                 amount = amountItems
             };
         }

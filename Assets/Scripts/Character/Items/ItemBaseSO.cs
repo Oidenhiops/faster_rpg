@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
@@ -13,8 +14,49 @@ public class ItemBaseSO : ScriptableObject
     public int maxStack;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
+    public virtual void EquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
+    {
+        foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
+        {
+            if (characterData.statistics.ContainsKey(statistic.Key))
+            {
+                characterData.statistics[statistic.Key].itemValue += statistic.Value.baseValue;
+                characterData.statistics[statistic.Key].RefreshValue();
+            }
+        }
+    }
     public virtual void DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }
+    public virtual void DesEquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
+    {
+        foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
+        {
+            if (characterData.statistics.ContainsKey(statistic.Key))
+            {
+                characterData.statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
+                characterData.statistics[statistic.Key].RefreshValue();
+            }
+        }
+    }
     public virtual void UseItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("UseItem not implemented"); }
+    public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> CloneStatistics()
+    {
+        var clone = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
+
+        foreach (var kvp in itemStatistics)
+        {
+            clone[kvp.Key] = new CharacterData.Statistic
+            {
+                baseValue = kvp.Value.baseValue,
+                aptitudeValue = kvp.Value.aptitudeValue,
+                itemValue = kvp.Value.itemValue,
+                buffValue = kvp.Value.buffValue,
+                maxValue = kvp.Value.maxValue,
+                currentValue = kvp.Value.currentValue
+            };
+        }
+
+        return clone;
+    }
     public enum GeneralTypeObject
     {
         None = 0,

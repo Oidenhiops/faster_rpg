@@ -21,4 +21,22 @@ MonoBehaviour:
   animationName: 
   maxStack: 1
   itemStatistics:
-    _serializedList: []
+    _serializedList:
+    - Key: 1
+      Value:
+        baseValue: 10
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 0
+    - Key: 3
+      Value:
+        baseValue: 15
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 0

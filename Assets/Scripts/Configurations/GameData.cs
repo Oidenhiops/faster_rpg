@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using AYellowpaper.SerializedCollections;
+using Unity.VisualScripting;
 
 public class GameData : MonoBehaviour
 {
@@ -341,17 +342,6 @@ public class GameData : MonoBehaviour
             charactersDBSO.data[0][2].initialDataSO.CloneStatistics(),
             charactersDBSO.data[0][3].initialDataSO.CloneStatistics()
         };
-        foreach (SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> stats in characterStatistics)
-        {
-            foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in stats)
-            {
-                if (statistic.Key != CharacterData.TypeStatistic.Exp)
-                {
-                    statistic.Value.RefreshValue();
-                    statistic.Value.SetMaxValue();
-                }
-            }
-        }
         int bagIndex = 0;
         foreach (SerializedDictionary<int, CharacterData.CharacterItem> bag in bags)
         {
@@ -367,7 +357,7 @@ public class GameData : MonoBehaviour
         bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
         bags[0][3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
 
-        return new GameDataSlot
+        GameDataSlot newSlotData = new GameDataSlot
         {
             isUse = true,
             createdDate = DateTime.Now.ToString(),
@@ -457,6 +447,32 @@ public class GameData : MonoBehaviour
                 },
             }
         };
+
+        foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
+        {
+            foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> equipment in characterData.Value.equipments)
+            {
+                if (equipment.Value != null && equipment.Value?.itemId != 0)
+                {
+                    equipment.Value.itemBaseSO = itemsDBSO.data[equipment.Value.typeObject][equipment.Value.itemId];
+                    equipment.Value.itemBaseSO.EquipItem(characterData.Value, equipment.Value);
+                }
+            }
+        }
+
+        foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
+        {
+            foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterData.Value.statistics)
+            {
+                if (statistic.Key != CharacterData.TypeStatistic.Exp)
+                {
+                    statistic.Value.RefreshValue();
+                    statistic.Value.SetMaxValue();
+                }
+            }
+        }
+
+        return newSlotData;
     }
     public void SetStartingItems()
     {
