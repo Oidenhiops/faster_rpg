@@ -1945,6 +1945,28 @@ MonoBehaviour:
           fastItemBg: {fileID: 1024057329}
           fastItemIcon: {fileID: 1366799621}
           fastItemAmount: {fileID: 1904505231}
+    statistics:
+      _serializedList:
+      - Key: 1
+        Value: {fileID: 318842496}
+      - Key: 2
+        Value: {fileID: 422535965}
+      - Key: 3
+        Value: {fileID: 422297864}
+      - Key: 4
+        Value: {fileID: 1112056946}
+      - Key: 5
+        Value: {fileID: 1061265090}
+      - Key: 6
+        Value: {fileID: 1974020651}
+      - Key: 7
+        Value: {fileID: 1449426827}
+      - Key: 8
+        Value: {fileID: 1742046240}
+      - Key: 10
+        Value: {fileID: 444134341}
+      - Key: 11
+        Value: {fileID: 207459725}
     interactables:
       interactablesPanel: {fileID: 1567700085}
       container: {fileID: 1691429235}
@@ -2771,7 +2793,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5.4
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

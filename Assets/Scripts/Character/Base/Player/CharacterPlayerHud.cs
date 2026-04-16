@@ -137,6 +137,21 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
                 characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[consumable.Key]);
             }
+            foreach (KeyValuePair<CharacterData.TypeStatistic, TMP_Text> statistic in characterUI.statistics)
+            {
+                if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
+                {
+                    if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp)
+                    {
+                        statistic.Value.text = $"{stat.currentValue}/{stat.maxValue}";
+                    }
+                    else
+                    {
+                        int otherStatsValue = stat.currentValue;
+                        statistic.Value.text = stat.baseValue.ToString() + (otherStatsValue - stat.baseValue != 0 ? $" (+{otherStatsValue - stat.baseValue})" : "");
+                    }
+                }
+            }
             UpdateFastItems();
             await Awaitable.NextFrameAsync();
             if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
@@ -291,6 +306,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> equipments = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
+        public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
         public InteractableUI interactables;
         public ItemDescription itemDescription;
         public Transform panelToResetSelect;
