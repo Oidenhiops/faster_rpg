@@ -13,7 +13,8 @@ public class ItemBaseSO : ScriptableObject
     public string animationName;
     public int maxStack;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
-    public virtual void EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
+    public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
+    public virtual async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }
     public virtual void EquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
@@ -21,11 +22,10 @@ public class ItemBaseSO : ScriptableObject
             if (characterData.statistics.ContainsKey(statistic.Key))
             {
                 characterData.statistics[statistic.Key].itemValue += statistic.Value.baseValue;
-                characterData.statistics[statistic.Key].RefreshValue();
+                characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
     }
-    public virtual void DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }
     public virtual void DesEquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
@@ -33,7 +33,7 @@ public class ItemBaseSO : ScriptableObject
             if (characterData.statistics.ContainsKey(statistic.Key))
             {
                 characterData.statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
-                characterData.statistics[statistic.Key].RefreshValue();
+                characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
     }

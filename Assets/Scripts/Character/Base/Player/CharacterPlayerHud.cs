@@ -137,21 +137,7 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
                 characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[consumable.Key]);
             }
-            foreach (KeyValuePair<CharacterData.TypeStatistic, TMP_Text> statistic in characterUI.statistics)
-            {
-                if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
-                {
-                    if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp)
-                    {
-                        statistic.Value.text = $"{stat.currentValue}/{stat.maxValue}";
-                    }
-                    else
-                    {
-                        int otherStatsValue = stat.currentValue;
-                        statistic.Value.text = stat.baseValue.ToString() + (otherStatsValue - stat.baseValue != 0 ? $" (+{otherStatsValue - stat.baseValue})" : "");
-                    }
-                }
-            }
+            RefreshCharacterStatistics();
             UpdateFastItems();
             await Awaitable.NextFrameAsync();
             if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
@@ -168,6 +154,24 @@ public class CharacterPlayerHud : MonoBehaviour
         characterUI.panelToResetSelect.gameObject.SetActive(true);
         await Awaitable.NextFrameAsync();
         characterUI.panelToResetSelect.gameObject.SetActive(false);
+    }
+    public void RefreshCharacterStatistics()
+    {
+        foreach (KeyValuePair<CharacterData.TypeStatistic, TMP_Text> statistic in characterUI.statistics)
+        {
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
+            {
+                if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp)
+                {
+                    statistic.Value.text = $"{stat.currentValue}/{stat.maxValue}";
+                }
+                else
+                {
+                    int otherStatsValue = stat.currentValue;
+                    statistic.Value.text = stat.baseValue.ToString() + (otherStatsValue - stat.baseValue != 0 ? $" (+{otherStatsValue - stat.baseValue})" : "");
+                }
+            }
+        }
     }
     public void UpdateFastItems()
     {

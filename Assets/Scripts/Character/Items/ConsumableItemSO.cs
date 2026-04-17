@@ -11,7 +11,7 @@ public class ConsumableItemSO : ItemBaseSO
             if (character.charactersData[character.characterIndex].characterData.statistics.ContainsKey(statistic.Key))
             {
                 character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].currentValue += statistic.Value.baseValue;
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].RefreshValue();
+                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
         GameObject effect = Instantiate(useEffectPrefab, character.transform.position + Vector3.up * 0.5f, Quaternion.identity);

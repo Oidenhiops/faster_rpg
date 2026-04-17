@@ -61,7 +61,7 @@ public class CharacterBase : MonoBehaviour
         charactersData[characterIndex].characterData.skills = initialDataSO.CloneSkills();
         foreach (var statistic in charactersData[characterIndex].characterData.statistics)
         {
-            statistic.Value.RefreshValue();
+            statistic.Value.RefreshValue((int)statistic.Key);
             statistic.Value.SetMaxValue();
         }
         charactersData[characterIndex].characterSkin = new CharacterSkinData

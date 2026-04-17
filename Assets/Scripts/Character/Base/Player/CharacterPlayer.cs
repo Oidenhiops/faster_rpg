@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -63,7 +64,7 @@ public class CharacterPlayer : CharacterBase
             await InitializeAnimations();
             isInitialize = true;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             Debug.LogError($"Error initializing character: {ex.Message}");
         }
@@ -105,12 +106,12 @@ public class CharacterPlayer : CharacterBase
     public override void UseItem()
     {
         if (isInventoryOpen) return;
-        charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
+        if (charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO) charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
     }
     public override void UseItem(int bagSlotIndex)
     {
         if (isInventoryOpen) return;
-        charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+        if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
     }
     public void OnHandleShowItemsToPickUp()
     {
@@ -157,7 +158,7 @@ public class CharacterPlayer : CharacterBase
             if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != InventorySlot.TypeInventorySlot.Consumables &&
                 characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
             {
-                ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, draggedSlotIndex);
+                _ = ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, draggedSlotIndex);
             }
             else if ((characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Consumables || characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag) &&
                      characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
@@ -172,7 +173,7 @@ public class CharacterPlayer : CharacterBase
             if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != InventorySlot.TypeInventorySlot.Consumables &&
                 characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
             {
-                ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, lastSelectedSlotIndex);
+                _ = ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, lastSelectedSlotIndex);
             }
             else if ((characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Consumables || characterPlayerHud.lastSelectedSlot.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag) &&
                      characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
@@ -237,7 +238,7 @@ public class CharacterPlayer : CharacterBase
         }
         characterPlayerHud.UpdateFastItems();
     }
-    private void ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
+    async Awaitable ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
     {
         if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.typeObject == equipmentIndex ||
             charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO == null)
@@ -247,6 +248,10 @@ public class CharacterPlayer : CharacterBase
 
             charactersData[characterIndex].characterData.equipments[equipmentIndex] = bagItemTemp;
             charactersData[characterIndex].characterData.bag[bagSlotIndex] = equipmentItemTemp;
+
+            if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp);
+            if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp);
+            characterPlayerHud.RefreshCharacterStatistics();
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
             characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].characterData.equipments[equipmentIndex]);
         }
@@ -389,11 +394,11 @@ public class CharacterPlayer : CharacterBase
         {
             if (GetEquipmentItemByIndex(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
             {
-                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+                _ = ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
             }
             else
             {
-                ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+                _ = ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
             }
         }
         else
@@ -418,7 +423,7 @@ public class CharacterPlayer : CharacterBase
         }
         _ = characterPlayerHud.ResetInventoryTarget();
     }
-    public void DropItem()
+    public async Task DropItem()
     {
         int draggedSlotIndex = characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex;
         if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == InventorySlot.TypeInventorySlot.Bag)
@@ -434,8 +439,10 @@ public class CharacterPlayer : CharacterBase
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), true);
             LaunchDropItem(itemDropped);
+            if (charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO) await charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO.DesEquipItem(this, GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject));
             charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
             characterPlayerHud.GetEquipmentSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject).InitializeSlot(new CharacterData.CharacterItem());
+            characterPlayerHud.RefreshCharacterStatistics();
         }
         else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Consumables)
         {

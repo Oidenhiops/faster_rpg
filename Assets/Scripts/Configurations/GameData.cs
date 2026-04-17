@@ -342,21 +342,6 @@ public class GameData : MonoBehaviour
             charactersDBSO.data[0][2].initialDataSO.CloneStatistics(),
             charactersDBSO.data[0][3].initialDataSO.CloneStatistics()
         };
-        int bagIndex = 0;
-        foreach (SerializedDictionary<int, CharacterData.CharacterItem> bag in bags)
-        {
-            for (int i = 0; i < characterStatistics[bagIndex][CharacterData.TypeStatistic.BagSpace].currentValue; i++)
-            {
-                bag.Add(i, new CharacterData.CharacterItem());
-            }
-            bagIndex++;
-        }
-
-        bags[0][0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3);
-        bags[0][1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
-        bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
-        bags[0][3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
-
         GameDataSlot newSlotData = new GameDataSlot
         {
             isUse = true,
@@ -466,12 +451,23 @@ public class GameData : MonoBehaviour
             {
                 if (statistic.Key != CharacterData.TypeStatistic.Exp)
                 {
-                    statistic.Value.RefreshValue();
+                    statistic.Value.RefreshValue((int)statistic.Key);
                     statistic.Value.SetMaxValue();
                 }
             }
         }
 
+        foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
+        {
+            for (int i = 0; i < characterData.Value.statistics[CharacterData.TypeStatistic.BagSpace].currentValue; i++)
+            {
+                characterData.Value.bag.Add(i, new CharacterData.CharacterItem());
+            }
+        }
+        bags[0][0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3);
+        bags[0][1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
+        bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
+        bags[0][3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
         return newSlotData;
     }
     public void SetStartingItems()

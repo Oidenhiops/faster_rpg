@@ -31,7 +31,7 @@ public class CharacterData
     {
         foreach (KeyValuePair<TypeStatistic, Statistic> statistic in statistics)
         {
-            statistic.Value.RefreshValue();
+            statistic.Value.RefreshValue((int)statistic.Key);
             statistic.Value.SetMaxValue();
         }
     }
@@ -54,11 +54,7 @@ public class CharacterData
             if (statistic.Key != TypeStatistic.Exp && statistic.Key != TypeStatistic.Crtv && statistic.Key != TypeStatistic.Crtd)
             {
                 statistic.Value.baseValue = Mathf.CeilToInt(statistic.Value.baseValue * (1.25f * statistic.Value.aptitudeValue / 100));
-                statistic.Value.RefreshValue();
-                if (statistic.Key != TypeStatistic.Hp && statistic.Key != TypeStatistic.Sp)
-                {
-                    statistic.Value.SetMaxValue();
-                }
+                statistic.Value.RefreshValue((int)statistic.Key);
             }
         }
     }
@@ -81,7 +77,7 @@ public class CharacterData
         public SerializedDictionary<StatusEffectBaseSO, int> buffValue = new SerializedDictionary<StatusEffectBaseSO, int>();
         public int currentValue = 0;
         public int maxValue = 0;
-        public void RefreshValue()
+        public void RefreshValue(int typeStatistic = 0)
         {
             int baseWhitItem = baseValue + itemValue;
             int totalBuffValue = 0;
@@ -91,6 +87,7 @@ public class CharacterData
             int whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
             maxValue = Mathf.Clamp(whitAptitude, 1, 99999);
             if (currentValue > maxValue) currentValue = maxValue;
+            else if (typeStatistic != 0 && typeStatistic != 1 && typeStatistic != 2) currentValue = maxValue;
         }
         public void SetMaxValue()
         {
