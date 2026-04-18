@@ -51,26 +51,6 @@ public class CharacterBase : MonoBehaviour
             Debug.LogError(e);
         }
     }
-    async Awaitable InitializeDataWhitInitialValues(InitialDataSO initialDataSO)
-    {
-        charactersData[characterIndex].characterData.name = GenerateFantasyName();
-        charactersData[characterIndex].characterData.level = 1;
-        charactersData[characterIndex].characterData.characterSkinId = initialDataSO.skinId;
-        gameObject.name = charactersData[characterIndex].characterData.name;
-        charactersData[characterIndex].characterData.statistics = initialDataSO.CloneStatistics();
-        charactersData[characterIndex].characterData.skills = initialDataSO.CloneSkills();
-        foreach (var statistic in charactersData[characterIndex].characterData.statistics)
-        {
-            statistic.Value.RefreshValue((int)statistic.Key);
-            statistic.Value.SetMaxValue();
-        }
-        charactersData[characterIndex].characterSkin = new CharacterSkinData
-        {
-            // atlas = initialDataSO.characterVisualSO.atlas,
-            // atlasHands = initialDataSO.characterVisualSO.atlasHands
-        };
-        await Awaitable.NextFrameAsync();
-    }
     public void MoveCharacter()
     {
         characterMovement.HandleMovement();

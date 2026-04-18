@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using AYellowpaper.SerializedCollections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
@@ -139,6 +140,7 @@ public class CharacterPlayerHud : MonoBehaviour
             }
             RefreshCharacterStatistics();
             UpdateFastItems();
+            RefreshSkills();
             await Awaitable.NextFrameAsync();
             if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
             characterUI.panelToResetSelect.gameObject.SetActive(false);
@@ -170,6 +172,24 @@ public class CharacterPlayerHud : MonoBehaviour
                     int otherStatsValue = stat.currentValue;
                     statistic.Value.text = stat.baseValue.ToString() + (otherStatsValue - stat.baseValue != 0 ? $" (+{otherStatsValue - stat.baseValue})" : "");
                 }
+            }
+        }
+    }
+    public void RefreshSkills()
+    {
+        foreach (KeyValuePair<int, SkillUi> skill in characterUI.skills)
+        {
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO)
+            {
+                skill.Value.skillImage.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO.icon;
+                skill.Value.lockImage.enabled = false;
+                skill.Value.skillImage.enabled = true;
+            }
+            else
+            {
+                skill.Value.skillImage.sprite = null;
+                skill.Value.lockImage.enabled = true;
+                skill.Value.skillImage.enabled = false;
             }
         }
     }
@@ -311,6 +331,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
+        public SerializedDictionary<int, SkillUi> skills = new SerializedDictionary<int, SkillUi>();
         public InteractableUI interactables;
         public ItemDescription itemDescription;
         public Transform panelToResetSelect;
@@ -354,6 +375,12 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public GameObject interactablesPanel;
         public Transform container;
+    }
+    [Serializable]
+    public class SkillUi
+    {
+        public Image skillImage;
+        public Image lockImage;
     }
     public enum AnchorPreset
     {

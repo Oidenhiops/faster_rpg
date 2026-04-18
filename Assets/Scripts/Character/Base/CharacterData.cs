@@ -23,7 +23,14 @@ public class CharacterData
     };
     public SerializedDictionary<int, CharacterItem> consumables = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
-    public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>> skills = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterSkillInfo>>();
+    public SerializedDictionary<int, CharacterSkillInfo> skills = new SerializedDictionary<int, CharacterSkillInfo>
+    {
+        {0, new CharacterSkillInfo()},
+        {1, new CharacterSkillInfo()},
+        {2, new CharacterSkillInfo()},
+        {3, new CharacterSkillInfo()},
+        {4, new CharacterSkillInfo()},
+    };
     public int characterId;
     public int characterEvolutionId;
     public int characterSkinId;
@@ -134,7 +141,6 @@ public class CharacterData
         public string skillId;
         public SkillsBaseSO skillsBaseSO;
         public int level;
-        public SerializedDictionary<TypeStatistic, Statistic> statistics = new SerializedDictionary<TypeStatistic, Statistic>();
     }
     public enum MasteryRange
     {

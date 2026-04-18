@@ -145,14 +145,11 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
-                foreach (KeyValuePair<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterData.CharacterSkillInfo>> item in characterData.Value.skills)
+                foreach (KeyValuePair<int, CharacterData.CharacterSkillInfo> skill in characterData.Value.skills)
                 {
-                    foreach (KeyValuePair<string, CharacterData.CharacterSkillInfo> skill in item.Value)
+                    if (skill.Value.skillId != "")
                     {
-                        if (skill.Value.skillId != "")
-                        {
-                            skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
-                        }
+                        skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
                     }
                 }
             }

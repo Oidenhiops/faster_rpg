@@ -17,7 +17,7 @@ public class InitialDataSO : ScriptableObject
         {CharacterData.TypeStatistic.Crtv, new CharacterData.Statistic{ aptitudeValue = 100 }},
         {CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic{ aptitudeValue = 100 }},
     };
-    public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterData.CharacterSkillInfo>> initialSkills = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterData.CharacterSkillInfo>>();
+    public SerializedDictionary<int, CharacterData.CharacterSkillInfo> initialSkills = new SerializedDictionary<int, CharacterData.CharacterSkillInfo>();
     public int skinId;
     public CharacterAnimationsSO characterAnimationsSO;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> CloneStatistics()
@@ -39,25 +39,18 @@ public class InitialDataSO : ScriptableObject
 
         return clone;
     }
-    public SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterData.CharacterSkillInfo>> CloneSkills()
+    public SerializedDictionary<int, CharacterData.CharacterSkillInfo> CloneSkills()
     {
-        var clone = new SerializedDictionary<ItemBaseSO.TypeWeapon, SerializedDictionary<string, CharacterData.CharacterSkillInfo>>();
-
-        foreach (var weaponKvp in initialSkills)
+        var skills = new SerializedDictionary<int, CharacterData.CharacterSkillInfo>();
+        foreach (var skillKvp in initialSkills)
         {
-            var skillDict = new SerializedDictionary<string, CharacterData.CharacterSkillInfo>();
-            foreach (var skillKvp in weaponKvp.Value)
+            skills.Add(skillKvp.Key, new CharacterData.CharacterSkillInfo
             {
-                skillDict.Add(skillKvp.Key, new CharacterData.CharacterSkillInfo
-                {
-                    skillId = skillKvp.Value.skillsBaseSO.skillId,
-                    skillsBaseSO = skillKvp.Value.skillsBaseSO,
-                    level = skillKvp.Value.level,
-                    statistics = skillKvp.Value.skillsBaseSO.CloneStatistics()
-                });
-            }
-            clone.Add(weaponKvp.Key, skillDict);
+                skillId = skillKvp.Value.skillsBaseSO.skillId,
+                skillsBaseSO = skillKvp.Value.skillsBaseSO,
+                level = skillKvp.Value.level,
+            });
         }
-        return clone;
+        return skills;
     }
 }
