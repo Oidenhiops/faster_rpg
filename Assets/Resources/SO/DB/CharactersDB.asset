@@ -14,13 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharactersDBSO
   data:
     _serializedList:
-    - Key: 0
+    - Key: 1
       Value:
-      - isUnlocked: 1
-        initialDataSO: {fileID: 11400000, guid: 6ec6211609d365b459e6ccf6df7df722, type: 2}
-      - isUnlocked: 1
-        initialDataSO: {fileID: 11400000, guid: 0b5f3ceb8f1dd7f47b456f053bd332aa, type: 2}
-      - isUnlocked: 1
-        initialDataSO: {fileID: 11400000, guid: e5c24ca9b5a550b46a753d2b4726a394, type: 2}
-      - isUnlocked: 1
-        initialDataSO: {fileID: 11400000, guid: af329bdb196ef3e49bb272b9b17cca66, type: 2}
+        _serializedList:
+        - Key: 1
+          Value:
+            isUnlocked: 1
+            initialDataSO: {fileID: 11400000, guid: 6ec6211609d365b459e6ccf6df7df722, type: 2}
+        - Key: 2
+          Value:
+            isUnlocked: 1
+            initialDataSO: {fileID: 11400000, guid: 0b5f3ceb8f1dd7f47b456f053bd332aa, type: 2}
+        - Key: 3
+          Value:
+            isUnlocked: 1
+            initialDataSO: {fileID: 11400000, guid: e5c24ca9b5a550b46a753d2b4726a394, type: 2}
+        - Key: 4
+          Value:
+            isUnlocked: 1
+            initialDataSO: {fileID: 11400000, guid: af329bdb196ef3e49bb272b9b17cca66, type: 2}

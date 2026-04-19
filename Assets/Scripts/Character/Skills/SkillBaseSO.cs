@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SkillsBaseSO : ScriptableObject
 {
-    public string skillId;
-    public string skillIdText;
+    public int skillId;
+    public int skillIdText;
     public Sprite icon;
     public string animationSkillName;
     public string generalAnimationSkillName;
@@ -13,18 +13,8 @@ public class SkillsBaseSO : ScriptableObject
     public bool needSceneAnimation;
     public GameObject skillVFXPrefab;
     public float skillVFXDuration = 1f;
-    public GameObject floatingTextPrefab;
     public SerializedDictionary<int, SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> statistics = new SerializedDictionary<int, SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>();
     public ItemBaseSO.TypeWeapon weaponForUseSkill;
-    public Vector3Int[] positionsToMakeSkill;
-    public int skillRadius = 5;
-    [Tooltip("Si se usan posiciones fijas para usar la habilidad")]
-    public bool usePositionsToMakeSkill;
-    public Vector3Int[] positionsSkillForm;
-    public int skillInnerRadius = 5;
-    [Tooltip("Permite mover el cursor de forma libre para seleccionar la posicion donde usar la habilidad")]
-    public bool isFreeMovementSkill;
-    public bool needCharacterToMakeSkill;
     public virtual void UseSkill(CharacterBase characterMakeSkill, CharacterBase characterToMakeSkill) { Debug.LogError("UseSkill non implemented"); }
     public virtual void DiscountMpAfterUseSkill(CharacterBase characterMakeSkill) { Debug.LogError("DiscountMpAfterUseSkill non implemented"); }
     public virtual void LevelUpSkill(CharacterBase character) { Debug.LogError("LevelUpSkill non implemented"); }

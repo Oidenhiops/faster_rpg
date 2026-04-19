@@ -252,6 +252,11 @@ public class CharacterPlayer : CharacterBase
             if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp);
             if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp);
             characterPlayerHud.RefreshCharacterStatistics();
+            if ((equipmentItemTemp.itemBaseSO && equipmentItemTemp.itemBaseSO.typeObject == ItemBaseSO.TypeObject.Utility) || 
+                bagItemTemp.itemBaseSO && bagItemTemp.itemBaseSO.typeObject == ItemBaseSO.TypeObject.Utility)
+            {
+                characterPlayerHud.RefreshSkills();
+            }
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
             characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].characterData.equipments[equipmentIndex]);
         }

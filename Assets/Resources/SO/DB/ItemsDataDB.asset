@@ -60,7 +60,7 @@ MonoBehaviour:
       Value:
         _serializedList:
         - Key: 1
-          Value: {fileID: 11400000, guid: 4e9a7e2a91004c84c8bbf0f404cd04cd, type: 2}
+          Value: {fileID: 11400000, guid: e12b663c2c20dc9429cf9eb46940e7b1, type: 2}
     - Key: 10
       Value:
         _serializedList:

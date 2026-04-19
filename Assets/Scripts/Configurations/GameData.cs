@@ -147,7 +147,7 @@ public class GameData : MonoBehaviour
             {
                 foreach (KeyValuePair<int, CharacterData.CharacterSkillInfo> skill in characterData.Value.skills)
                 {
-                    if (skill.Value.skillId != "")
+                    if (skill.Value.skillId != 0)
                     {
                         skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
                     }
@@ -334,10 +334,10 @@ public class GameData : MonoBehaviour
         };
         List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> characterStatistics = new List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>
         {
-            charactersDBSO.data[0][0].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[0][1].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[0][2].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[0][3].initialDataSO.CloneStatistics()
+            charactersDBSO.data[1][1].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[1][2].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[1][3].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[1][4].initialDataSO.CloneStatistics()
         };
         GameDataSlot newSlotData = new GameDataSlot
         {
@@ -371,9 +371,9 @@ public class GameData : MonoBehaviour
                             { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
                         },
                         bag = bags[0],
-                        characterId = 0,
-                        characterEvolutionId = 0,
-                        characterSkinId = 0,
+                        characterId = 1,
+                        characterEvolutionId = 1,
+                        characterSkinId = 1,
                     }
                 },
                 { randomNames[1], new CharacterData()
@@ -388,9 +388,9 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[1],
-                        characterId = 0,
-                        characterEvolutionId = 1,
-                        characterSkinId = 1,
+                        characterId = 1,
+                        characterEvolutionId = 2,
+                        characterSkinId = 2,
                     }
                 },
                 { randomNames[2], new CharacterData()
@@ -405,9 +405,9 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[2],
-                        characterId = 0,
-                        characterEvolutionId = 2,
-                        characterSkinId = 2,
+                        characterId = 1,
+                        characterEvolutionId = 3,
+                        characterSkinId = 3,
                     }
                 },
                 { randomNames[3], new CharacterData()
@@ -422,9 +422,9 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[3],
-                        characterId = 0,
-                        characterEvolutionId = 3,
-                        characterSkinId = 3,
+                        characterId = 1,
+                        characterEvolutionId = 4,
+                        characterSkinId = 4,
                     }
                 },
             }

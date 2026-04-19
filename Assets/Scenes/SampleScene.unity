@@ -2826,7 +2826,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 5.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -5654,7 +5654,7 @@ MonoBehaviour:
   charactersDBSO: {fileID: 11400000, guid: 31f29f7787f58d1498b4cb4b30ccb3bf, type: 2}
   charactersSkinDBSO: {fileID: 11400000, guid: eebd9eedfc97cd340bffc18b2cf3b938, type: 2}
   itemsDBSO: {fileID: 11400000, guid: bea8bcc675308c243ac4dddf3c06ceb0, type: 2}
-  skillsDBSO: {fileID: 0}
+  skillsDBSO: {fileID: 11400000, guid: 77e65aa2d03fd4d4fbef9f562c7f3862, type: 2}
 --- !u!114 &545223954
 MonoBehaviour:
   m_ObjectHideFlags: 0

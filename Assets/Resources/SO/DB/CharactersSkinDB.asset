@@ -14,25 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinDBSO
   data:
     _serializedList:
-    - Key: 0
+    - Key: 1
       Value:
         _serializedList:
-        - Key: 0
+        - Key: 1
           Value:
             atlas: {fileID: 2800000, guid: 9e2afc0a82189ab4db570f3de27c1595, type: 3}
             atlasHands: {fileID: 2800000, guid: 9e2afc0a82189ab4db570f3de27c1595, type: 3}
             icon: {fileID: -676009834, guid: 5ad2e935482f278468588df16e4f60b8, type: 3}
-        - Key: 1
+        - Key: 2
           Value:
             atlas: {fileID: 2800000, guid: 444a5d41657c958458d900b3986e9bd7, type: 3}
             atlasHands: {fileID: 2800000, guid: 444a5d41657c958458d900b3986e9bd7, type: 3}
             icon: {fileID: -2091287336, guid: 5ad2e935482f278468588df16e4f60b8, type: 3}
-        - Key: 2
+        - Key: 3
           Value:
             atlas: {fileID: 2800000, guid: a8f4dfa1c809662479874d14f64733e9, type: 3}
             atlasHands: {fileID: 2800000, guid: a8f4dfa1c809662479874d14f64733e9, type: 3}
             icon: {fileID: -118481683, guid: 5ad2e935482f278468588df16e4f60b8, type: 3}
-        - Key: 3
+        - Key: 4
           Value:
             atlas: {fileID: 2800000, guid: 0d9bfb15e37471d478169c2c48e439f4, type: 3}
             atlasHands: {fileID: 2800000, guid: 0d9bfb15e37471d478169c2c48e439f4, type: 3}

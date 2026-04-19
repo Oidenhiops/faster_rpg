@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 277fea691be463341a7f71a22c600ae9, type: 3}
-  m_Name: SimpleUtility
-  m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
+  m_Script: {fileID: 11500000, guid: 92e423c8b8b4d39469e809663f6c8220, type: 3}
+  m_Name: SkillUtilityItem
+  m_EditorClassIdentifier: Assembly-CSharp::SkillUtilitySO
   id: 1
   idText: 12
   icon: {fileID: -1917821749, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
@@ -31,3 +31,4 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
+  skillsBaseSO: {fileID: 11400000, guid: 7f3fe7183eb82ec47ae2e8db055d0107, type: 2}

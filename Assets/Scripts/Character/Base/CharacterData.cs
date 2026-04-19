@@ -138,7 +138,7 @@ public class CharacterData
     [Serializable]
     public class CharacterSkillInfo
     {
-        public string skillId;
+        public int skillId;
         public SkillsBaseSO skillsBaseSO;
         public int level;
     }

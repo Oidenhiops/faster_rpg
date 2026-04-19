@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharactersDB", menuName = "ScriptableObjects/DB/CharactersDB", order = 1)]
 public class CharactersDBSO : ScriptableObject
 {
-    public SerializedDictionary<int, List<CharacterInfo>> data = new SerializedDictionary<int, List<CharacterInfo>>();
+    public SerializedDictionary<int, SerializedDictionary<int, CharacterInfo>> data = new SerializedDictionary<int, SerializedDictionary<int, CharacterInfo>>();
     [System.Serializable] public class CharacterInfo
     {
         public bool isUnlocked;

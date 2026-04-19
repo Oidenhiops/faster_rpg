@@ -124,5 +124,5 @@ MonoBehaviour:
         maxValue: 12
   initialSkills:
     _serializedList: []
-  skinId: 3
+  skinId: 4
   characterAnimationsSO: {fileID: 11400000, guid: d3ad89c378dbcd349b519aa46d7931c4, type: 2}
