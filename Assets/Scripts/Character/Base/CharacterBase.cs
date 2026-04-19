@@ -58,6 +58,7 @@ public class CharacterBase : MonoBehaviour
     public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
     public virtual void UseItem() { }
     public virtual void UseItem(int bagSlotIndex) { }
+    public virtual void UseUtility() { }
     protected bool SetGrounded()
     {
         return Physics.OverlapBox

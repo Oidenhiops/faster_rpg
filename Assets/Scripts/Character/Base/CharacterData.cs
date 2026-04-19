@@ -141,6 +141,7 @@ public class CharacterData
         public int skillId;
         public SkillsBaseSO skillsBaseSO;
         public int level;
+        public int cd;
     }
     public enum MasteryRange
     {
@@ -167,6 +168,6 @@ public class CharacterData
         Exp = 9,
         Crtv = 10,
         Crtd = 11,
-        BagSpace = 12
+        BagSpace = 12,
     }
 }

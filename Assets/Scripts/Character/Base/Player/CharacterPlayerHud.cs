@@ -182,14 +182,13 @@ public class CharacterPlayerHud : MonoBehaviour
             if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO)
             {
                 skill.Value.skillImage.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO.icon;
-                skill.Value.lockImage.enabled = false;
-                skill.Value.skillImage.enabled = true;
+                skill.Value.lockImage.gameObject.SetActive(false);
+                skill.Value.skillImage.gameObject.SetActive(true);
             }
             else
             {
-                skill.Value.skillImage.sprite = null;
-                skill.Value.lockImage.enabled = true;
-                skill.Value.skillImage.enabled = false;
+                skill.Value.skillImage.gameObject.SetActive(false);
+                skill.Value.lockImage.gameObject.SetActive(true);
             }
         }
     }

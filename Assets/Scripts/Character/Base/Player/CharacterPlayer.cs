@@ -15,6 +15,7 @@ public class CharacterPlayer : CharacterBase
     public Action OnShowItemsToPickUp;
     public bool isChangingCharacter;
     public bool isInventoryOpen;
+    public CharacterBase otherCharacterToMakeSkill;
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
@@ -103,10 +104,21 @@ public class CharacterPlayer : CharacterBase
     {
         UseItem();
     }
+    public void OnHandleUseUtility(InputAction.CallbackContext context)
+    {
+        UseUtility();
+    }
+    public override void UseUtility()
+    {
+        if (isInventoryOpen) return;
+        if (charactersData[characterIndex].characterData.skills[0].skillsBaseSO && charactersData[characterIndex].characterData.skills[0].cd <= 0)
+            charactersData[characterIndex].characterData.skills[0].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, 0);
+    }
     public override void UseItem()
     {
         if (isInventoryOpen) return;
-        if (charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO) charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
+        if (charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO) 
+                charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
     }
     public override void UseItem(int bagSlotIndex)
     {
