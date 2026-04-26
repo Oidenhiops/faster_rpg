@@ -1865,6 +1865,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 211714511}
   characterMovement: {fileID: 211714506}
   characterAnimations: {fileID: 211714503}
+  characterStatusEffect: {fileID: 211714512}
   isDashing: 0
   interactableBannerPrefab: {fileID: 1398121657027770714, guid: bc98a0c87e9c98a49a7144748c5c1581, type: 3}
   interactables:
@@ -2032,7 +2033,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5190808c8191caa4d8e9112491d4aa94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStatusEffect
-  characterBase: {fileID: 0}
+  characterBase: {fileID: 211714510}
   statusEffects:
     _serializedList: []
 --- !u!1 &219281684

@@ -24,3 +24,4 @@ MonoBehaviour:
   statistics:
     _serializedList: []
   weaponForUseSkill: 0
+  statusEffectBaseSO: {fileID: 11400000, guid: 6512928ac73b76744898e80a43915b80, type: 2}

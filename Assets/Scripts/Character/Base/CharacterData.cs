@@ -89,7 +89,7 @@ public class CharacterData
             int baseWhitItem = baseValue + itemValue;
             int totalBuffValue = 0;
             foreach (KeyValuePair<StatusEffectBaseSO, int> buff in buffValue) totalBuffValue += buff.Value;
-            int baseWhitBuff = baseValue * totalBuffValue / 100;
+            int baseWhitBuff = Mathf.CeilToInt(baseValue * totalBuffValue / 100);
             int finalValue = Mathf.CeilToInt(baseWhitItem + baseWhitBuff);
             int whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
             maxValue = Mathf.Clamp(whitAptitude, 1, 99999);
@@ -169,5 +169,6 @@ public class CharacterData
         Crtv = 10,
         Crtd = 11,
         BagSpace = 12,
+        Cd = 13
     }
 }

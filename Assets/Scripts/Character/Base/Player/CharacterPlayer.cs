@@ -24,6 +24,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
         inputActions.Player.ChangeFastItem.performed += OnHandleChangeFastItem;
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
+        inputActions.Player.UseUtility.performed += OnHandleUseUtility;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()

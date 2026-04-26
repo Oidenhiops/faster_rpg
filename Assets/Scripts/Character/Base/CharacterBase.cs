@@ -18,9 +18,9 @@ public class CharacterBase : MonoBehaviour
     public CharacterPlayerHud characterPlayerHud;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
+    public CharacterStatusEffect characterStatusEffect;
     public bool isGrounded => SetGrounded();
     public bool isDashing;
-    // public CharacterStatusEffect characterStatusEffect;
     public void OnEnable()
     {
         if (isInitialize) characterAnimations.MakeAnimation("Idle");
