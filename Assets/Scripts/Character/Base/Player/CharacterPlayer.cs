@@ -89,6 +89,7 @@ public class CharacterPlayer : CharacterBase
             _ = InitializeAnimations();
             _ = ChangeCharacterAction();
             _ = characterPlayerHud.RefreshCharacterInventory();
+            characterPlayerHud.RefreshStatusEffects();
         }
     }
     async Awaitable ChangeCharacterAction()

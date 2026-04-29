@@ -18,6 +18,7 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
             }
         }
         characterToMakeEffect.characterStatusEffect.AddStatusEffect(this);
+        characterToMakeEffect.characterPlayerHud?.RefreshCharacterStatistics();
     }
     public override void RemoveEffect(CharacterBase characterToMakeEffect)
     {
@@ -32,5 +33,6 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
                 }
             }
         }
+        characterToMakeEffect.characterPlayerHud?.RefreshCharacterStatistics();
     }
 }

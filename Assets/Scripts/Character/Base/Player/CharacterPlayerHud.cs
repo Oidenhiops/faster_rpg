@@ -192,6 +192,35 @@ public class CharacterPlayerHud : MonoBehaviour
             }
         }
     }
+    public void RefreshStatusEffects()
+    {
+        foreach(Transform statusEffect in characterUI.statusEffectUI.statusEffectContainer.transform)
+        {
+            Destroy(statusEffect.gameObject);
+        }
+        if (characterPlayer.characterStatusEffect.statusEffects.ContainsKey(characterPlayer.characterIndex))
+        {
+            foreach(KeyValuePair<StatusEffectBaseSO, CharacterStatusEffect.StatusEffect> statusEffect in characterPlayer.characterStatusEffect.statusEffects[characterPlayer.characterIndex])
+            {
+                StatusEffectBanner statusEffectBanner = Instantiate(characterUI.statusEffectUI.statusEffectPrefab, characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
+                statusEffectBanner.SetBannerData(statusEffect.Value);
+                characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.Key, statusEffectBanner);
+            }
+        }
+    }
+    public void AddStatusEffect(CharacterStatusEffect.StatusEffect statusEffect)
+    {
+        if (characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(statusEffect.statusEffectBaseSO))
+        {
+            characterUI.statusEffectUI.statusEffectsBanners[statusEffect.statusEffectBaseSO].RefreshData(statusEffect);
+        }
+        else
+        {
+            StatusEffectBanner statusEffectBanner = Instantiate(characterUI.statusEffectUI.statusEffectPrefab, characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
+            statusEffectBanner.SetBannerData(statusEffect);
+            characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.statusEffectBaseSO, statusEffectBanner);
+        }
+    }
     public void UpdateFastItems()
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
@@ -331,6 +360,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
         public SerializedDictionary<int, SkillUi> skills = new SerializedDictionary<int, SkillUi>();
+        public StatusEffectUI statusEffectUI;
         public InteractableUI interactables;
         public ItemDescription itemDescription;
         public Transform panelToResetSelect;
@@ -380,6 +410,13 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public Image skillImage;
         public Image lockImage;
+    }
+    [Serializable]
+    public class StatusEffectUI
+    {
+        public Transform statusEffectContainer;
+        public GameObject statusEffectPrefab;
+        public SerializedDictionary<StatusEffectBaseSO, StatusEffectBanner> statusEffectsBanners = new SerializedDictionary<StatusEffectBaseSO, StatusEffectBanner>();
     }
     public enum AnchorPreset
     {

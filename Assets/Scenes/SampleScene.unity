@@ -2004,6 +2004,11 @@ MonoBehaviour:
         Value:
           skillImage: {fileID: 1387158781}
           lockImage: {fileID: 1006975595}
+    statusEffectUI:
+      statusEffectContainer: {fileID: 816561604}
+      statusEffectPrefab: {fileID: 6917333200606152589, guid: 2e7b3ea104b67b94ab3764e775701540, type: 3}
+      statusEffectsBanners:
+        _serializedList: []
     interactables:
       interactablesPanel: {fileID: 1567700085}
       container: {fileID: 1691429235}
@@ -2921,7 +2926,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5.4
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

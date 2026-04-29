@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
@@ -10,7 +11,44 @@ public class CharacterStatusEffect : MonoBehaviour
     {
         if (statusEffects.Count > 0)
         {
-            
+            foreach(KeyValuePair<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffect in statusEffects)
+            {
+                foreach(KeyValuePair<StatusEffectBaseSO, StatusEffect> status in statusEffect.Value)
+                {
+                    status.Value.cd -= Time.deltaTime;
+                    if (status.Value.cd <= 0)
+                    {
+                        status.Value.amount--;
+                        if (status.Value.amount > 0)
+                        {
+                            status.Value.cd = status.Value.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
+                            status.Value.statusEffectBaseSO.ReApplyEffect(characterBase);
+                            if (characterBase.characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key)) 
+                                    characterBase.characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].SetBannerData(status.Value);
+                        }
+                        else
+                        {
+                            status.Value.statusEffectBaseSO.RemoveEffect(characterBase);
+                            if (characterBase.characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
+                            {
+                                Destroy(characterBase.characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].gameObject);
+                                characterBase.characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status.Key);
+                                statusEffect.Value.Remove(status.Key);
+                                if (statusEffect.Value.Count <= 0)
+                                {
+                                    statusEffects.Remove(statusEffect.Key);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (statusEffects.ContainsKey(characterBase.characterIndex)) 
+                                characterBase.characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].RefreshCD(status.Value);
+                    }
+                }
+            }
         }
     }
     public void AddStatusEffect(StatusEffectBaseSO statusEffect)
@@ -33,7 +71,7 @@ public class CharacterStatusEffect : MonoBehaviour
                 {statusEffect, new StatusEffect(statusEffect)}
             });
         }
-        characterBase.characterPlayerHud?.RefreshCharacterStatistics();
+        characterBase.characterPlayerHud?.AddStatusEffect(statusEffects[characterBase.characterIndex][statusEffect]);
     }
     public void AddStatusEffect(int characterIndex, StatusEffectBaseSO statusEffect)
     {
@@ -55,6 +93,7 @@ public class CharacterStatusEffect : MonoBehaviour
                 {statusEffect, new StatusEffect(statusEffect)}
             });
         }
+        characterBase.characterPlayerHud?.AddStatusEffect(statusEffects[characterBase.characterIndex][statusEffect]);
     }
     [Serializable]
     public class StatusEffect
