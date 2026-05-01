@@ -198,6 +198,7 @@ public class CharacterPlayerHud : MonoBehaviour
         {
             Destroy(statusEffect.gameObject);
         }
+        characterUI.statusEffectUI.statusEffectsBanners.Clear();
         if (characterPlayer.characterStatusEffect.statusEffects.ContainsKey(characterPlayer.characterIndex))
         {
             foreach(KeyValuePair<StatusEffectBaseSO, CharacterStatusEffect.StatusEffect> statusEffect in characterPlayer.characterStatusEffect.statusEffects[characterPlayer.characterIndex])

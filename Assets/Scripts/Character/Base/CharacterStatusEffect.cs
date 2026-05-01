@@ -7,6 +7,8 @@ public class CharacterStatusEffect : MonoBehaviour
 {
     public CharacterBase characterBase;
     public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
+    public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
+    List<int> characterKeysToRemove = new();
     void FixedUpdate()
     {
         if (statusEffects.Count > 0)
@@ -33,11 +35,11 @@ public class CharacterStatusEffect : MonoBehaviour
                             {
                                 Destroy(characterBase.characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].gameObject);
                                 characterBase.characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status.Key);
-                                statusEffect.Value.Remove(status.Key);
-                                if (statusEffect.Value.Count <= 0)
+                                AddStatusEffectToRemove(statusEffect.Key, status.Key);
+                                if (statusEffect.Value.Count - statusToRemove[statusEffect.Key].Count <= 0)
                                 {
-                                    statusEffects.Remove(statusEffect.Key);
-                                }
+                                    characterKeysToRemove.Add(statusEffect.Key);
+                                }                            
                             }
                             break;
                         }
@@ -49,7 +51,38 @@ public class CharacterStatusEffect : MonoBehaviour
                     }
                 }
             }
+            if (statusToRemove.Count > 0)
+            {
+                RemoveStatus();
+            }
         }
+    }
+    public void AddStatusEffectToRemove(int character, StatusEffectBaseSO status)
+    {
+        if (statusToRemove.ContainsKey(character))
+        {
+            statusToRemove[character].Add(status);
+        }
+        else
+        {
+            statusToRemove.Add(character, new List<StatusEffectBaseSO> { status });
+        }
+    }
+    public void RemoveStatus()
+    {
+        foreach(KeyValuePair<int, List<StatusEffectBaseSO>> character in statusToRemove)
+        {
+            foreach(StatusEffectBaseSO status in character.Value)
+            {
+                statusEffects[character.Key].Remove(status);
+            }
+        }
+        foreach(int character in characterKeysToRemove)
+        {
+            statusEffects.Remove(character);
+        }
+        statusToRemove.Clear();
+        characterKeysToRemove.Clear();
     }
     public void AddStatusEffect(StatusEffectBaseSO statusEffect)
     {
