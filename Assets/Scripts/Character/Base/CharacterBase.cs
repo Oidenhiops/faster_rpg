@@ -59,6 +59,7 @@ public class CharacterBase : MonoBehaviour
     public virtual void UseItem() { }
     public virtual void UseItem(int bagSlotIndex) { }
     public virtual void UseUtility() { }
+    public virtual void UseSkill(int skillIndex) {}
     protected bool SetGrounded()
     {
         return Physics.OverlapBox

@@ -116,6 +116,20 @@ public class CharacterPlayer : CharacterBase
         if (charactersData[characterIndex].characterData.skills[0].skillsBaseSO && charactersData[characterIndex].characterData.skills[0].cd <= 0)
             charactersData[characterIndex].characterData.skills[0].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, 0);
     }
+    public void OnHandleUseSkill(InputAction.CallbackContext context)
+    {
+        UseSkill(context.ReadValue<int>());
+    }
+    public override void UseSkill(int skillIndex)
+    {
+        if (charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level].statistics.ContainsKey(CharacterData.TypeStatistic.Sp))
+        {
+            if (charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Sp].currentValue - charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level].statistics[CharacterData.TypeStatistic.Sp].baseValue >= 0)
+            {
+                
+            }
+        }
+    }
     public override void UseItem()
     {
         if (isInventoryOpen) return;

@@ -31,4 +31,13 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
+    - Key: 13
+      Value:
+        baseValue: 10
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 0
   skillsBaseSO: {fileID: 11400000, guid: 7f3fe7183eb82ec47ae2e8db055d0107, type: 2}

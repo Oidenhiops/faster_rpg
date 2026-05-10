@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using AYellowpaper.SerializedCollections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class CharacterPlayerHud : MonoBehaviour
@@ -350,7 +348,6 @@ public class CharacterPlayerHud : MonoBehaviour
             characterUI.interactables.interactablesPanel.SetActive(false);
         }
     }
-
     [Serializable]
     public class CharacterUI
     {

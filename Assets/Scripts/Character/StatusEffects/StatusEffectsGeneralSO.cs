@@ -20,6 +20,10 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
         characterToMakeEffect.characterStatusEffect.AddStatusEffect(this);
         characterToMakeEffect.characterPlayerHud?.RefreshCharacterStatistics();
     }
+    public override void ReApplyEffect(CharacterBase characterToMakeEffect)
+    {
+        
+    }
     public override void RemoveEffect(CharacterBase characterToMakeEffect)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in statusEffectStatistics)
