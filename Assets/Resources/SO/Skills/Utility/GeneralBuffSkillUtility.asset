@@ -17,11 +17,21 @@ MonoBehaviour:
   icon: {fileID: -343937895, guid: bfc3823bac79ab14e80720571aa0d782, type: 3}
   animationSkillName: 
   generalAnimationSkillName: 
-  typeSkill: 2
-  needSceneAnimation: 0
   skillVFXPrefab: {fileID: 0}
   skillVFXDuration: 1
   statistics:
-    _serializedList: []
+    _serializedList:
+    - Key: 0
+      Value:
+        _serializedList:
+        - Key: 13
+          Value:
+            baseValue: 15
+            aptitudeValue: 0
+            itemValue: 0
+            buffValue:
+              _serializedList: []
+            currentValue: 0
+            maxValue: 0
   weaponForUseSkill: 0
   statusEffectBaseSO: {fileID: 11400000, guid: 6512928ac73b76744898e80a43915b80, type: 2}

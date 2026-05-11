@@ -9,7 +9,7 @@ public class StatusEffectBanner : MonoBehaviour
     public GameObject amountBg;
     public Image statusEffectCounterFill;
     public TMP_Text statusEffectCounterText;
-    public void SetBannerData(CharacterStatusEffect.StatusEffect statusEffect)
+    public void SetBannerData(CharacterBase.StatusEffect statusEffect)
     {
         statusEffectImage.sprite = statusEffect.statusEffectBaseSO.icon;
         statusEffectCounterText.text = statusEffect.cd.ToString("F1");
@@ -17,12 +17,12 @@ public class StatusEffectBanner : MonoBehaviour
         amountBg.gameObject.SetActive(statusEffect.amount > 1);
         amountText.text = statusEffect.amount.ToString();
     }
-    public void RefreshCD(CharacterStatusEffect.StatusEffect statusEffect)
+    public void RefreshCD(CharacterBase.StatusEffect statusEffect)
     {
         statusEffectCounterText.text = statusEffect.cd.ToString("F1");
         statusEffectCounterFill.fillAmount = statusEffect.cd / statusEffect.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
     }
-    public void RefreshData(CharacterStatusEffect.StatusEffect statusEffect)
+    public void RefreshData(CharacterBase.StatusEffect statusEffect)
     {
         statusEffectCounterText.text = statusEffect.cd.ToString("F1");
         statusEffectCounterFill.fillAmount = statusEffect.cd / statusEffect.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;

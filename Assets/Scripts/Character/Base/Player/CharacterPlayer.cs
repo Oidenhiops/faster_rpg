@@ -24,7 +24,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
         inputActions.Player.ChangeFastItem.performed += OnHandleChangeFastItem;
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
-        inputActions.Player.UseUtility.performed += OnHandleUseUtility;
+        inputActions.Player.UseSkill.performed += OnHandleUseSkill;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -106,27 +106,38 @@ public class CharacterPlayer : CharacterBase
     {
         UseItem();
     }
-    public void OnHandleUseUtility(InputAction.CallbackContext context)
-    {
-        UseUtility();
-    }
-    public override void UseUtility()
-    {
-        if (isInventoryOpen) return;
-        if (charactersData[characterIndex].characterData.skills[0].skillsBaseSO && charactersData[characterIndex].characterData.skills[0].cd <= 0)
-            charactersData[characterIndex].characterData.skills[0].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, 0);
-    }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
     {
-        UseSkill(context.ReadValue<int>());
+        UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
     }
     public override void UseSkill(int skillIndex)
     {
-        if (charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level].statistics.ContainsKey(CharacterData.TypeStatistic.Sp))
+        if (charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO != null &&
+            !(skillsCd.ContainsKey(characterIndex) && skillsCd[characterIndex].ContainsKey(skillIndex)) &&
+            charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.ValidateCanUseSkill(this, characterIndex, charactersData[characterIndex].characterData.skills[skillIndex].level))
         {
-            if (charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Sp].currentValue - charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level].statistics[CharacterData.TypeStatistic.Sp].baseValue >= 0)
+            if (charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, skillIndex))
             {
-                
+                if (skillsCd.ContainsKey(characterIndex))
+                {
+                    skillsCd[characterIndex].Add(0, new SkillCd 
+                    { 
+                        maxCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
+                        currentCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue
+                    });
+                }
+                else
+                {
+                    skillsCd.Add(characterIndex, new SerializedDictionary<int, SkillCd> { { 0, new SkillCd 
+                    { 
+                        maxCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
+                        currentCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue 
+                    }}});
+                }
+                if (handleUseSkillCoroutine == null)
+                {
+                    handleUseSkillCoroutine = StartCoroutine(HandleUseSkill());
+                }
             }
         }
     }

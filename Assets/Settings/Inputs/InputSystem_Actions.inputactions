@@ -115,13 +115,13 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "UseUtility",
-                    "type": "Button",
-                    "id": "862d1c08-f45c-4501-9fa2-0ce5926d3d64",
-                    "expectedControlType": "",
+                    "name": "UseSkill",
+                    "type": "Value",
+                    "id": "8efe4cb5-940b-492c-a8fb-9dc028376309",
+                    "expectedControlType": "Integer",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -567,12 +567,56 @@
                 },
                 {
                     "name": "",
-                    "id": "41dcced5-bcfa-49b3-a0d6-ef675fcd9b71",
+                    "id": "16228881-531a-4063-b49b-894ca35d15f4",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "Scale(factor=0)",
                     "groups": "",
-                    "action": "UseUtility",
+                    "action": "UseSkill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "09bf5e51-4be5-4781-a6a8-fe089d8ff4d0",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "Scale",
+                    "groups": "",
+                    "action": "UseSkill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2c43a1df-fd79-4939-84c2-932d26117b2e",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "Scale(factor=2)",
+                    "groups": "",
+                    "action": "UseSkill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "59b27e5b-8177-4ea0-951b-4279025a4a7d",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "Scale(factor=3)",
+                    "groups": "",
+                    "action": "UseSkill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fc7d8c1c-b0af-4739-963a-e6541cb8f57f",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "Scale(factor=4)",
+                    "groups": "",
+                    "action": "UseSkill",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -197,9 +197,9 @@ public class CharacterPlayerHud : MonoBehaviour
             Destroy(statusEffect.gameObject);
         }
         characterUI.statusEffectUI.statusEffectsBanners.Clear();
-        if (characterPlayer.characterStatusEffect.statusEffects.ContainsKey(characterPlayer.characterIndex))
+        if (characterPlayer.statusEffects.ContainsKey(characterPlayer.characterIndex))
         {
-            foreach(KeyValuePair<StatusEffectBaseSO, CharacterStatusEffect.StatusEffect> statusEffect in characterPlayer.characterStatusEffect.statusEffects[characterPlayer.characterIndex])
+            foreach(KeyValuePair<StatusEffectBaseSO, CharacterBase.StatusEffect> statusEffect in characterPlayer.statusEffects[characterPlayer.characterIndex])
             {
                 StatusEffectBanner statusEffectBanner = Instantiate(characterUI.statusEffectUI.statusEffectPrefab, characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
                 statusEffectBanner.SetBannerData(statusEffect.Value);
@@ -207,7 +207,7 @@ public class CharacterPlayerHud : MonoBehaviour
             }
         }
     }
-    public void AddStatusEffect(CharacterStatusEffect.StatusEffect statusEffect)
+    public void AddStatusEffect(CharacterBase.StatusEffect statusEffect)
     {
         if (characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(statusEffect.statusEffectBaseSO))
         {
@@ -408,6 +408,21 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public Image skillImage;
         public Image lockImage;
+        public Image skillImageCd;
+        public TMP_Text skillCdText;
+        public void RefreshCD(CharacterBase.SkillCd skillCd)
+        {
+            if (skillCd.currentCd > 0)
+            {
+                skillImageCd.fillAmount = skillCd.currentCd / skillCd.maxCd;
+                skillCdText.text = skillCd.currentCd.ToString("F1");
+            }
+            else
+            {
+                skillImageCd.fillAmount = 0;
+                skillCdText.text = "";
+            }
+        }
     }
     [Serializable]
     public class StatusEffectUI

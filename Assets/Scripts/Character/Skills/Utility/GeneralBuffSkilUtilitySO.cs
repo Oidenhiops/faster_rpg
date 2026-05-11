@@ -3,8 +3,9 @@ using UnityEngine;
 public class GeneralBuffSkilUtilitySO : SkillsBaseSO
 {
     public StatusEffectBaseSO statusEffectBaseSO;
-    public override void UseSkill(CharacterBase characterMakeSkill, CharacterBase characterToMakeSkill, int skillIndex)
+    public override bool UseSkill(CharacterBase characterMakeSkill, CharacterBase characterToMakeSkill, int skillIndex)
     {
         statusEffectBaseSO.ApplyEffect(characterMakeSkill);
+        return true;
     }
 }

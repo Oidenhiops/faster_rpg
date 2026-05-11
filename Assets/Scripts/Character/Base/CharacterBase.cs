@@ -1,4 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
 public class CharacterBase : MonoBehaviour
@@ -18,7 +22,14 @@ public class CharacterBase : MonoBehaviour
     public CharacterPlayerHud characterPlayerHud;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
-    public CharacterStatusEffect characterStatusEffect;
+    public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
+    public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
+    List<int> statusEffectsCharacterKeysToRemove = new();
+    public SerializedDictionary<int, SerializedDictionary<int, SkillCd>> skillsCd = new SerializedDictionary<int, SerializedDictionary<int, SkillCd>>();
+    public SerializedDictionary<int, List<int>> skillsToRemove = new SerializedDictionary<int, List<int>>();
+    List<int> skillsCharacterKeysToRemove = new();
+    protected Coroutine handleStatusEffectCoroutine;
+    protected Coroutine handleUseSkillCoroutine;
     public bool isGrounded => SetGrounded();
     public bool isDashing;
     public void OnEnable()
@@ -58,8 +69,7 @@ public class CharacterBase : MonoBehaviour
     public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
     public virtual void UseItem() { }
     public virtual void UseItem(int bagSlotIndex) { }
-    public virtual void UseUtility() { }
-    public virtual void UseSkill(int skillIndex) {}
+    public virtual void UseSkill(int skillIndex) { }
     protected bool SetGrounded()
     {
         return Physics.OverlapBox
@@ -165,6 +175,195 @@ public class CharacterBase : MonoBehaviour
         // _ = GameManager.Instance.LoadScene(GameManager.TypeScene.HomeScene);
         await Awaitable.NextFrameAsync();
     }
+    public IEnumerator HandleStatusEffect()
+    {
+        while (statusEffects.Count > 0)
+        {
+            foreach (KeyValuePair<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffect in statusEffects)
+            {
+                foreach (KeyValuePair<StatusEffectBaseSO, StatusEffect> status in statusEffect.Value)
+                {
+                    status.Value.cd -= Time.deltaTime;
+                    if (status.Value.cd <= 0)
+                    {
+                        status.Value.amount--;
+                        if (status.Value.amount > 0)
+                        {
+                            status.Value.cd = status.Value.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
+                            status.Value.statusEffectBaseSO.ReApplyEffect(this);
+                            if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
+                                characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].SetBannerData(status.Value);
+                        }
+                        else
+                        {
+                            status.Value.statusEffectBaseSO.RemoveEffect(this);
+                            if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
+                            {
+                                Destroy(characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].gameObject);
+                                characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status.Key);
+                                AddStatusEffectToRemove(statusEffect.Key, status.Key);
+                                if (statusEffect.Value.Count - statusToRemove[statusEffect.Key].Count <= 0)
+                                {
+                                    statusEffectsCharacterKeysToRemove.Add(statusEffect.Key);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (statusEffects.ContainsKey(characterIndex))
+                            characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].RefreshCD(status.Value);
+                    }
+                }
+            }
+            if (statusToRemove.Count > 0)
+            {
+                RemoveStatus();
+            }
+            yield return null;
+        }
+        handleStatusEffectCoroutine = null;
+    }
+    public void AddStatusEffectToRemove(int character, StatusEffectBaseSO status)
+    {
+        if (statusToRemove.ContainsKey(character))
+        {
+            statusToRemove[character].Add(status);
+        }
+        else
+        {
+            statusToRemove.Add(character, new List<StatusEffectBaseSO> { status });
+        }
+    }
+    public void RemoveStatus()
+    {
+        foreach (KeyValuePair<int, List<StatusEffectBaseSO>> character in statusToRemove)
+        {
+            foreach (StatusEffectBaseSO status in character.Value)
+            {
+                statusEffects[character.Key].Remove(status);
+            }
+        }
+        foreach (int character in statusEffectsCharacterKeysToRemove)
+        {
+            statusEffects.Remove(character);
+        }
+        statusToRemove.Clear();
+        statusEffectsCharacterKeysToRemove.Clear();
+    }
+    public IEnumerator HandleUseSkill()
+    {
+        while (skillsCd.Count > 0)
+        {
+            foreach (KeyValuePair<int, SerializedDictionary<int, SkillCd>> character in skillsCd)
+            {
+                foreach (KeyValuePair<int, SkillCd> skill in character.Value)
+                {
+                    skill.Value.currentCd -= Time.deltaTime;
+                    if (character.Key == characterIndex)
+                    {
+                        characterPlayerHud?.characterUI.skills[skill.Key].RefreshCD(skill.Value);
+                    }
+                    if (skill.Value.currentCd <= 0)
+                    {
+                        AddSkillToRemove(character.Key, skill.Key);
+                        if (character.Value.Count - 1 <= 0)
+                        {
+                            skillsCharacterKeysToRemove.Add(character.Key);
+                        }
+                    }
+                }
+            }
+            if (skillsToRemove.Count > 0)
+            {
+                RemoveSkillCd();
+            }
+            yield return null;
+        }
+        handleUseSkillCoroutine = null;
+    }
+    public void AddSkillToRemove(int character, int skillId)
+    {
+        if (skillsToRemove.ContainsKey(character))
+        {
+            skillsToRemove[character].Add(skillId);
+        }
+        else
+        {
+            skillsToRemove.Add(character, new List<int> { skillId });
+        }
+    }
+    public void RemoveSkillCd()
+    {
+        foreach (KeyValuePair<int, List<int>> character in skillsToRemove)
+        {
+            foreach (int skill in character.Value)
+            {
+                skillsCd[character.Key].Remove(skill);
+            }
+        }
+        foreach (int character in statusEffectsCharacterKeysToRemove)
+        {
+            skillsCd.Remove(character);
+        }
+        skillsToRemove.Clear();
+        skillsCharacterKeysToRemove.Clear();
+    }
+    public void AddStatusEffect(StatusEffectBaseSO statusEffect)
+    {
+        if (statusEffects.ContainsKey(characterIndex))
+        {
+            if (statusEffects[characterIndex].ContainsKey(statusEffect))
+            {
+                statusEffects[characterIndex][statusEffect].AppendStatusEffect();
+            }
+            else
+            {
+                statusEffects[characterIndex].Add(statusEffect, new StatusEffect(statusEffect));
+            }
+        }
+        else
+        {
+            statusEffects.Add(characterIndex, new SerializedDictionary<StatusEffectBaseSO, StatusEffect>
+            {
+                {statusEffect, new StatusEffect(statusEffect)}
+            });
+        }
+        characterPlayerHud?.AddStatusEffect(statusEffects[characterIndex][statusEffect]);
+
+        if (handleStatusEffectCoroutine == null)
+        {
+            handleStatusEffectCoroutine = StartCoroutine(HandleStatusEffect());
+        }
+    }
+    public void AddStatusEffect(int characterIndex, StatusEffectBaseSO statusEffect)
+    {
+        if (statusEffects.ContainsKey(characterIndex))
+        {
+            if (statusEffects[characterIndex].ContainsKey(statusEffect))
+            {
+                statusEffects[characterIndex][statusEffect].AppendStatusEffect();
+            }
+            else
+            {
+                statusEffects[characterIndex].Add(statusEffect, new StatusEffect(statusEffect));
+            }
+        }
+        else
+        {
+            statusEffects.Add(characterIndex, new SerializedDictionary<StatusEffectBaseSO, StatusEffect>
+            {
+                {statusEffect, new StatusEffect(statusEffect)}
+            });
+        }
+        characterPlayerHud?.AddStatusEffect(statusEffects[characterIndex][statusEffect]);
+
+        if (handleStatusEffectCoroutine == null)
+        {
+            handleStatusEffectCoroutine = StartCoroutine(HandleStatusEffect());
+        }
+    }
     [Serializable]
     public class CharactersData
     {
@@ -184,8 +383,36 @@ public class CharacterBase : MonoBehaviour
     [Serializable]
     public class CharacterSkinData
     {
-    public Texture2D atlas;
-    public Texture2D atlasHands;
-    public Sprite icon;
+        public Texture2D atlas;
+        public Texture2D atlasHands;
+        public Sprite icon;
+    }
+    [Serializable]
+    public class StatusEffect
+    {
+        public StatusEffectBaseSO statusEffectBaseSO = new StatusEffectBaseSO();
+        public float cd;
+        public int amount;
+        public StatusEffect(StatusEffectBaseSO statusEffect)
+        {
+            statusEffectBaseSO = statusEffect;
+            cd = statusEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
+            amount = 1;
+        }
+        public void AppendStatusEffect()
+        {
+            bool canAdd = amount < statusEffectBaseSO.maxStack;
+            amount = canAdd ? amount + 1 : statusEffectBaseSO.maxStack;
+            if (!canAdd)
+            {
+                cd = statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
+            }
+        }
+    }
+    [Serializable]
+    public class SkillCd
+    {
+        public float maxCd;
+        public float currentCd;
     }
 }

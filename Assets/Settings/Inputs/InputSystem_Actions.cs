@@ -201,13 +201,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""UseUtility"",
-                    ""type"": ""Button"",
-                    ""id"": ""862d1c08-f45c-4501-9fa2-0ce5926d3d64"",
-                    ""expectedControlType"": """",
+                    ""name"": ""UseSkill"",
+                    ""type"": ""Value"",
+                    ""id"": ""8efe4cb5-940b-492c-a8fb-9dc028376309"",
+                    ""expectedControlType"": ""Integer"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -653,12 +653,56 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""41dcced5-bcfa-49b3-a0d6-ef675fcd9b71"",
+                    ""id"": ""16228881-531a-4063-b49b-894ca35d15f4"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""Scale(factor=0)"",
                     ""groups"": """",
-                    ""action"": ""UseUtility"",
+                    ""action"": ""UseSkill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""09bf5e51-4be5-4781-a6a8-fe089d8ff4d0"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""UseSkill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2c43a1df-fd79-4939-84c2-932d26117b2e"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": """",
+                    ""action"": ""UseSkill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59b27e5b-8177-4ea0-951b-4279025a4a7d"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=3)"",
+                    ""groups"": """",
+                    ""action"": ""UseSkill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fc7d8c1c-b0af-4739-963a-e6541cb8f57f"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=4)"",
+                    ""groups"": """",
+                    ""action"": ""UseSkill"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1258,7 +1302,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_ToggleInventory = m_Player.FindAction("ToggleInventory", throwIfNotFound: true);
         m_Player_ChangeFastItem = m_Player.FindAction("ChangeFastItem", throwIfNotFound: true);
         m_Player_UseFastItem = m_Player.FindAction("UseFastItem", throwIfNotFound: true);
-        m_Player_UseUtility = m_Player.FindAction("UseUtility", throwIfNotFound: true);
+        m_Player_UseSkill = m_Player.FindAction("UseSkill", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1364,7 +1408,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ToggleInventory;
     private readonly InputAction m_Player_ChangeFastItem;
     private readonly InputAction m_Player_UseFastItem;
-    private readonly InputAction m_Player_UseUtility;
+    private readonly InputAction m_Player_UseSkill;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1425,9 +1469,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @UseFastItem => m_Wrapper.m_Player_UseFastItem;
         /// <summary>
-        /// Provides access to the underlying input action "Player/UseUtility".
+        /// Provides access to the underlying input action "Player/UseSkill".
         /// </summary>
-        public InputAction @UseUtility => m_Wrapper.m_Player_UseUtility;
+        public InputAction @UseSkill => m_Wrapper.m_Player_UseSkill;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1490,9 +1534,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @UseFastItem.started += instance.OnUseFastItem;
             @UseFastItem.performed += instance.OnUseFastItem;
             @UseFastItem.canceled += instance.OnUseFastItem;
-            @UseUtility.started += instance.OnUseUtility;
-            @UseUtility.performed += instance.OnUseUtility;
-            @UseUtility.canceled += instance.OnUseUtility;
+            @UseSkill.started += instance.OnUseSkill;
+            @UseSkill.performed += instance.OnUseSkill;
+            @UseSkill.canceled += instance.OnUseSkill;
         }
 
         /// <summary>
@@ -1540,9 +1584,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @UseFastItem.started -= instance.OnUseFastItem;
             @UseFastItem.performed -= instance.OnUseFastItem;
             @UseFastItem.canceled -= instance.OnUseFastItem;
-            @UseUtility.started -= instance.OnUseUtility;
-            @UseUtility.performed -= instance.OnUseUtility;
-            @UseUtility.canceled -= instance.OnUseUtility;
+            @UseSkill.started -= instance.OnUseSkill;
+            @UseSkill.performed -= instance.OnUseSkill;
+            @UseSkill.canceled -= instance.OnUseSkill;
         }
 
         /// <summary>
@@ -1928,12 +1972,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnUseFastItem(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "UseUtility" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "UseSkill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUseUtility(InputAction.CallbackContext context);
+        void OnUseSkill(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

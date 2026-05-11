@@ -17,7 +17,7 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
                 }
             }
         }
-        characterToMakeEffect.characterStatusEffect.AddStatusEffect(this);
+        characterToMakeEffect.AddStatusEffect(this);
         characterToMakeEffect.characterPlayerHud?.RefreshCharacterStatistics();
     }
     public override void ReApplyEffect(CharacterBase characterToMakeEffect)
