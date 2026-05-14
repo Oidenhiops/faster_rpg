@@ -182,14 +182,7 @@ public class CharacterAnimator : MonoBehaviour
             }
             else
             {
-                if (currentAnimation.sprites[currentSpriteIndex].midle.characterSprite != null)
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].midle;
-                }
-                else
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].down;
-                }
+                return currentAnimation.sprites[currentSpriteIndex].down;
             }
         }
         else

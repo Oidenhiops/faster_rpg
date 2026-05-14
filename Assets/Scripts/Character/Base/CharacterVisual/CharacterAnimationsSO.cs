@@ -13,8 +13,8 @@ public class CharacterAnimationsSO : ScriptableObject
     public bool isEightDirections;
     public SerializedDictionary<string, AnimationsInfo> animations = new SerializedDictionary<string, AnimationsInfo>();
     public string animationName;
-    public Sprite characterSpriteSheetBase;
-    #if UNITY_EDITOR
+    public Texture2D characterSpriteSheetBase;
+    // #if UNITY_EDITOR
     [NaughtyAttributes.Button]
     public void GenerateAllCharacterAnimations()
     {
@@ -26,7 +26,7 @@ public class CharacterAnimationsSO : ScriptableObject
         while (true)
         {
             List<Sprite> row = new List<Sprite>();
-            for (int i = 0; i < characterSpriteSheetBase.rect.width / spriteW; i++)
+            for (int i = 0; i < characterSpriteSheetBase.width / spriteW; i++)
             {
                 if (i + indexSpriteForEvaluate > allSprites.Length - 1 || allSprites[i + indexSpriteForEvaluate].rect.y != allSprites[indexSpriteForEvaluate].rect.y)
                 {
@@ -36,7 +36,7 @@ public class CharacterAnimationsSO : ScriptableObject
             }
         }
     }
-#endif
+// #endif
 
     [Serializable]
     public class AnimationsInfo
@@ -54,15 +54,14 @@ public class CharacterAnimationsSO : ScriptableObject
     [Serializable]
     public class SpritesInfo
     {
-        public SpriteData midle;
-        public SpriteData up;
-        public SpriteData down;
-        public SpriteData left;
-        public SpriteData right;
         public SpriteData upLeft;
+        public SpriteData up;
         public SpriteData upRight;
-        public SpriteData downLeft;
+        public SpriteData right;
         public SpriteData downRight;
+        public SpriteData down;
+        public SpriteData downLeft;
+        public SpriteData left;
     }
     [Serializable]
     public class SpriteData
