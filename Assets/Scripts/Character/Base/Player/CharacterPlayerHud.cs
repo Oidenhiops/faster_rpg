@@ -182,11 +182,13 @@ public class CharacterPlayerHud : MonoBehaviour
                 skill.Value.skillImage.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO.icon;
                 skill.Value.lockImage.gameObject.SetActive(false);
                 skill.Value.skillImage.gameObject.SetActive(true);
+                skill.Value.RefreshCD(new CharacterBase.SkillCd { currentCd = 0, maxCd = 0 });
             }
             else
             {
                 skill.Value.skillImage.gameObject.SetActive(false);
                 skill.Value.lockImage.gameObject.SetActive(true);
+                skill.Value.RefreshCD(new CharacterBase.SkillCd { currentCd = 0, maxCd = 0 });
             }
         }
     }

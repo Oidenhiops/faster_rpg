@@ -18,8 +18,6 @@ public class InitialDataSO : ScriptableObject
         {CharacterData.TypeStatistic.Crtd, new CharacterData.Statistic{ aptitudeValue = 100 }},
     };
     public SerializedDictionary<int, CharacterData.CharacterSkillInfo> initialSkills = new SerializedDictionary<int, CharacterData.CharacterSkillInfo>();
-    public int skinId;
-    public CharacterAnimationsSO characterAnimationsSO;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> CloneStatistics()
     {
         var clone = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();

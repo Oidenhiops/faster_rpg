@@ -303,7 +303,7 @@ public class CharacterBase : MonoBehaviour
                 skillsCd[character.Key].Remove(skill);
             }
         }
-        foreach (int character in statusEffectsCharacterKeysToRemove)
+        foreach (int character in skillsCharacterKeysToRemove)
         {
             skillsCd.Remove(character);
         }

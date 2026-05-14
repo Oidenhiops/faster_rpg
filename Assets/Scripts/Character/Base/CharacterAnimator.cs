@@ -10,6 +10,7 @@ public class CharacterAnimator : MonoBehaviour
     public int currentSpriteIndex;
     public float currentSpritePerTime = 0.1f;
     public string animationAfterEnd;
+    public Sprite spriteSheetBase;
     public void SetInitialData()
     {
         StopAllCoroutines();

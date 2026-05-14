@@ -34,6 +34,7 @@ public class CharacterPlayer : CharacterBase
             List<CharactersData> charactersDataList = new List<CharactersData>();
             foreach (var characterData in GameData.Instance.gameDataInfo.gameDataSlots[GameData.Instance.systemDataInfo.currentGameDataIndex].characters)
             {
+                //modificar
                 if (GameData.Instance.charactersSkinDBSO.data.ContainsKey(characterData.Value.characterId))
                 {
                     if (GameData.Instance.charactersSkinDBSO.data[characterData.Value.characterId].TryGetValue(characterData.Value.characterSkinId, out CharacterSkinData skinData))
@@ -41,7 +42,6 @@ public class CharacterPlayer : CharacterBase
                         charactersDataList.Add(new CharactersData
                         {
                             characterSkin = skinData,
-                            characterAnimationsSO = GameData.Instance.charactersDBSO.data[characterData.Value.characterId][characterData.Value.characterSkinId].initialDataSO.characterAnimationsSO,
                             characterData = characterData.Value
                         });
                     }

@@ -1754,6 +1754,7 @@ MonoBehaviour:
   currentSpriteIndex: 0
   currentSpritePerTime: 0.1
   animationAfterEnd: 
+  spriteSheetBase: {fileID: -1006419203, guid: efea121b597d42b42a6d4560932a9d14, type: 3}
 --- !u!114 &211714506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1869,6 +1870,8 @@ MonoBehaviour:
   statusToRemove:
     _serializedList: []
   skillsCd:
+    _serializedList: []
+  skillsToRemove:
     _serializedList: []
   isDashing: 0
   interactableBannerPrefab: {fileID: 1398121657027770714, guid: bc98a0c87e9c98a49a7144748c5c1581, type: 3}
@@ -3137,7 +3140,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 5.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
