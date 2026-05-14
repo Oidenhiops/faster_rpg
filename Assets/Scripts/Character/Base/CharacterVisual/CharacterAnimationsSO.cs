@@ -34,6 +34,7 @@ public class CharacterAnimationsSO : ScriptableObject
                 }
                 row.Add(allSprites[i + indexSpriteForEvaluate]);
             }
+            break;
         }
     }
 // #endif
