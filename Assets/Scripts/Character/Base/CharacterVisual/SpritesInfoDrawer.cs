@@ -25,7 +25,9 @@ public class SpritesInfoDrawer : PropertyDrawer
         EditorGUI.EndProperty();
     }
     private static readonly string[] cellNames = {
-        "upLeft", "up", "upRight", "left", "midle", "right", "downLeft", "down", "downRight"
+        "upLeft", "up", "upRight",
+        "left",            "right",
+        "downLeft", "down", "downRight"
     };
 
     private void DrawGrid(Rect rect, SerializedProperty property)
@@ -36,46 +38,33 @@ public class SpritesInfoDrawer : PropertyDrawer
             property.FindPropertyRelative("up"),
             property.FindPropertyRelative("upRight"),
             property.FindPropertyRelative("left"),
-            property.FindPropertyRelative("midle"),
             property.FindPropertyRelative("right"),
             property.FindPropertyRelative("downLeft"),
             property.FindPropertyRelative("down"),
             property.FindPropertyRelative("downRight")
         };
 
-        for (int x = 0; x < 3; x++)
+        int cellIndex = 0;
+        for (int row = 0; row < 3; row++)
         {
-            var cellRect = new Rect(
-                rect.x + x * (CellSizeWidth + Padding),
-                rect.y,
-                CellSizeWidth,
-                CellSizeHeight
-            );
-            DrawCell(cellRect, cells[x], cellNames[x]);
-        }
+            for (int col = 0; col < 3; col++)
+            {
+                if (row == 1 && col == 1)
+                {
+                    continue;
+                }
 
-        for (int x = 0; x < 3; x++)
-        {
-            var cellRect = new Rect(
-                rect.x + x * (CellSizeWidth + Padding),
-                rect.y + (CellSizeHeight + Padding),
-                CellSizeWidth,
-                CellSizeHeight
-            );
-            DrawCell(cellRect, cells[3 + x], cellNames[3 + x]);
-        }
+                var cellRect = new Rect(
+                    rect.x + col * (CellSizeWidth + Padding),
+                    rect.y + row * (CellSizeHeight + Padding),
+                    CellSizeWidth,
+                    CellSizeHeight
+                );
 
-        for (int x = 0; x < 3; x++)
-        {
-            var cellRect = new Rect(
-                rect.x + x * (CellSizeWidth + Padding),
-                rect.y + (CellSizeHeight * 2 + Padding),
-                CellSizeWidth,
-                CellSizeHeight
-            );
-            DrawCell(cellRect, cells[6 + x], cellNames[6 + x]);
+                DrawCell(cellRect, cells[cellIndex], cellNames[cellIndex]);
+                cellIndex++;
+            }
         }
-
     }
     private void DrawCell(Rect rect, SerializedProperty spriteDataProp, string cellName)
     {
