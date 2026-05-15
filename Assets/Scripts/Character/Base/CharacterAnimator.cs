@@ -178,6 +178,7 @@ public class CharacterAnimator : MonoBehaviour
                 {
                     mesh.Value.gameObject.SetActive(true);
                     mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSprite.textures[currentAnimation.name]);
+                    mesh.Value.material.SetColor("_Color", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSpriteColor);
                 }
                 else
                 {
