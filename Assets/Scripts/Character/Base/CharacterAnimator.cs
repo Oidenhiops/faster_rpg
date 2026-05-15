@@ -19,32 +19,9 @@ public class CharacterAnimator : MonoBehaviour
         StopAllCoroutines();
         currentSpriteIndex = 0;
         animationAfterEnd = "";
-        foreach (KeyValuePair<CharacterData.TypeSkin, MeshRenderer> mesh in characterBase.characterModel.meshRenderers)
-        {
-            if (characterBase.charactersData[characterBase.characterIndex].skins.TryGetValue(mesh.Key, out CharacterData.CharacterSkinInfo skinInfo))
-            {
-                if (skinInfo.originalSprite)
-                {
-                    mesh.Value.gameObject.SetActive(true);
-                    mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSprite.textures["Idle"]);
-                }
-                else
-                {
-                    mesh.Value.gameObject.SetActive(false);
-                }
-            }
-            else
-            {
-                mesh.Value.gameObject.SetActive(false);
-            }
-        }
         currentAnimation = GetAnimation("Idle");
+        SetTextureFromAnimation();
         StartCoroutine(AnimateSprite());
-    }
-    float GetScaleFactor(float size)
-    {
-        float baseScale = 64f;
-        return size / baseScale;
     }
     public void MakeAnimation(string animationName)
     {
@@ -53,6 +30,7 @@ public class CharacterAnimator : MonoBehaviour
         StopAllCoroutines();
         currentAnimation = GetAnimation(animationName);
         currentSpriteIndex = 0;
+        SetTextureFromAnimation();
         StartCoroutine(AnimateSprite());
     }
     public string GetAnimationAttack()
@@ -72,10 +50,10 @@ public class CharacterAnimator : MonoBehaviour
     {
         while (true)
         {
-            SetTextureFromAtlas(GetCurrentSpriteData().characterSprite);
+            SetUvsFromAtlas(GetCurrentSpriteData().characterSprite);
             if (characterBase.charactersData[characterBase.characterIndex].skins[CharacterData.TypeSkin.Hands].originalSprite)
             {
-                SetTextureFromAtlas(GetCurrentSpriteData().characterSprite);
+                SetUvsFromAtlas(GetCurrentSpriteData().characterSprite);
                 SetHandsPos();
             }
             yield return new WaitForSeconds(currentSpritePerTime);
@@ -175,7 +153,7 @@ public class CharacterAnimator : MonoBehaviour
             return null;
         }
     }
-    void SetTextureFromAtlas(Sprite spriteFromAtlas)
+    void SetUvsFromAtlas(Sprite spriteFromAtlas)
     {
         Vector2[] uvs = characterBase.characterModel.originalMesh.uv;
         Texture2D texture = spriteFromAtlas.texture;
@@ -188,6 +166,28 @@ public class CharacterAnimator : MonoBehaviour
         foreach (KeyValuePair<CharacterData.TypeSkin, MeshRenderer> mesh in characterBase.characterModel.meshRenderers)
         {
             mesh.Value.GetComponent<MeshFilter>().mesh.uv = uvs;
+        }
+    }
+    void SetTextureFromAnimation()
+    {
+        foreach (KeyValuePair<CharacterData.TypeSkin, MeshRenderer> mesh in characterBase.characterModel.meshRenderers)
+        {
+            if (characterBase.charactersData[characterBase.characterIndex].skins.TryGetValue(mesh.Key, out CharacterData.CharacterSkinInfo skinInfo))
+            {
+                if (skinInfo.originalSprite)
+                {
+                    mesh.Value.gameObject.SetActive(true);
+                    mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSprite.textures[currentAnimation.name]);
+                }
+                else
+                {
+                    mesh.Value.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                mesh.Value.gameObject.SetActive(false);
+            }
         }
     }
     void SetHandsPos()
