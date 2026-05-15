@@ -20,7 +20,7 @@ public class SkillsBaseSO : ScriptableObject
     {
         if (statistics.Count == 0 || !statistics[skillLevel].ContainsKey(CharacterData.TypeStatistic.Sp)) return true;
         else if (
-            character.charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Sp].currentValue - 
+            character.charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Sp].currentValue - 
             statistics[skillLevel][CharacterData.TypeStatistic.Sp].baseValue >= 0
             ) return true;
         return false;

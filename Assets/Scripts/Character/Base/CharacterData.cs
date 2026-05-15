@@ -31,9 +31,14 @@ public class CharacterData
         {3, new CharacterSkillInfo()},
         {4, new CharacterSkillInfo()},
     };
-    public int characterId;
-    public int characterEvolutionId;
-    public int characterSkinId;
+    public SerializedDictionary<TypeSkin, CharacterSkinInfo> skins = new SerializedDictionary<TypeSkin, CharacterSkinInfo>
+    {
+        {TypeSkin.None, new CharacterSkinInfo()},
+        {TypeSkin.Skin, new CharacterSkinInfo()},
+        {TypeSkin.Hair, new CharacterSkinInfo()},
+        {TypeSkin.Eyes, new CharacterSkinInfo()},
+        {TypeSkin.Mouth, new CharacterSkinInfo()},
+    };
     public void InitializeStatistics()
     {
         foreach (KeyValuePair<TypeStatistic, Statistic> statistic in statistics)
@@ -143,6 +148,16 @@ public class CharacterData
         public int level;
         public int cd;
     }
+    [Serializable]
+    public class CharacterSkinInfo
+    {
+        public int originalSkinId;
+        public CharactersSkinSO originalSprite;
+        public Color originalSpriteColor;
+        public int otherSkinId;
+        public CharactersSkinSO otherSkin;
+        public Color otherSkinColor;
+    }
     public enum MasteryRange
     {
         N = 0,
@@ -170,5 +185,14 @@ public class CharacterData
         Crtd = 11,
         BagSpace = 12,
         Cd = 13
+    }
+    public enum TypeSkin
+    {
+        None = 0,
+        Skin = 1,
+        Hands = 2,
+        Hair = 3,
+        Eyes = 4,
+        Mouth = 5,
     }
 }

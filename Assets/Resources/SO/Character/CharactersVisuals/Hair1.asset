@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bffe2857fb3859c47a352e0c0cded9ce, type: 3}
+  m_Name: Hair1
+  m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinSO
+  skinSize: 64
+  textures:
+    _serializedList:
+    - Key: Idle
+      Value: {fileID: 2800000, guid: ac736c2f2c5739841b21f0892e20fa2f, type: 3}
+    - Key: Walk
+      Value: {fileID: 2800000, guid: db3efe201f5bf1f4f9e11d4cd37a6db0, type: 3}
+    - Key: Die
+      Value: {fileID: 2800000, guid: bef802240729b1049a1c53e5864055df, type: 3}

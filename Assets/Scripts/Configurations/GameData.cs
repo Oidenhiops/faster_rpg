@@ -371,9 +371,7 @@ public class GameData : MonoBehaviour
                             { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
                         },
                         bag = bags[0],
-                        characterId = 1,
-                        characterEvolutionId = 1,
-                        characterSkinId = 1,
+                        skins = charactersSkinDBSO.GenerateRandomSkin()
                     }
                 },
                 { randomNames[1], new CharacterData()
@@ -388,9 +386,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[1],
-                        characterId = 1,
-                        characterEvolutionId = 2,
-                        characterSkinId = 2,
+                        skins = charactersSkinDBSO.GenerateRandomSkin()
                     }
                 },
                 { randomNames[2], new CharacterData()
@@ -405,9 +401,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[2],
-                        characterId = 1,
-                        characterEvolutionId = 3,
-                        characterSkinId = 3,
+                        skins = charactersSkinDBSO.GenerateRandomSkin()
                     }
                 },
                 { randomNames[3], new CharacterData()
@@ -422,9 +416,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[3],
-                        characterId = 1,
-                        characterEvolutionId = 4,
-                        characterSkinId = 4,
+                        skins = charactersSkinDBSO.GenerateRandomSkin()
                     }
                 },
             }

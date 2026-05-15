@@ -31,21 +31,10 @@ public class CharacterPlayer : CharacterBase
     {
         try
         {
-            List<CharactersData> charactersDataList = new List<CharactersData>();
+            List<CharacterData> charactersDataList = new List<CharacterData>();
             foreach (var characterData in GameData.Instance.gameDataInfo.gameDataSlots[GameData.Instance.systemDataInfo.currentGameDataIndex].characters)
             {
-                //modificar
-                if (GameData.Instance.charactersSkinDBSO.data.ContainsKey(characterData.Value.characterId))
-                {
-                    if (GameData.Instance.charactersSkinDBSO.data[characterData.Value.characterId].TryGetValue(characterData.Value.characterSkinId, out CharacterSkinData skinData))
-                    {
-                        charactersDataList.Add(new CharactersData
-                        {
-                            characterSkin = skinData,
-                            characterData = characterData.Value
-                        });
-                    }
-                }
+                charactersDataList.Add(characterData.Value);
             }
             charactersData = charactersDataList.ToArray();
             await InitializeItems();
@@ -54,7 +43,7 @@ public class CharacterPlayer : CharacterBase
                 if (i <= charactersData.Length - 1)
                 {
                     characterPlayerHud.characterUI.characterPortraits[i].portraitObject.SetActive(true);
-                    characterPlayerHud.characterUI.characterPortraits[i].characterSprite.sprite = charactersDataList[i].characterSkin.icon;
+                    // characterPlayerHud.characterUI.characterPortraits[i].characterSprite.sprite = charactersDataList[i].characterSkin.icon;
                 }
                 else
                 {
@@ -73,9 +62,9 @@ public class CharacterPlayer : CharacterBase
     }
     async Awaitable InitializeItems()
     {
-        foreach (CharactersData character in charactersData)
+        foreach (CharacterData character in charactersData)
         {
-            character.characterData.InitializeItems();
+            character.InitializeItems();
         }
     }
     void OnHandleChangeCharacter(InputAction.CallbackContext context)
@@ -112,26 +101,26 @@ public class CharacterPlayer : CharacterBase
     }
     public override void UseSkill(int skillIndex)
     {
-        if (charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO != null &&
+        if (charactersData[characterIndex].skills[skillIndex].skillsBaseSO != null &&
             !(skillsCd.ContainsKey(characterIndex) && skillsCd[characterIndex].ContainsKey(skillIndex)) &&
-            charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.ValidateCanUseSkill(this, characterIndex, charactersData[characterIndex].characterData.skills[skillIndex].level))
+            charactersData[characterIndex].skills[skillIndex].skillsBaseSO.ValidateCanUseSkill(this, characterIndex, charactersData[characterIndex].skills[skillIndex].level))
         {
-            if (charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, skillIndex))
+            if (charactersData[characterIndex].skills[skillIndex].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, skillIndex))
             {
                 if (skillsCd.ContainsKey(characterIndex))
                 {
                     skillsCd[characterIndex].Add(0, new SkillCd 
                     { 
-                        maxCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
-                        currentCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue
+                        maxCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
+                        currentCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue
                     });
                 }
                 else
                 {
                     skillsCd.Add(characterIndex, new SerializedDictionary<int, SkillCd> { { 0, new SkillCd 
                     { 
-                        maxCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
-                        currentCd = charactersData[characterIndex].characterData.skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].characterData.skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue 
+                        maxCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
+                        currentCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue 
                     }}});
                 }
                 if (handleUseSkillCoroutine == null)
@@ -144,13 +133,13 @@ public class CharacterPlayer : CharacterBase
     public override void UseItem()
     {
         if (isInventoryOpen) return;
-        if (charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO) 
-                charactersData[characterIndex].characterData.consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].characterData.consumables[currentFastItemIndex]);
+        if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO) 
+                charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].consumables[currentFastItemIndex]);
     }
     public override void UseItem(int bagSlotIndex)
     {
         if (isInventoryOpen) return;
-        if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+        if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].bag[bagSlotIndex]);
     }
     public void OnHandleShowItemsToPickUp()
     {
@@ -160,8 +149,8 @@ public class CharacterPlayer : CharacterBase
     {
         if (FindEmptyBagSlot(out int bagIndex))
         {
-            charactersData[characterIndex].characterData.bag[bagIndex] = itemDropped.itemData;
-            characterPlayerHud.GetBagSlotByIndex(bagIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagIndex]);
+            charactersData[characterIndex].bag[bagIndex] = itemDropped.itemData;
+            characterPlayerHud.GetBagSlotByIndex(bagIndex).InitializeSlot(charactersData[characterIndex].bag[bagIndex]);
             Destroy(itemDropped.gameObject);
             interactables.Remove(itemDropped);
             OnShowItemsToPickUp?.Invoke();
@@ -224,69 +213,69 @@ public class CharacterPlayer : CharacterBase
     }
     void ChangeBagToBag(int bagSlotIndex, int draggedBagSlotIndex)
     {
-        if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO != null &&
-            charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO == charactersData[characterIndex].characterData.bag[draggedBagSlotIndex].itemBaseSO &&
-            charactersData[characterIndex].characterData.bag[bagSlotIndex].amount < charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO.maxStack)
+        if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO != null &&
+            charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO == charactersData[characterIndex].bag[draggedBagSlotIndex].itemBaseSO &&
+            charactersData[characterIndex].bag[bagSlotIndex].amount < charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.maxStack)
         {
-            FindAmountToAppend(charactersData[characterIndex].characterData.bag[draggedBagSlotIndex], charactersData[characterIndex].characterData.bag[bagSlotIndex], out int amountToAppend);
-            charactersData[characterIndex].characterData.bag[bagSlotIndex].amount += amountToAppend;
-            charactersData[characterIndex].characterData.bag[draggedBagSlotIndex].amount -= amountToAppend;
-            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
-            if (charactersData[characterIndex].characterData.bag[draggedBagSlotIndex].amount <= 0)
+            FindAmountToAppend(charactersData[characterIndex].bag[draggedBagSlotIndex], charactersData[characterIndex].bag[bagSlotIndex], out int amountToAppend);
+            charactersData[characterIndex].bag[bagSlotIndex].amount += amountToAppend;
+            charactersData[characterIndex].bag[draggedBagSlotIndex].amount -= amountToAppend;
+            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
+            if (charactersData[characterIndex].bag[draggedBagSlotIndex].amount <= 0)
             {
-                charactersData[characterIndex].characterData.bag[draggedBagSlotIndex] = new CharacterData.CharacterItem();
+                charactersData[characterIndex].bag[draggedBagSlotIndex] = new CharacterData.CharacterItem();
             }
-            characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[draggedBagSlotIndex]);
+            characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[draggedBagSlotIndex]);
         }
         else
         {
             CharacterData.CharacterItem bagItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlotIndex));
             CharacterData.CharacterItem draggedItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(draggedBagSlotIndex));
 
-            charactersData[characterIndex].characterData.bag[draggedBagSlotIndex] = bagItemTemp;
-            charactersData[characterIndex].characterData.bag[bagSlotIndex] = draggedItemTemp;
-            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
-            characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[draggedBagSlotIndex]);
+            charactersData[characterIndex].bag[draggedBagSlotIndex] = bagItemTemp;
+            charactersData[characterIndex].bag[bagSlotIndex] = draggedItemTemp;
+            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
+            characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[draggedBagSlotIndex]);
         }
     }
     void ChangeConsumableToConsumable(int consumableSlotIndex, int draggedConsumableSlotIndex)
     {
-        if (charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO != null &&
-            charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex].itemBaseSO &&
-            charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount < charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO.maxStack)
+        if (charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO != null &&
+            charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].consumables[draggedConsumableSlotIndex].itemBaseSO &&
+            charactersData[characterIndex].consumables[consumableSlotIndex].amount < charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO.maxStack)
         {
-            FindAmountToAppend(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex], charactersData[characterIndex].characterData.consumables[consumableSlotIndex], out int amountToAppend);
-            charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount += amountToAppend;
-            charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex].amount -= amountToAppend;
-            characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
-            if (charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex].amount <= 0)
+            FindAmountToAppend(charactersData[characterIndex].consumables[draggedConsumableSlotIndex], charactersData[characterIndex].consumables[consumableSlotIndex], out int amountToAppend);
+            charactersData[characterIndex].consumables[consumableSlotIndex].amount += amountToAppend;
+            charactersData[characterIndex].consumables[draggedConsumableSlotIndex].amount -= amountToAppend;
+            characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
+            if (charactersData[characterIndex].consumables[draggedConsumableSlotIndex].amount <= 0)
             {
-                charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex] = new CharacterData.CharacterItem();
+                charactersData[characterIndex].consumables[draggedConsumableSlotIndex] = new CharacterData.CharacterItem();
             }
-            characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex]);
+            characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[draggedConsumableSlotIndex]);
         }
         else
         {
             CharacterData.CharacterItem consumableItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(consumableSlotIndex));
             CharacterData.CharacterItem draggedItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(draggedConsumableSlotIndex));
 
-            charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex] = consumableItemTemp;
-            charactersData[characterIndex].characterData.consumables[consumableSlotIndex] = draggedItemTemp;
-            characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
-            characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[draggedConsumableSlotIndex]);
+            charactersData[characterIndex].consumables[draggedConsumableSlotIndex] = consumableItemTemp;
+            charactersData[characterIndex].consumables[consumableSlotIndex] = draggedItemTemp;
+            characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
+            characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[draggedConsumableSlotIndex]);
         }
         characterPlayerHud.UpdateFastItems();
     }
     async Awaitable ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
     {
-        if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO?.typeObject == equipmentIndex ||
-            charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO == null)
+        if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO?.typeObject == equipmentIndex ||
+            charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO == null)
         {
             CharacterData.CharacterItem bagItemTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlotIndex));
             CharacterData.CharacterItem equipmentItemTemp = new CharacterData.CharacterItem(GetEquipmentItemByIndex(equipmentIndex));
 
-            charactersData[characterIndex].characterData.equipments[equipmentIndex] = bagItemTemp;
-            charactersData[characterIndex].characterData.bag[bagSlotIndex] = equipmentItemTemp;
+            charactersData[characterIndex].equipments[equipmentIndex] = bagItemTemp;
+            charactersData[characterIndex].bag[bagSlotIndex] = equipmentItemTemp;
 
             if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp);
             if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp);
@@ -296,27 +285,27 @@ public class CharacterPlayer : CharacterBase
             {
                 characterPlayerHud.RefreshSkills();
             }
-            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
-            characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].characterData.equipments[equipmentIndex]);
+            characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
+            characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
         }
     }
     private void ChangeBagAndConsumable(int bagSlotIndex, int consumableSlotIndex, bool isFromBagToConsumable)
     {
         if (!isFromBagToConsumable)
         {
-            if (charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO != null &&
-                charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO &&
-                charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount < charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO.maxStack)
+            if (charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO != null &&
+                charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO &&
+                charactersData[characterIndex].consumables[consumableSlotIndex].amount < charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO.maxStack)
             {
-                FindAmountToAppend(charactersData[characterIndex].characterData.bag[bagSlotIndex], charactersData[characterIndex].characterData.consumables[consumableSlotIndex], out int amountToAppend);
-                charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount += amountToAppend;
-                charactersData[characterIndex].characterData.bag[bagSlotIndex].amount -= amountToAppend;
-                characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
-                if (charactersData[characterIndex].characterData.bag[bagSlotIndex].amount <= 0)
+                FindAmountToAppend(charactersData[characterIndex].bag[bagSlotIndex], charactersData[characterIndex].consumables[consumableSlotIndex], out int amountToAppend);
+                charactersData[characterIndex].consumables[consumableSlotIndex].amount += amountToAppend;
+                charactersData[characterIndex].bag[bagSlotIndex].amount -= amountToAppend;
+                characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
+                if (charactersData[characterIndex].bag[bagSlotIndex].amount <= 0)
                 {
-                    charactersData[characterIndex].characterData.bag[bagSlotIndex] = new CharacterData.CharacterItem();
+                    charactersData[characterIndex].bag[bagSlotIndex] = new CharacterData.CharacterItem();
                 }
-                characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
+                characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
             }
             else
             {
@@ -325,19 +314,19 @@ public class CharacterPlayer : CharacterBase
         }
         else
         {
-            if (charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO != null &&
-                charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO == charactersData[characterIndex].characterData.consumables[consumableSlotIndex].itemBaseSO &&
-                charactersData[characterIndex].characterData.bag[bagSlotIndex].amount < charactersData[characterIndex].characterData.bag[bagSlotIndex].itemBaseSO.maxStack)
+            if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO != null &&
+                charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO == charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO &&
+                charactersData[characterIndex].bag[bagSlotIndex].amount < charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.maxStack)
             {
-                FindAmountToAppend(charactersData[characterIndex].characterData.consumables[consumableSlotIndex], charactersData[characterIndex].characterData.bag[bagSlotIndex], out int amountToAppend);
-                charactersData[characterIndex].characterData.bag[bagSlotIndex].amount += amountToAppend;
-                charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount -= amountToAppend;
-                characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
-                if (charactersData[characterIndex].characterData.consumables[consumableSlotIndex].amount <= 0)
+                FindAmountToAppend(charactersData[characterIndex].consumables[consumableSlotIndex], charactersData[characterIndex].bag[bagSlotIndex], out int amountToAppend);
+                charactersData[characterIndex].bag[bagSlotIndex].amount += amountToAppend;
+                charactersData[characterIndex].consumables[consumableSlotIndex].amount -= amountToAppend;
+                characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
+                if (charactersData[characterIndex].consumables[consumableSlotIndex].amount <= 0)
                 {
-                    charactersData[characterIndex].characterData.consumables[consumableSlotIndex] = new CharacterData.CharacterItem();
+                    charactersData[characterIndex].consumables[consumableSlotIndex] = new CharacterData.CharacterItem();
                 }
-                characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
+                characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
             }
             else
             {
@@ -351,15 +340,15 @@ public class CharacterPlayer : CharacterBase
         CharacterData.CharacterItem bagSlotTemp = new CharacterData.CharacterItem(GetBagItemByIndex(bagSlotIndex));
         CharacterData.CharacterItem consumableItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(consumableSlotIndex));
 
-        charactersData[characterIndex].characterData.bag[bagSlotIndex] = consumableItemTemp;
-        charactersData[characterIndex].characterData.consumables[consumableSlotIndex] = bagSlotTemp;
-        characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[bagSlotIndex]);
-        characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[consumableSlotIndex]);
+        charactersData[characterIndex].bag[bagSlotIndex] = consumableItemTemp;
+        charactersData[characterIndex].consumables[consumableSlotIndex] = bagSlotTemp;
+        characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
+        characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
         characterPlayerHud.UpdateFastItems();
     }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
-        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].characterData.bag)
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].bag)
         {
             if (bagSlot.Value.itemBaseSO == null)
             {
@@ -372,7 +361,7 @@ public class CharacterPlayer : CharacterBase
     }
     public bool FindEmptyConsumableSlot(out int bagIndex)
     {
-        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].characterData.consumables)
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in charactersData[characterIndex].consumables)
         {
             if (bagSlot.Value.itemBaseSO == null)
             {
@@ -385,9 +374,9 @@ public class CharacterPlayer : CharacterBase
     }
     public bool FindSimilarConsumableSlot(int bagIndex, out int consumableIndex)
     {
-        foreach (KeyValuePair<int, CharacterData.CharacterItem> consumableSlot in charactersData[characterIndex].characterData.consumables)
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> consumableSlot in charactersData[characterIndex].consumables)
         {
-            if (consumableSlot.Value.itemBaseSO != null && consumableSlot.Value.itemBaseSO.id == charactersData[characterIndex].characterData.bag[bagIndex].itemBaseSO.id && consumableSlot.Value.amount < consumableSlot.Value.itemBaseSO.maxStack)
+            if (consumableSlot.Value.itemBaseSO != null && consumableSlot.Value.itemBaseSO.id == charactersData[characterIndex].bag[bagIndex].itemBaseSO.id && consumableSlot.Value.amount < consumableSlot.Value.itemBaseSO.maxStack)
             {
                 consumableIndex = consumableSlot.Key;
                 return true;
@@ -409,7 +398,7 @@ public class CharacterPlayer : CharacterBase
     }
     public CharacterData.CharacterItem GetBagItemByIndex(int index)
     {
-        if (charactersData[characterIndex].characterData.bag.TryGetValue(index, out CharacterData.CharacterItem bagItem))
+        if (charactersData[characterIndex].bag.TryGetValue(index, out CharacterData.CharacterItem bagItem))
         {
             return bagItem;
         }
@@ -417,7 +406,7 @@ public class CharacterPlayer : CharacterBase
     }
     public CharacterData.CharacterItem GetConsumableItemByIndex(int index)
     {
-        if (charactersData[characterIndex].characterData.consumables.TryGetValue(index, out CharacterData.CharacterItem consumableItem))
+        if (charactersData[characterIndex].consumables.TryGetValue(index, out CharacterData.CharacterItem consumableItem))
         {
             return consumableItem;
         }
@@ -425,7 +414,7 @@ public class CharacterPlayer : CharacterBase
     }
     public CharacterData.CharacterItem GetEquipmentItemByIndex(ItemBaseSO.TypeObject index)
     {
-        if (charactersData[characterIndex].characterData.equipments.TryGetValue(index, out CharacterData.CharacterItem equipmentItem))
+        if (charactersData[characterIndex].equipments.TryGetValue(index, out CharacterData.CharacterItem equipmentItem))
         {
             return equipmentItem;
         }
@@ -434,30 +423,30 @@ public class CharacterPlayer : CharacterBase
     public void FastEquipItem(int slotIndex)
     {
         if (characterPlayerHud.isDraggingItem) return;
-        if (charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO?.typeObject != ItemBaseSO.TypeObject.Consumable)
+        if (charactersData[characterIndex].bag[slotIndex].itemBaseSO?.typeObject != ItemBaseSO.TypeObject.Consumable)
         {
-            if (GetEquipmentItemByIndex(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
+            if (GetEquipmentItemByIndex(charactersData[characterIndex].bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
             {
-                _ = ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+                _ = ChangeEquipmentAndBag(charactersData[characterIndex].bag[slotIndex].itemBaseSO.typeObject, slotIndex);
             }
             else
             {
-                _ = ChangeEquipmentAndBag(charactersData[characterIndex].characterData.bag[slotIndex].itemBaseSO.typeObject, slotIndex);
+                _ = ChangeEquipmentAndBag(charactersData[characterIndex].bag[slotIndex].itemBaseSO.typeObject, slotIndex);
             }
         }
         else
         {
             if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
             {
-                FindAmountToAppend(charactersData[characterIndex].characterData.bag[slotIndex], charactersData[characterIndex].characterData.consumables[similarConsumableIndex], out int amountToAppend);
-                charactersData[characterIndex].characterData.bag[slotIndex].amount -= amountToAppend;
-                charactersData[characterIndex].characterData.consumables[similarConsumableIndex].amount += amountToAppend;
-                characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].characterData.consumables[similarConsumableIndex]);
-                if (charactersData[characterIndex].characterData.bag[slotIndex].amount <= 0)
+                FindAmountToAppend(charactersData[characterIndex].bag[slotIndex], charactersData[characterIndex].consumables[similarConsumableIndex], out int amountToAppend);
+                charactersData[characterIndex].bag[slotIndex].amount -= amountToAppend;
+                charactersData[characterIndex].consumables[similarConsumableIndex].amount += amountToAppend;
+                characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].consumables[similarConsumableIndex]);
+                if (charactersData[characterIndex].bag[slotIndex].amount <= 0)
                 {
-                    charactersData[characterIndex].characterData.bag[slotIndex] = new CharacterData.CharacterItem();
+                    charactersData[characterIndex].bag[slotIndex] = new CharacterData.CharacterItem();
                 }
-                characterPlayerHud.GetBagSlotByIndex(slotIndex).InitializeSlot(charactersData[characterIndex].characterData.bag[slotIndex]);
+                characterPlayerHud.GetBagSlotByIndex(slotIndex).InitializeSlot(charactersData[characterIndex].bag[slotIndex]);
             }
             else if (FindEmptyConsumableSlot(out int consumableIndex))
             {
@@ -475,7 +464,7 @@ public class CharacterPlayer : CharacterBase
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetBagItemByIndex(draggedSlotIndex), true);
             LaunchDropItem(itemDropped);
-            charactersData[characterIndex].characterData.bag[draggedSlotIndex] = new CharacterData.CharacterItem();
+            charactersData[characterIndex].bag[draggedSlotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
         }
         else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.generalTypeObject == ItemBaseSO.GeneralTypeObject.Equipment)
@@ -483,8 +472,8 @@ public class CharacterPlayer : CharacterBase
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), true);
             LaunchDropItem(itemDropped);
-            if (charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO) await charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO.DesEquipItem(this, GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject));
-            charactersData[characterIndex].characterData.equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
+            if (charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO) await charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO.DesEquipItem(this, GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject));
+            charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
             characterPlayerHud.GetEquipmentSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject).InitializeSlot(new CharacterData.CharacterItem());
             characterPlayerHud.RefreshCharacterStatistics();
         }
@@ -493,7 +482,7 @@ public class CharacterPlayer : CharacterBase
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetConsumableItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex), true);
             LaunchDropItem(itemDropped);
-            charactersData[characterIndex].characterData.consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
+            charactersData[characterIndex].consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
         }
     }

@@ -118,7 +118,7 @@ public class CharacterPlayerHud : MonoBehaviour
             }
             int index = 0;
             characterUI.characterBag.inventorySlots.Clear();
-            foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.charactersData[characterPlayer.characterIndex].characterData.bag)
+            foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.charactersData[characterPlayer.characterIndex].bag)
             {
                 InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
                 bagSlotPrefab.characterPlayerHud = this;
@@ -129,12 +129,12 @@ public class CharacterPlayerHud : MonoBehaviour
             }
             foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.equipments)
             {
-                characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.equipments[item.Key]);
+                characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
             }
             foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
             {
                 characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
-                characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[consumable.Key]);
+                characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].consumables[consumable.Key]);
             }
             RefreshCharacterStatistics();
             UpdateFastItems();
@@ -159,7 +159,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, TMP_Text> statistic in characterUI.statistics)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
             {
                 if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp)
                 {
@@ -177,9 +177,9 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         foreach (KeyValuePair<int, SkillUi> skill in characterUI.skills)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO)
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].skills[skill.Key].skillsBaseSO)
             {
-                skill.Value.skillImage.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.skills[skill.Key].skillsBaseSO.icon;
+                skill.Value.skillImage.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].skills[skill.Key].skillsBaseSO.icon;
                 skill.Value.lockImage.gameObject.SetActive(false);
                 skill.Value.skillImage.gameObject.SetActive(true);
                 skill.Value.RefreshCD(new CharacterBase.SkillCd { currentCd = 0, maxCd = 0 });
@@ -226,13 +226,13 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].itemBaseSO != null)
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO != null)
             {
                 characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 1;
                 characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].itemBaseSO.icon;
+                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO.icon;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].characterData.consumables[fastItem.Key].amount.ToString() : "";
+                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].amount.ToString() : "";
             }
             else
             {

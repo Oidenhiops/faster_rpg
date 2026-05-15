@@ -19,7 +19,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
         CameraInfo.Instance.CamDirection(new Vector3(inputsDirection.x, 0, inputsDirection.y), out Vector3 directionFromCamera);
         if (inputsDirection != Vector2.zero)
         {
-            if (characterBase.charactersData[characterBase.characterIndex].characterAnimationsSO.isEightDirections)
+            if (characterBase.characterAnimations.characterAnimationsSO.isEightDirections)
             {
                 characterBase.directionAnimation.x = Mathf.RoundToInt(inputsDirection.x);
                 characterBase.directionAnimation.z = Mathf.RoundToInt(inputsDirection.y);
@@ -53,21 +53,21 @@ public class CharacterPlayerMovement : CharacterMovementBase
         {
             if (inputsDirection != Vector2.zero)
             {
-                directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
-                directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
+                directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
+                directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
                 directionFromCamera.y = 0;
             }
             else
             {
                 CameraInfo.Instance.CamDirection(new Vector3(characterBase.directionAnimation.x, 0, characterBase.directionAnimation.z), out Vector3 directionFromCameraByAnimation);
-                directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
+                directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
                 directionFromCamera.y = 0;
             }
         }
         else
         {
-            directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue;
-            directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue;
+            directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue;
+            directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue;
             directionFromCamera.y = rb.linearVelocity.y;
         }
         rb.linearVelocity = directionFromCamera;

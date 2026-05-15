@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f30484edb84a7fe4aad73b4c10872bb7
+guid: ac736c2f2c5739841b21f0892e20fa2f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -39,18 +39,18 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 0
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 24
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -69,10 +69,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: wiwi_idle_0
+      name: wiwiwi_idle_hair_0
       rect:
         serializedVersion: 2
         x: 0
@@ -125,14 +125,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 82a88cc3ea561b34f81ead763a6a75cb
-      internalID: 1020273998
+      spriteID: 14a189556f74ba643b501bcbe2d5f88d
+      internalID: -878876558
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_1
+      name: wiwiwi_idle_hair_1
       rect:
         serializedVersion: 2
         x: 24
@@ -147,14 +147,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a6c410a5d462c4d47b78230ed7d4938b
-      internalID: -1028443591
+      spriteID: 90f7a8a0183dd8c41b8a8024a3295831
+      internalID: -529117205
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_2
+      name: wiwiwi_idle_hair_2
       rect:
         serializedVersion: 2
         x: 48
@@ -169,14 +169,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 68a6d56a728612541a1e842f159186fb
-      internalID: -1938480075
+      spriteID: 5d313c64a07203249a269947378728f7
+      internalID: -1110677683
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_3
+      name: wiwiwi_idle_hair_3
       rect:
         serializedVersion: 2
         x: 72
@@ -191,14 +191,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3f733b4e30be38c498371724a8b2b9b2
-      internalID: 1477547491
+      spriteID: 929766f577c6a714e9f28992366d3d99
+      internalID: 1133043959
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_4
+      name: wiwiwi_idle_hair_4
       rect:
         serializedVersion: 2
         x: 0
@@ -213,14 +213,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fd305e4c08a2d4d4c9460615a7380854
-      internalID: 1864029141
+      spriteID: d4ac84ecb0e188b44bf52378951f6396
+      internalID: 840339631
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_5
+      name: wiwiwi_idle_hair_5
       rect:
         serializedVersion: 2
         x: 24
@@ -235,14 +235,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bf6bc5967fb11fa4b97248a993894080
-      internalID: -619343186
+      spriteID: d664798526aaef74ea4f22e3770c3522
+      internalID: 87590586
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_6
+      name: wiwiwi_idle_hair_6
       rect:
         serializedVersion: 2
         x: 48
@@ -257,14 +257,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 98c97a01efcccfa4d8e39297904fffbe
-      internalID: -1820092397
+      spriteID: 4626bcb95963a014285d486ba959c918
+      internalID: -1128596903
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_7
+      name: wiwiwi_idle_hair_7
       rect:
         serializedVersion: 2
         x: 72
@@ -279,14 +279,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: eeeb3b5be235f17479eda61cd8d00208
-      internalID: -989433074
+      spriteID: 6b8eea736a6b9df46b02181d8501fc10
+      internalID: 1308969198
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_8
+      name: wiwiwi_idle_hair_8
       rect:
         serializedVersion: 2
         x: 0
@@ -301,14 +301,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3713aeb5a0abdef469897371fc3d439b
-      internalID: 946218924
+      spriteID: 3a8d2810e8bddb24382548760e645c3a
+      internalID: 1379544798
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_9
+      name: wiwiwi_idle_hair_9
       rect:
         serializedVersion: 2
         x: 24
@@ -323,14 +323,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5237595ea88b6b742a0c0754bb32dc4d
-      internalID: -686472622
+      spriteID: 783e353e4bb34c84e9a441b76551aa14
+      internalID: -1363058481
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_10
+      name: wiwiwi_idle_hair_10
       rect:
         serializedVersion: 2
         x: 48
@@ -345,14 +345,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 28abb202ce6272642b67279ded78e691
-      internalID: 1081900290
+      spriteID: d4f2683382154a7478ce64c13631bca4
+      internalID: 1304827553
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_11
+      name: wiwiwi_idle_hair_11
       rect:
         serializedVersion: 2
         x: 72
@@ -367,14 +367,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8922ed18d1fe0774a875cf362257f06b
-      internalID: -96454963
+      spriteID: fb94182810b52a04baaec0e1c7f95987
+      internalID: -1901007023
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_12
+      name: wiwiwi_idle_hair_12
       rect:
         serializedVersion: 2
         x: 0
@@ -389,14 +389,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 28a6afcb6ab6f3743bcbfafd2a86271a
-      internalID: 471481745
+      spriteID: 014a5b6ea5f1239419f0fe07f98c4018
+      internalID: 1100502376
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_13
+      name: wiwiwi_idle_hair_13
       rect:
         serializedVersion: 2
         x: 24
@@ -411,14 +411,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ba9b751b8705ae84392255f3c28ac767
-      internalID: -2118330316
+      spriteID: 5f70bca52b4761f4990917d8eaa711dd
+      internalID: -1473824056
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_14
+      name: wiwiwi_idle_hair_14
       rect:
         serializedVersion: 2
         x: 48
@@ -433,14 +433,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d8b80379eed134a43b8689d177dd2332
-      internalID: -1370805249
+      spriteID: c6c1a1ef4e5997544a2deac4ee751d3b
+      internalID: -1783214718
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_15
+      name: wiwiwi_idle_hair_15
       rect:
         serializedVersion: 2
         x: 72
@@ -455,14 +455,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea2525ea83230a24a8fc921cc3dde759
-      internalID: 784177104
+      spriteID: 2a57473a029ff3246badc31eeb39731c
+      internalID: -286065878
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_16
+      name: wiwiwi_idle_hair_16
       rect:
         serializedVersion: 2
         x: 0
@@ -477,14 +477,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 52f9b7ff5326ca242842a28e98132ab4
-      internalID: 2118405767
+      spriteID: da26b2ba7d35a6f4d9bb3b9d0d5e0a43
+      internalID: -1295307633
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_17
+      name: wiwiwi_idle_hair_17
       rect:
         serializedVersion: 2
         x: 24
@@ -499,14 +499,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a8ab2cfc4ec45a94ab74a651e6031500
-      internalID: 1258668650
+      spriteID: 65a65122786d65446afbfc2946194613
+      internalID: -533589725
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_18
+      name: wiwiwi_idle_hair_18
       rect:
         serializedVersion: 2
         x: 48
@@ -521,14 +521,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d2f8d23720165d14d98c0bbcdcde8022
-      internalID: 1433663463
+      spriteID: c5df28dfe3de24b4683faac84d99fe58
+      internalID: -1903034072
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_19
+      name: wiwiwi_idle_hair_19
       rect:
         serializedVersion: 2
         x: 72
@@ -543,14 +543,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 97bc715b8e976fe4cb6072b5a0538823
-      internalID: 1468974939
+      spriteID: 954a0f7da07fc7b448f2f7cbfc153fdd
+      internalID: -786888108
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_20
+      name: wiwiwi_idle_hair_20
       rect:
         serializedVersion: 2
         x: 0
@@ -565,14 +565,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c3bc41c8665aea34bb053149534ea01a
-      internalID: -1693097552
+      spriteID: dea0b27a8b6de0c49a22995804af15a6
+      internalID: 525593604
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_21
+      name: wiwiwi_idle_hair_21
       rect:
         serializedVersion: 2
         x: 24
@@ -587,14 +587,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2f06514c61818e641851bce5b72583ae
-      internalID: 1821322162
+      spriteID: 83fffcdd82612a64ea1880f6d0a30c7b
+      internalID: 1124546827
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_22
+      name: wiwiwi_idle_hair_22
       rect:
         serializedVersion: 2
         x: 48
@@ -609,14 +609,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 905456f8f60859e458c32d13991d33ff
-      internalID: 442920818
+      spriteID: faa251666fae6d14c907536954ecc051
+      internalID: 1343395564
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_23
+      name: wiwiwi_idle_hair_23
       rect:
         serializedVersion: 2
         x: 72
@@ -631,14 +631,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 042477679c8dcb240839daa95c64f63b
-      internalID: 737832756
+      spriteID: b15907b9bb57de046bd618e6df985466
+      internalID: -1968514105
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_24
+      name: wiwiwi_idle_hair_24
       rect:
         serializedVersion: 2
         x: 0
@@ -653,14 +653,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 644aa000d95eb6b4598df5e202985030
-      internalID: 1644709210
+      spriteID: 7f68c92e825d2204da89f3ad4971501e
+      internalID: 1535147894
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_25
+      name: wiwiwi_idle_hair_25
       rect:
         serializedVersion: 2
         x: 24
@@ -675,14 +675,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e16a6eb7d059f284e8749fad2662289d
-      internalID: -1461668113
+      spriteID: 42852d9fdd9cd37408ad906957924913
+      internalID: -609121532
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_26
+      name: wiwiwi_idle_hair_26
       rect:
         serializedVersion: 2
         x: 48
@@ -697,14 +697,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a35b5917f0ecb7e4991e63f81eb3c40a
-      internalID: 1539348769
+      spriteID: 467780a6f3e93824596d4b6cfbc4f24b
+      internalID: -1286440627
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_27
+      name: wiwiwi_idle_hair_27
       rect:
         serializedVersion: 2
         x: 72
@@ -719,14 +719,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c7160a513316ec549b402fa11916e9b6
-      internalID: -271734957
+      spriteID: 080d72cab0dc6b74bb572d167e437ec4
+      internalID: -854588605
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_28
+      name: wiwiwi_idle_hair_28
       rect:
         serializedVersion: 2
         x: 0
@@ -741,14 +741,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 881af3de99ec7794ba9962f3bd601440
-      internalID: 193044293
+      spriteID: a9b10f5f6d737bc4f8cff2e3d912ff92
+      internalID: 659469410
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_29
+      name: wiwiwi_idle_hair_29
       rect:
         serializedVersion: 2
         x: 24
@@ -763,14 +763,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 40c1b02f87352b24b85cf49823274dd9
-      internalID: 1110455257
+      spriteID: 064c188373d310647a7b4771c7a5daa4
+      internalID: -22926560
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_30
+      name: wiwiwi_idle_hair_30
       rect:
         serializedVersion: 2
         x: 48
@@ -785,14 +785,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ee30c099abe586b4eaecfc8cd8d09273
-      internalID: -1454607257
+      spriteID: 304ea512ea6661946bf206ad2ad7b3bf
+      internalID: -877859259
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wiwi_idle_31
+      name: wiwiwi_idle_hair_31
       rect:
         serializedVersion: 2
         x: 72
@@ -807,8 +807,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 846593d722472c64488adc57dd252124
-      internalID: -602794989
+      spriteID: 270f4fce2e288e84f92bf0f8f154246b
+      internalID: -17585868
       vertices: []
       indices: 
       edges: []
@@ -817,7 +817,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 0a4baacaea0f75d48b9344a7856f642f
+    spriteID: 9acdfe5480d1eeb4d865d1a6af4add69
     internalID: 0
     vertices: []
     indices: 
@@ -829,38 +829,38 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":24.0,"y":24.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      wiwi_idle_0: 1020273998
-      wiwi_idle_1: -1028443591
-      wiwi_idle_10: 1081900290
-      wiwi_idle_11: -96454963
-      wiwi_idle_12: 471481745
-      wiwi_idle_13: -2118330316
-      wiwi_idle_14: -1370805249
-      wiwi_idle_15: 784177104
-      wiwi_idle_16: 2118405767
-      wiwi_idle_17: 1258668650
-      wiwi_idle_18: 1433663463
-      wiwi_idle_19: 1468974939
-      wiwi_idle_2: -1938480075
-      wiwi_idle_20: -1693097552
-      wiwi_idle_21: 1821322162
-      wiwi_idle_22: 442920818
-      wiwi_idle_23: 737832756
-      wiwi_idle_24: 1644709210
-      wiwi_idle_25: -1461668113
-      wiwi_idle_26: 1539348769
-      wiwi_idle_27: -271734957
-      wiwi_idle_28: 193044293
-      wiwi_idle_29: 1110455257
-      wiwi_idle_3: 1477547491
-      wiwi_idle_30: -1454607257
-      wiwi_idle_31: -602794989
-      wiwi_idle_4: 1864029141
-      wiwi_idle_5: -619343186
-      wiwi_idle_6: -1820092397
-      wiwi_idle_7: -989433074
-      wiwi_idle_8: 946218924
-      wiwi_idle_9: -686472622
+      wiwiwi_idle_hair_0: -878876558
+      wiwiwi_idle_hair_1: -529117205
+      wiwiwi_idle_hair_10: 1304827553
+      wiwiwi_idle_hair_11: -1901007023
+      wiwiwi_idle_hair_12: 1100502376
+      wiwiwi_idle_hair_13: -1473824056
+      wiwiwi_idle_hair_14: -1783214718
+      wiwiwi_idle_hair_15: -286065878
+      wiwiwi_idle_hair_16: -1295307633
+      wiwiwi_idle_hair_17: -533589725
+      wiwiwi_idle_hair_18: -1903034072
+      wiwiwi_idle_hair_19: -786888108
+      wiwiwi_idle_hair_2: -1110677683
+      wiwiwi_idle_hair_20: 525593604
+      wiwiwi_idle_hair_21: 1124546827
+      wiwiwi_idle_hair_22: 1343395564
+      wiwiwi_idle_hair_23: -1968514105
+      wiwiwi_idle_hair_24: 1535147894
+      wiwiwi_idle_hair_25: -609121532
+      wiwiwi_idle_hair_26: -1286440627
+      wiwiwi_idle_hair_27: -854588605
+      wiwiwi_idle_hair_28: 659469410
+      wiwiwi_idle_hair_29: -22926560
+      wiwiwi_idle_hair_3: 1133043959
+      wiwiwi_idle_hair_30: -877859259
+      wiwiwi_idle_hair_31: -17585868
+      wiwiwi_idle_hair_4: 840339631
+      wiwiwi_idle_hair_5: 87590586
+      wiwiwi_idle_hair_6: -1128596903
+      wiwiwi_idle_hair_7: 1308969198
+      wiwiwi_idle_hair_8: 1379544798
+      wiwiwi_idle_hair_9: -1363058481
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

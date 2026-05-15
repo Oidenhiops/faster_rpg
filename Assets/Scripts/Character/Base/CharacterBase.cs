@@ -11,11 +11,10 @@ public class CharacterBase : MonoBehaviour
     public bool isCharacterPlayer;
     public bool autoInit;
     public CharacterModel characterModel;
-    public CharactersData[] charactersData;
+    public CharacterData[] charactersData;
     public int characterIndex;
     public int currentFastItemIndex;
     public Vector3Int directionAnimation = new Vector3Int();
-    [NonSerialized] public Vector3 characterScale;
     public GameObject floatingTextPrefab;
     public GameObject dieEffectPrefab;
     public GameObject itempDroppedPrefab;
@@ -82,16 +81,16 @@ public class CharacterBase : MonoBehaviour
     public virtual void TakeExp(CharacterData.Statistic statistic)
     {
         int amount = Mathf.CeilToInt(statistic.maxValue * 0.1f);
-        charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue += amount;
+        charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue += amount;
         int level = 0;
-        while (charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue >= charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue)
+        while (charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue >= charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue)
         {
-            int spare = charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue > charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue ?
-                Mathf.CeilToInt(charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue - charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue) : 0;
-            charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].baseValue = Mathf.CeilToInt(charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue * 2.2f);
-            charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue = charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].baseValue;
-            charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue = spare;
-            charactersData[characterIndex].characterData.LevelUp();
+            int spare = charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue > charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue ?
+                Mathf.CeilToInt(charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue - charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue) : 0;
+            charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].baseValue = Mathf.CeilToInt(charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue * 2.2f);
+            charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue = charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].baseValue;
+            charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue = spare;
+            charactersData[characterIndex].LevelUp();
             level++;
         }
     }
@@ -156,20 +155,19 @@ public class CharacterBase : MonoBehaviour
         characterAnimations.animationAfterEnd = otherAnimation;
         FloatingText floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity).GetComponent<FloatingText>();
         _ = floatingText.SendText(damage.ToString(), Color.red, false);
-        if (charactersData[characterIndex].characterData.statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))
+        if (charactersData[characterIndex].statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))
         {
             characterTakedDamageStatistic.currentValue -= damage;
         }
         characterAnimations.MakeEffect(CharacterAnimator.TypeAnimationsEffects.Shake);
         characterAnimations.MakeEffect(CharacterAnimator.TypeAnimationsEffects.Blink);
-        if (charactersData[characterIndex].characterData.statistics[CharacterData.TypeStatistic.Hp].currentValue <= 0) await Die(characterMakeDamage, otherAnimation);
+        if (charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Hp].currentValue <= 0) await Die(characterMakeDamage, otherAnimation);
         await Awaitable.NextFrameAsync();
     }
     public virtual async Awaitable Die(CharacterBase characterMakeDamage, string lastAnimation = "")
     {
         await Awaitable.WaitForSecondsAsync(0.3f);
         GameObject dieEffect = Instantiate(dieEffectPrefab, transform.position, Quaternion.identity);
-        characterModel.characterMeshRenderer.gameObject.SetActive(false);
         await Awaitable.WaitForSecondsAsync(1);
         Destroy(dieEffect);
         // _ = GameManager.Instance.LoadScene(GameManager.TypeScene.HomeScene);
@@ -365,27 +363,12 @@ public class CharacterBase : MonoBehaviour
         }
     }
     [Serializable]
-    public class CharactersData
-    {
-        public CharacterAnimationsSO characterAnimationsSO;
-        public CharacterSkinData characterSkin;
-        public CharacterData characterData;
-    }
-    [Serializable]
     public class CharacterModel
     {
-        public MeshRenderer characterMeshRenderer;
-        public MeshRenderer characterMeshRendererHand;
+        public SerializedDictionary<CharacterData.TypeSkin, MeshRenderer> meshRenderers = new SerializedDictionary<CharacterData.TypeSkin, MeshRenderer>();
         public Transform leftHand;
         public Transform rightHand;
         public Mesh originalMesh;
-    }
-    [Serializable]
-    public class CharacterSkinData
-    {
-        public Texture2D atlas;
-        public Texture2D atlasHands;
-        public Sprite icon;
     }
     [Serializable]
     public class StatusEffect

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,44 +12,34 @@ public class CharacterAnimator : MonoBehaviour
     public float currentSpritePerTime = 0.1f;
     public string animationAfterEnd;
     public Sprite spriteSheetBase;
-    public void SetInitialData()
+    public CharacterAnimationsSO characterAnimationsSO;
+    public void 
+    SetInitialData()
     {
         StopAllCoroutines();
         currentSpriteIndex = 0;
         animationAfterEnd = "";
-        characterBase.characterModel.characterMeshRenderer.transform.parent.transform.localScale = Vector3.one * GetScaleFactor(characterBase.charactersData[characterBase.characterIndex].characterAnimationsSO.animations["Idle"].sprites.ElementAt(0).upLeft.characterSprite.rect.height);
-        characterBase.characterScale = characterBase.characterModel.characterMeshRenderer.transform.parent.transform.localScale;
-        characterBase.characterModel.characterMeshRenderer.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].characterSkin.atlas);
-        if (characterBase.charactersData[characterBase.characterIndex].characterSkin.atlasHands)
+        foreach (KeyValuePair<CharacterData.TypeSkin, MeshRenderer> mesh in characterBase.characterModel.meshRenderers)
         {
-            characterBase.characterModel.characterMeshRendererHand.gameObject.SetActive(true);
-            characterBase.characterModel.characterMeshRendererHand.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].characterSkin.atlasHands);
-        }
-        else
-        {
-            characterBase.characterModel.characterMeshRendererHand.gameObject.SetActive(false);
+            if (characterBase.charactersData[characterBase.characterIndex].skins.TryGetValue(mesh.Key, out CharacterData.CharacterSkinInfo skinInfo))
+            {
+                if (skinInfo.originalSprite)
+                {
+                    mesh.Value.gameObject.SetActive(true);
+                    mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSprite.textures["Idle"]);
+                }
+                else
+                {
+                    mesh.Value.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                mesh.Value.gameObject.SetActive(false);
+            }
         }
         currentAnimation = GetAnimation("Idle");
         StartCoroutine(AnimateSprite());
-    }
-    void LateUpdate()
-    {
-        if (CameraInfo.Instance && characterBase.isInitialize)
-        {
-            ChangeDirectionModel(ref characterBase.directionAnimation);
-        }
-    }
-        void ChangeDirectionModel(ref Vector3Int direction)
-    {
-        if (direction.x > 0)
-        {
-            characterBase.characterScale.x = -Mathf.Abs(characterBase.characterScale.x);
-        }
-        else if (direction.x < 0)
-        {
-            characterBase.characterScale.x = Mathf.Abs(characterBase.characterScale.x);
-        }
-        characterBase.characterModel.characterMeshRenderer.transform.localScale = characterBase.characterScale;
     }
     float GetScaleFactor(float size)
     {
@@ -66,7 +57,7 @@ public class CharacterAnimator : MonoBehaviour
     }
     public string GetAnimationAttack()
     {
-        characterBase.charactersData[characterBase.characterIndex].characterData.GetCurrentWeapon(out CharacterData.CharacterItem weapon);
+        characterBase.charactersData[characterBase.characterIndex].GetCurrentWeapon(out CharacterData.CharacterItem weapon);
         if (weapon != null)
         {
             return weapon.itemBaseSO.animationName;
@@ -75,22 +66,16 @@ public class CharacterAnimator : MonoBehaviour
     }
     private CharacterAnimationsSO.AnimationsInfo GetAnimation(string animationName)
     {
-        return characterBase.charactersData[characterBase.characterIndex].characterAnimationsSO.animations[animationName];
+        return characterAnimationsSO.animations[animationName];
     }
     IEnumerator AnimateSprite()
     {
         while (true)
         {
-            SetTextureFromAtlas(
-                GetCurrentSpriteData().characterSprite,
-                characterBase.characterModel.characterMeshRenderer
-            );
-            if (characterBase.charactersData[characterBase.characterIndex].characterSkin.atlasHands)
+            SetTextureFromAtlas(GetCurrentSpriteData().characterSprite);
+            if (characterBase.charactersData[characterBase.characterIndex].skins[CharacterData.TypeSkin.Hands].originalSprite)
             {
-                SetTextureFromAtlas(
-                    GetCurrentSpriteData().characterSprite,
-                    characterBase.characterModel.characterMeshRendererHand
-                );
+                SetTextureFromAtlas(GetCurrentSpriteData().characterSprite);
                 SetHandsPos();
             }
             yield return new WaitForSeconds(currentSpritePerTime);
@@ -125,7 +110,7 @@ public class CharacterAnimator : MonoBehaviour
     }
     public CharacterAnimationsSO.SpriteData GetCurrentSpriteData()
     {
-        if (characterBase.charactersData[characterBase.characterIndex].characterAnimationsSO.isEightDirections)
+        if (characterAnimationsSO.isEightDirections)
         {
             if (characterBase.directionAnimation == Vector3Int.forward)
             {
@@ -190,18 +175,20 @@ public class CharacterAnimator : MonoBehaviour
             return null;
         }
     }
-    void SetTextureFromAtlas(Sprite spriteFromAtlas, MeshRenderer meshRenderer)
+    void SetTextureFromAtlas(Sprite spriteFromAtlas)
     {
         Vector2[] uvs = characterBase.characterModel.originalMesh.uv;
         Texture2D texture = spriteFromAtlas.texture;
-        meshRenderer.material.mainTexture = texture;
         Rect spriteRect = spriteFromAtlas.rect;
         for (int i = 0; i < uvs.Length; i++)
         {
             uvs[i].x = Mathf.Lerp(spriteRect.x / texture.width, (spriteRect.x + spriteRect.width) / texture.width, uvs[i].x);
             uvs[i].y = Mathf.Lerp(spriteRect.y / texture.height, (spriteRect.y + spriteRect.height) / texture.height, uvs[i].y);
         }
-        meshRenderer.GetComponent<MeshFilter>().mesh.uv = uvs;
+        foreach (KeyValuePair<CharacterData.TypeSkin, MeshRenderer> mesh in characterBase.characterModel.meshRenderers)
+        {
+            mesh.Value.GetComponent<MeshFilter>().mesh.uv = uvs;
+        }
     }
     void SetHandsPos()
     {

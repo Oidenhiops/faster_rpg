@@ -33,25 +33,25 @@ public class SkillUtilitySO : ItemBaseSO
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterItem.itemStatistics)
         {
-            if (character.charactersData[character.characterIndex].characterData.statistics.ContainsKey(statistic.Key))
+            if (character.charactersData[character.characterIndex].statistics.ContainsKey(statistic.Key))
             {
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].itemValue += statistic.Value.baseValue;
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                character.charactersData[character.characterIndex].statistics[statistic.Key].itemValue += statistic.Value.baseValue;
+                character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
-        character.charactersData[character.characterIndex].characterData.skills[0].skillsBaseSO = skillsBaseSO;
-        character.charactersData[character.characterIndex].characterData.skills[0].skillId = skillsBaseSO.skillId;
+        character.charactersData[character.characterIndex].skills[0].skillsBaseSO = skillsBaseSO;
+        character.charactersData[character.characterIndex].skills[0].skillId = skillsBaseSO.skillId;
     }
     public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterItem.itemStatistics)
         {
-            if (character.charactersData[character.characterIndex].characterData.statistics.ContainsKey(statistic.Key))
+            if (character.charactersData[character.characterIndex].statistics.ContainsKey(statistic.Key))
             {
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                character.charactersData[character.characterIndex].statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
+                character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
-        character.charactersData[character.characterIndex].characterData.skills[0] = new CharacterData.CharacterSkillInfo();
+        character.charactersData[character.characterIndex].skills[0] = new CharacterData.CharacterSkillInfo();
     }
 }

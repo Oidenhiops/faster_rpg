@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bffe2857fb3859c47a352e0c0cded9ce, type: 3}
+  m_Name: Skin1
+  m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinSO
+  skinSize: 64
+  textures:
+    _serializedList:
+    - Key: Idle
+      Value: {fileID: 2800000, guid: f30484edb84a7fe4aad73b4c10872bb7, type: 3}
+    - Key: Walk
+      Value: {fileID: 2800000, guid: e9362ea4214b030478be10084d08be2b, type: 3}
+    - Key: Die
+      Value: {fileID: 2800000, guid: 250371ed72e1ba04f98b08c6ef3100fe, type: 3}

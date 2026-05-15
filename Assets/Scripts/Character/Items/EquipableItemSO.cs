@@ -8,10 +8,10 @@ public class EquipableItemSO : ItemBaseSO
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterItem.itemStatistics)
         {
-            if (character.charactersData[character.characterIndex].characterData.statistics.ContainsKey(statistic.Key))
+            if (character.charactersData[character.characterIndex].statistics.ContainsKey(statistic.Key))
             {
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].itemValue += statistic.Value.baseValue;
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                character.charactersData[character.characterIndex].statistics[statistic.Key].itemValue += statistic.Value.baseValue;
+                character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
     }
@@ -19,10 +19,10 @@ public class EquipableItemSO : ItemBaseSO
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterItem.itemStatistics)
         {
-            if (character.charactersData[character.characterIndex].characterData.statistics.ContainsKey(statistic.Key))
+            if (character.charactersData[character.characterIndex].statistics.ContainsKey(statistic.Key))
             {
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
-                character.charactersData[character.characterIndex].characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                character.charactersData[character.characterIndex].statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
+                character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
     }
