@@ -14,14 +14,16 @@ public class CharactersSkinDBSO : ScriptableObject
         Color skinColor = RandomColor();
         skins.Add(CharacterData.TypeSkin.Skin, new CharacterData.CharacterSkinInfo
         {
-            originalSprite = data[CharacterData.TypeSkin.Skin][skinIndex],
+            originalSkinId = skinIndex,
+            originalSkin = data[CharacterData.TypeSkin.Skin][skinIndex],
             originalSpriteColor = skinColor,
             otherSkin = null,
             otherSkinColor = Color.white
         });
         skins.Add(CharacterData.TypeSkin.Hands, new CharacterData.CharacterSkinInfo
         {
-            originalSprite = data[CharacterData.TypeSkin.Hands][skinIndex],
+            originalSkinId = skinIndex,
+            originalSkin = data[CharacterData.TypeSkin.Hands][skinIndex],
             originalSpriteColor = skinColor,
             otherSkin = null,
             otherSkinColor = Color.white
@@ -29,7 +31,8 @@ public class CharactersSkinDBSO : ScriptableObject
         int hairIndex = Random.Range(1, data[CharacterData.TypeSkin.Hair].Count);
         skins.Add(CharacterData.TypeSkin.Hair, new CharacterData.CharacterSkinInfo
         {
-            originalSprite = data[CharacterData.TypeSkin.Hair][hairIndex],
+            originalSkinId = hairIndex,
+            originalSkin = data[CharacterData.TypeSkin.Hair][hairIndex],
             originalSpriteColor = RandomColor(),
             otherSkin = null,
             otherSkinColor = Color.white
@@ -37,7 +40,8 @@ public class CharactersSkinDBSO : ScriptableObject
         int eyesIndex = Random.Range(1, data[CharacterData.TypeSkin.Eyes].Count);
         skins.Add(CharacterData.TypeSkin.Eyes, new CharacterData.CharacterSkinInfo
         {
-            originalSprite = data[CharacterData.TypeSkin.Eyes][eyesIndex],
+            originalSkinId = eyesIndex,
+            originalSkin = data[CharacterData.TypeSkin.Eyes][eyesIndex],
             originalSpriteColor = RandomColor(),
             otherSkin = null,
             otherSkinColor = Color.white

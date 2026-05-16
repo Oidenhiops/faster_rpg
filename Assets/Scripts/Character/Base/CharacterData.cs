@@ -152,7 +152,7 @@ public class CharacterData
     public class CharacterSkinInfo
     {
         public int originalSkinId;
-        public CharactersSkinSO originalSprite;
+        public CharactersSkinSO originalSkin;
         public Color originalSpriteColor;
         public int otherSkinId;
         public CharactersSkinSO otherSkin;

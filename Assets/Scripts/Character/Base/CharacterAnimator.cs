@@ -51,7 +51,7 @@ public class CharacterAnimator : MonoBehaviour
         while (true)
         {
             SetUvsFromAtlas(GetCurrentSpriteData().characterSprite);
-            if (characterBase.charactersData[characterBase.characterIndex].skins[CharacterData.TypeSkin.Hands].originalSprite)
+            if (characterBase.charactersData[characterBase.characterIndex].skins[CharacterData.TypeSkin.Hands].originalSkin)
             {
                 SetUvsFromAtlas(GetCurrentSpriteData().characterSprite);
                 SetHandsPos();
@@ -174,10 +174,10 @@ public class CharacterAnimator : MonoBehaviour
         {
             if (characterBase.charactersData[characterBase.characterIndex].skins.TryGetValue(mesh.Key, out CharacterData.CharacterSkinInfo skinInfo))
             {
-                if (skinInfo.originalSprite)
+                if (skinInfo.originalSkin)
                 {
                     mesh.Value.gameObject.SetActive(true);
-                    mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSprite.textures[currentAnimation.name]);
+                    mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSkin.textures[currentAnimation.name]);
                     mesh.Value.material.SetColor("_Color", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSpriteColor);
                 }
                 else

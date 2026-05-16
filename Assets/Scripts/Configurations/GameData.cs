@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using AYellowpaper.SerializedCollections;
-using Unity.VisualScripting;
 
 public class GameData : MonoBehaviour
 {
@@ -150,6 +149,26 @@ public class GameData : MonoBehaviour
                     if (skill.Value.skillId != 0)
                     {
                         skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
+                    }
+                }
+            }
+        }
+    }
+    void InitializeCharacterSkins()
+    {
+        foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
+        {
+            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            {
+                foreach (KeyValuePair<CharacterData.TypeSkin, CharacterData.CharacterSkinInfo> skin in characterData.Value.skins)
+                {
+                    if (skin.Value.originalSkinId != 0)
+                    {
+                        skin.Value.originalSkin = charactersSkinDBSO.data[skin.Key][skin.Value.originalSkinId];
+                    }
+                    if (skin.Value.otherSkinId != 0)
+                    {
+                        skin.Value.otherSkin = charactersSkinDBSO.data[skin.Key][skin.Value.otherSkinId];
                     }
                 }
             }
