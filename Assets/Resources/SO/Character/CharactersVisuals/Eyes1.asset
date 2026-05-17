@@ -16,8 +16,8 @@ MonoBehaviour:
   textures:
     _serializedList:
     - Key: Idle
-      Value: {fileID: 2800000, guid: 8692f52ae834e9c47a2f0fe6f4b73889, type: 3}
+      Value: {fileID: 2800000, guid: 8439518f806544f4cb3fa9a44a649889, type: 3}
     - Key: Walk
-      Value: {fileID: 2800000, guid: e157def53e6014b4081629a9ace8c1ca, type: 3}
+      Value: {fileID: 2800000, guid: 5e3a5af6956d9d94e8e3d4043bab3da5, type: 3}
     - Key: Die
       Value: {fileID: 2800000, guid: d4b530dd8fb6fe54caa2e57a17aa1eaa, type: 3}

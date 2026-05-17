@@ -80,6 +80,14 @@ public class GameData : MonoBehaviour
         {
             Debug.LogError($"Error cargando habilidades de los personajes: {e}");
         }
+        try
+        {
+            InitializeCharacterSkins();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error cargando las skins de los personajes: {e}");
+        }
     }
     public void LoadGameDataInfo()
     {

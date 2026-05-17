@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bffe2857fb3859c47a352e0c0cded9ce, type: 3}
-  m_Name: Hand1
+  m_Name: Hands1
   m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinSO
   skinSize: 64
   textures:
     _serializedList:
     - Key: Idle
-      Value: {fileID: 2800000, guid: 4563ee0e7d7f6a24185c017490709ad3, type: 3}
+      Value: {fileID: 2800000, guid: 2dc43d3d038f85e45870d6992e7e4ef0, type: 3}
     - Key: Walk
-      Value: {fileID: 2800000, guid: 09144cdea4d9d7049abd82f564961293, type: 3}
+      Value: {fileID: 2800000, guid: d0768e9992b6fe1469e498e869d7b00b, type: 3}
     - Key: Die
-      Value: {fileID: 2800000, guid: 250371ed72e1ba04f98b08c6ef3100fe, type: 3}
+      Value: {fileID: 2800000, guid: d0768e9992b6fe1469e498e869d7b00b, type: 3}

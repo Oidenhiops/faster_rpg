@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
@@ -10,7 +8,7 @@ public class CharactersSkinDBSO : ScriptableObject
     public SerializedDictionary<CharacterData.TypeSkin, CharacterData.CharacterSkinInfo> GenerateRandomSkin()
     {
         SerializedDictionary<CharacterData.TypeSkin, CharacterData.CharacterSkinInfo> skins = new SerializedDictionary<CharacterData.TypeSkin, CharacterData.CharacterSkinInfo>();
-        int skinIndex = Random.Range(1, data[CharacterData.TypeSkin.Skin].Count);
+        int skinIndex = Random.Range(1, data[CharacterData.TypeSkin.Skin].Count + 1);
         Color skinColor = RandomColor();
         skins.Add(CharacterData.TypeSkin.Skin, new CharacterData.CharacterSkinInfo
         {
@@ -28,7 +26,7 @@ public class CharactersSkinDBSO : ScriptableObject
             otherSkin = null,
             otherSkinColor = Color.white
         });
-        int hairIndex = Random.Range(1, data[CharacterData.TypeSkin.Hair].Count);
+        int hairIndex = Random.Range(1, data[CharacterData.TypeSkin.Hair].Count - 1);
         skins.Add(CharacterData.TypeSkin.Hair, new CharacterData.CharacterSkinInfo
         {
             originalSkinId = hairIndex,
@@ -37,7 +35,7 @@ public class CharactersSkinDBSO : ScriptableObject
             otherSkin = null,
             otherSkinColor = Color.white
         });
-        int eyesIndex = Random.Range(1, data[CharacterData.TypeSkin.Eyes].Count);
+        int eyesIndex = Random.Range(1, data[CharacterData.TypeSkin.Eyes].Count - 1);
         skins.Add(CharacterData.TypeSkin.Eyes, new CharacterData.CharacterSkinInfo
         {
             originalSkinId = eyesIndex,
