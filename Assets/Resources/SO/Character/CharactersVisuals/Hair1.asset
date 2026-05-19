@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bffe2857fb3859c47a352e0c0cded9ce, type: 3}
   m_Name: Hair1
   m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinSO
-  skinSize: 64
   textures:
     _serializedList:
     - Key: Idle
-      Value: {fileID: 2800000, guid: 6fc84f0988202694bbd7475a2c4ebb01, type: 3}
+      Value: {fileID: 2800000, guid: 2569ee31e35fe684f805e9cdb377526b, type: 3}
     - Key: Walk
-      Value: {fileID: 2800000, guid: 0ce658e475f39d84e8e7c9310e2fcafc, type: 3}
-    - Key: Die
-      Value: {fileID: 2800000, guid: bef802240729b1049a1c53e5864055df, type: 3}
+      Value: {fileID: 2800000, guid: c2ae12cb5e93e8c429a5d61898872815, type: 3}
+    - Key: Jump
+      Value: {fileID: 2800000, guid: 489ec95dee51acd4db3574269292afe8, type: 3}
+    - Key: Dash
+      Value: {fileID: 2800000, guid: c2ae12cb5e93e8c429a5d61898872815, type: 3}
+    - Key: SwordAttack
+      Value: {fileID: 2800000, guid: c780d8bd48e50574a8d747f79f325eee, type: 3}

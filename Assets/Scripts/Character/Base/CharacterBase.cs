@@ -31,6 +31,7 @@ public class CharacterBase : MonoBehaviour
     protected Coroutine handleUseSkillCoroutine;
     public bool isGrounded => SetGrounded();
     public bool isDashing;
+    public bool isJumping;
     public void OnEnable()
     {
         if (isInitialize) characterAnimations.MakeAnimation("Idle");
@@ -366,6 +367,7 @@ public class CharacterBase : MonoBehaviour
     public class CharacterModel
     {
         public SerializedDictionary<CharacterData.TypeSkin, MeshRenderer> meshRenderers = new SerializedDictionary<CharacterData.TypeSkin, MeshRenderer>();
+        public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;
         public Mesh originalMesh;

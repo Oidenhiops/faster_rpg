@@ -11,7 +11,6 @@ public class CharacterAnimator : MonoBehaviour
     public int currentSpriteIndex;
     public float currentSpritePerTime = 0.1f;
     public string animationAfterEnd;
-    public Sprite spriteSheetBase;
     public CharacterAnimationsSO characterAnimationsSO;
     public void 
     SetInitialData()
@@ -19,7 +18,16 @@ public class CharacterAnimator : MonoBehaviour
         StopAllCoroutines();
         currentSpriteIndex = 0;
         animationAfterEnd = "";
-        currentAnimation = GetAnimation("Idle");
+        if (
+            currentAnimation.name == "Idle" || 
+            currentAnimation.name == "Walk" || 
+            currentAnimation.name == "Jump" || 
+            currentAnimation.name == "Dash"
+            ) currentAnimation = GetAnimation(currentAnimation.name);
+        else
+        {
+            currentAnimation = GetAnimation("Idle");
+        }
         SetTextureFromAnimation();
         StartCoroutine(AnimateSprite());
     }
@@ -51,14 +59,17 @@ public class CharacterAnimator : MonoBehaviour
         while (true)
         {
             SetUvsFromAtlas(GetCurrentSpriteData().characterSprite);
-            if (characterBase.charactersData[characterBase.characterIndex].skins[CharacterData.TypeSkin.Hands].originalSkin)
+            if (
+                characterBase.charactersData[characterBase.characterIndex].skins.ContainsKey(CharacterData.TypeSkin.Hands) &&
+                characterBase.charactersData[characterBase.characterIndex].skins[CharacterData.TypeSkin.Hands].originalSkin != null
+                )
             {
                 SetUvsFromAtlas(GetCurrentSpriteData().characterSprite);
                 SetHandsPos();
             }
             yield return new WaitForSeconds(currentSpritePerTime);
             currentSpriteIndex++;
-            if (currentSpriteIndex > currentAnimation.sprites.Count - 1)
+            if (currentSpriteIndex > currentAnimation.amountSprites - 1)
             {
                 if (currentAnimation.loop)
                 {
@@ -92,65 +103,79 @@ public class CharacterAnimator : MonoBehaviour
         {
             if (characterBase.directionAnimation == Vector3Int.forward)
             {
-                return currentAnimation.sprites[currentSpriteIndex].up;
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].up;
             }
             else if (characterBase.directionAnimation == Vector3Int.back)
             {
-                return currentAnimation.sprites[currentSpriteIndex].down;
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].down;
             }
             else if (characterBase.directionAnimation == Vector3Int.left)
             {
-                return currentAnimation.sprites[currentSpriteIndex].left;
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].left;
             }
             else if (characterBase.directionAnimation == Vector3Int.right)
             {
-                if (currentAnimation.sprites[currentSpriteIndex].right.characterSprite != null)
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].right;
-                }
-                else
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].left;
-                }
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].right;
             }
             else if (characterBase.directionAnimation == new Vector3Int(-1, 0, 1))
             {
-                return currentAnimation.sprites[currentSpriteIndex].upLeft;
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].upLeft;
             }
             else if (characterBase.directionAnimation == new Vector3Int(1, 0, 1))
             {
-                if (currentAnimation.sprites[currentSpriteIndex].upRight.characterSprite != null)
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].upRight;
-                }
-                else
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].upLeft;
-                }
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].upRight;
             }
             else if (characterBase.directionAnimation == new Vector3Int(-1, 0, -1))
             {
-                return currentAnimation.sprites[currentSpriteIndex].downLeft;
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].downLeft;
             }
             else if (characterBase.directionAnimation == new Vector3Int(1, 0, -1))
             {
-                if (currentAnimation.sprites[currentSpriteIndex].downRight.characterSprite != null)
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].downRight;
-                }
-                else
-                {
-                    return currentAnimation.sprites[currentSpriteIndex].downLeft;
-                }
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].downRight;
             }
             else
             {
-                return currentAnimation.sprites[currentSpriteIndex].down;
+                return characterAnimationsSO.spritesD8[currentSpriteIndex].down;
             }
         }
         else
         {
-            return null;
+            if (characterBase.directionAnimation == Vector3Int.forward)
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].upLeft;
+            }
+            else if (characterBase.directionAnimation == Vector3Int.back)
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].downLeft;
+            }
+            else if (characterBase.directionAnimation == Vector3Int.left)
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].upLeft;
+            }
+            else if (characterBase.directionAnimation == Vector3Int.right)
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].downRight;
+            }
+            else if (characterBase.directionAnimation == new Vector3Int(-1, 0, 1))
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].upLeft;
+            }
+            else if (characterBase.directionAnimation == new Vector3Int(1, 0, 1))
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].upRight;
+            }
+            else if (characterBase.directionAnimation == new Vector3Int(-1, 0, -1))
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].downLeft;
+            }
+            else if (characterBase.directionAnimation == new Vector3Int(1, 0, -1))
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].downRight;
+            }
+            else
+            {
+                return characterAnimationsSO.spritesD4[currentSpriteIndex].downLeft;
+            }
         }
     }
     void SetUvsFromAtlas(Sprite spriteFromAtlas)
@@ -176,18 +201,18 @@ public class CharacterAnimator : MonoBehaviour
             {
                 if (skinInfo.originalSkin)
                 {
-                    mesh.Value.gameObject.SetActive(true);
+                    mesh.Value.enabled = true;
                     mesh.Value.material.SetTexture("_BaseTexture", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSkin.textures[currentAnimation.name]);
                     mesh.Value.material.SetColor("_Color", characterBase.charactersData[characterBase.characterIndex].skins[mesh.Key].originalSpriteColor);
                 }
                 else
                 {
-                    mesh.Value.gameObject.SetActive(false);
+                    mesh.Value.enabled = false;
                 }
             }
             else
             {
-                mesh.Value.gameObject.SetActive(false);
+                mesh.Value.enabled = false;
             }
         }
     }

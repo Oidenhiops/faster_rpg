@@ -43,9 +43,9 @@ public class CharacterPlayerMovement : CharacterMovementBase
                     characterBase.directionAnimation.z = -1;
                 }
             }
-            if (!characterBase.isDashing) characterBase.characterAnimations.MakeAnimation("Walk");
+            if (!characterBase.isDashing && !characterBase.isJumping) characterBase.characterAnimations.MakeAnimation("Walk");
         }
-        else if (!characterBase.isDashing)
+        else if (!characterBase.isDashing && !characterBase.isJumping)
         {
             characterBase.characterAnimations.MakeAnimation("Idle");
         }
@@ -55,13 +55,13 @@ public class CharacterPlayerMovement : CharacterMovementBase
             {
                 directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
                 directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
-                directionFromCamera.y = 0;
+                directionFromCamera.y = rb.linearVelocity.y;
             }
             else
             {
                 CameraInfo.Instance.CamDirection(new Vector3(characterBase.directionAnimation.x, 0, characterBase.directionAnimation.z), out Vector3 directionFromCameraByAnimation);
                 directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
-                directionFromCamera.y = 0;
+                directionFromCamera.y = rb.linearVelocity.y;
             }
         }
         else
@@ -76,23 +76,40 @@ public class CharacterPlayerMovement : CharacterMovementBase
     {
         if (characterBase.isGrounded && !characterBase.isDashing)
         {
-            rb.AddForce(Vector3.up * 5, ForceMode.Impulse);
+            _ = MakeJump();
         }
     }
     void OnHandleDash(InputAction.CallbackContext context)
     {
         if (characterBase.isGrounded && !characterBase.isDashing)
         {
-            characterBase.isDashing = true;
-            characterBase.characterAnimations.MakeAnimation("Dash");
             _ = MakeDash();
         }
     }
 
     public async Awaitable MakeDash()
     {
+        characterBase.isDashing = true;
+        characterBase.characterAnimations.MakeAnimation("Dash");
         await Awaitable.WaitForSecondsAsync(0.1f);
         characterBase.isDashing = false;
+        characterBase.characterAnimations.MakeAnimation("Idle");
+    }
+    public async Awaitable MakeJump()
+    {
+        characterBase.isJumping = true;
+        characterBase.characterAnimations.MakeAnimation("Jump");
+        rb.AddForce(Vector3.up * 5, ForceMode.Impulse);
+        await Awaitable.WaitForSecondsAsync(0.1f);
+        while (characterBase.characterAnimations.name == "Jump")
+        {
+            await Awaitable.NextFrameAsync();
+        }
+        while (!characterBase.isGrounded )
+        {
+            await Awaitable.NextFrameAsync();
+        }
+        characterBase.isJumping = false;
         characterBase.characterAnimations.MakeAnimation("Idle");
     }
 }

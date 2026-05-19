@@ -13,6 +13,8 @@ public class CharacterAnimationsSO : ScriptableObject
     public SerializedDictionary<string, AnimationsInfo> animations = new SerializedDictionary<string, AnimationsInfo>();
     public string animationName;
     public Texture2D characterSpriteSheetBase;
+    public List<SpritesInfo> spritesD8;
+    public List<SpritesInfo> spritesD4;
     // #if UNITY_EDITOR
     [NaughtyAttributes.Button]
     public void GenerateCharacterAnimation()
@@ -65,7 +67,6 @@ public class CharacterAnimationsSO : ScriptableObject
         AnimationsInfo newAnimInfo = new AnimationsInfo
         {
             name = animationName,
-            sprites = new List<SpritesInfo>(),
             animationsEffects = new SerializedDictionary<CharacterAnimator.TypeAnimationsEffects, CharacterAnimator.AnimationEffectInfo>()
         };
         int frameCount = rows[0].Count;
@@ -102,8 +103,6 @@ public class CharacterAnimationsSO : ScriptableObject
                 spritesInfo.down.characterSprite  = GetFrameSprite(rows[2], frame);
                 spritesInfo.left.characterSprite  = GetFrameSprite(rows[3], frame);
             }
-
-            newAnimInfo.sprites.Add(spritesInfo);
         }
         animations.Add(animationName, newAnimInfo);
 
@@ -123,7 +122,7 @@ public class CharacterAnimationsSO : ScriptableObject
     {
         public string name;
         public string linkAnimation;
-        public List<SpritesInfo> sprites;
+        public int amountSprites;
         public SerializedDictionary<CharacterAnimator.TypeAnimationsEffects, CharacterAnimator.AnimationEffectInfo> animationsEffects;
         public bool loop = false;
         public bool needInstance = false;

@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bffe2857fb3859c47a352e0c0cded9ce, type: 3}
-  m_Name: Skin1
+  m_Name: Hand1
   m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinSO
   textures:
     _serializedList:
     - Key: Idle
-      Value: {fileID: 2800000, guid: 4a073e12ade510d4887880cdf71e23e3, type: 3}
+      Value: {fileID: 2800000, guid: 8af09bf4cad854a478902782324094f1, type: 3}
     - Key: Walk
-      Value: {fileID: 2800000, guid: 33134d67db680b54d911a4f2498c0ca6, type: 3}
+      Value: {fileID: 2800000, guid: a79bf091071281941ae856e9bfb0c9f1, type: 3}
     - Key: Jump
-      Value: {fileID: 2800000, guid: 63d2776d1fe734746aed1c8d3edf1665, type: 3}
+      Value: {fileID: 2800000, guid: c28cf5c12a5804943b43c29fe32d4eeb, type: 3}
     - Key: Dash
-      Value: {fileID: 2800000, guid: 33134d67db680b54d911a4f2498c0ca6, type: 3}
+      Value: {fileID: 2800000, guid: a79bf091071281941ae856e9bfb0c9f1, type: 3}
     - Key: SwordAttack
-      Value: {fileID: 2800000, guid: 46f875b549100e24bb70ac76d36a255b, type: 3}
+      Value: {fileID: 2800000, guid: 6f90e5dd38c10bf488e6b99fb5150909, type: 3}

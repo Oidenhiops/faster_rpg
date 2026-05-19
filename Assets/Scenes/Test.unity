@@ -1743,7 +1743,7 @@ MonoBehaviour:
   currentAnimation:
     name: 
     linkAnimation: 
-    sprites: []
+    amountSprites: 0
     animationsEffects:
       _serializedList: []
     loop: 0
@@ -1754,7 +1754,6 @@ MonoBehaviour:
   currentSpriteIndex: 0
   currentSpritePerTime: 0.1
   animationAfterEnd: 
-  spriteSheetBase: {fileID: -1006419203, guid: efea121b597d42b42a6d4560932a9d14, type: 3}
   characterAnimationsSO: {fileID: 11400000, guid: edb96f73ff367794aa51acd42ccdb62a, type: 2}
 --- !u!114 &211714506
 MonoBehaviour:
@@ -1863,6 +1862,7 @@ MonoBehaviour:
         Value: {fileID: 1252403364}
       - Key: 5
         Value: {fileID: 543565607}
+    modelTransform: {fileID: 1629831923}
     leftHand: {fileID: 388570752}
     rightHand: {fileID: 1408136769}
     originalMesh: {fileID: 6622264641530768373, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
@@ -2041,6 +2041,7 @@ MonoBehaviour:
   skillsToRemove:
     _serializedList: []
   isDashing: 0
+  isJumping: 0
   interactableBannerPrefab: {fileID: 1398121657027770714, guid: bc98a0c87e9c98a49a7144748c5c1581, type: 3}
   interactables:
     _serializedList: []

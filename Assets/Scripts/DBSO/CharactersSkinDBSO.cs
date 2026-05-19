@@ -18,23 +18,17 @@ public class CharactersSkinDBSO : ScriptableObject
             otherSkin = null,
             otherSkinColor = Color.white
         });
-        skins.Add(CharacterData.TypeSkin.Hands, new CharacterData.CharacterSkinInfo
+        if (data[CharacterData.TypeSkin.Hands].ContainsKey(skinIndex))
         {
-            originalSkinId = skinIndex,
-            originalSkin = data[CharacterData.TypeSkin.Hands][skinIndex],
-            originalSpriteColor = skinColor,
-            otherSkin = null,
-            otherSkinColor = Color.white
-        });
-        int hairIndex = Random.Range(1, data[CharacterData.TypeSkin.Hair].Count - 1);
-        skins.Add(CharacterData.TypeSkin.Hair, new CharacterData.CharacterSkinInfo
-        {
-            originalSkinId = hairIndex,
-            originalSkin = data[CharacterData.TypeSkin.Hair][hairIndex],
-            originalSpriteColor = RandomColor(),
-            otherSkin = null,
-            otherSkinColor = Color.white
-        });
+            skins.Add(CharacterData.TypeSkin.Hands, new CharacterData.CharacterSkinInfo
+            {
+                originalSkinId = skinIndex,
+                originalSkin = data[CharacterData.TypeSkin.Hands][skinIndex],
+                originalSpriteColor = skinColor,
+                otherSkin = null,
+                otherSkinColor = Color.white
+            });
+        }
         int eyesIndex = Random.Range(1, data[CharacterData.TypeSkin.Eyes].Count - 1);
         skins.Add(CharacterData.TypeSkin.Eyes, new CharacterData.CharacterSkinInfo
         {
@@ -44,14 +38,30 @@ public class CharactersSkinDBSO : ScriptableObject
             otherSkin = null,
             otherSkinColor = Color.white
         });
-        // int mouthIndex = Random.Range(1, data[CharacterData.TypeSkin.Mouth].Count);
-        // skins.Add(CharacterData.TypeSkin.Mouth, new CharacterData.CharacterSkinInfo
-        // {
-        //     originalSprite = data[CharacterData.TypeSkin.Mouth][mouthIndex],
-        //     originalSpriteColor = Color.white,
-        //     otherSprite = null,
-        //     otherSpriteColor = Color.white
-        // });
+        int hairIndex = Random.Range(1, data[CharacterData.TypeSkin.Hair].Count - 1);
+        if (data[CharacterData.TypeSkin.Hair].ContainsKey(hairIndex))
+        {
+            skins.Add(CharacterData.TypeSkin.Hair, new CharacterData.CharacterSkinInfo
+            {
+                originalSkinId = hairIndex,
+                originalSkin = data[CharacterData.TypeSkin.Hair][hairIndex],
+                originalSpriteColor = RandomColor(),
+                otherSkin = null,
+                otherSkinColor = Color.white
+            });
+        }
+        int mouthIndex = Random.Range(1, data[CharacterData.TypeSkin.Mouth].Count - 1);
+        if (data[CharacterData.TypeSkin.Mouth].ContainsKey(mouthIndex))
+        {
+            skins.Add(CharacterData.TypeSkin.Mouth, new CharacterData.CharacterSkinInfo
+            {
+                originalSkinId = mouthIndex,
+                originalSkin = data[CharacterData.TypeSkin.Mouth][mouthIndex],
+                originalSpriteColor = RandomColor(),
+                otherSkin = null,
+                otherSkinColor = Color.white
+            });
+        }
         return skins;
     }
     Color RandomColor()
