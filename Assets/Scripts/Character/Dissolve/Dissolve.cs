@@ -4,28 +4,20 @@ using UnityEngine;
 
 public class Dissolve : MonoBehaviour
 {
-    [SerializeField] GameObject[] objectsToDisolve;
-    List<Material> materials = new List<Material>();
+    [SerializeField] Renderer[] objectsToDisolve;
     public float refreshRate = 0.025f;
     public float dissolveRate = 0.0125f;
     public bool needAppear = false;
     private void Awake()
     {
-        foreach (var renderer in objectsToDisolve)
-        {
-            foreach (Material material in renderer.GetComponent<Renderer>().materials)
-            {
-                materials.Add(material);
-            }
-        }
         if (needAppear) NeedAppear();
     }
     [NaughtyAttributes.Button]
     public void NeedAppear()
     {
-        for (int i = 0; i < materials.Count; i++)
+        for (int i = 0; i < objectsToDisolve.Length; i++)
         {
-            materials[i].SetFloat("_DissolveAmount", 1);
+            objectsToDisolve[i].material.SetFloat("_DissolveAmount", 1);
         }
         AppearObject();
     }
@@ -41,15 +33,15 @@ public class Dissolve : MonoBehaviour
     }
     IEnumerator DissolveObj()
     {
-        if (materials.Count > 0)
+        if (objectsToDisolve.Length > 0)
         {
             float counter = 0;
-            while (materials[0].GetFloat("_DissolveAmount") < 1)
+            while (objectsToDisolve[0].material.GetFloat("_DissolveAmount") < 1)
             {
                 counter += dissolveRate;
-                for (int i = 0; i < materials.Count; i++)
+                for (int i = 0; i < objectsToDisolve.Length; i++)
                 {
-                    materials[i].SetFloat("_DissolveAmount", counter);
+                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", counter);
                 }
                 yield return new WaitForSeconds(refreshRate);
             }
@@ -57,15 +49,15 @@ public class Dissolve : MonoBehaviour
     }
     IEnumerator AppearObj()
     {
-        if (materials.Count > 0)
+        if (objectsToDisolve.Length > 0)
         {
             float counter = 1;
-            while (materials[0].GetFloat("_DissolveAmount") > 0)
+            while (objectsToDisolve[0].material.GetFloat("_DissolveAmount") > 0)
             {
                 counter -= dissolveRate;
-                for (int i = 0; i < materials.Count; i++)
+                for (int i = 0; i < objectsToDisolve.Length; i++)
                 {
-                    materials[i].SetFloat("_DissolveAmount", counter);
+                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", counter);
                 }
                 yield return new WaitForSeconds(refreshRate);
             }

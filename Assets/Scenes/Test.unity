@@ -2228,11 +2228,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dissolve
   objectsToDisolve:
-  - {fileID: 2111294707}
-  - {fileID: 958668601}
-  - {fileID: 946834189}
-  - {fileID: 1838536287}
-  - {fileID: 262800482}
+  - {fileID: 2092067460}
+  - {fileID: 1419217504}
+  - {fileID: 1252403364}
+  - {fileID: 543565607}
+  - {fileID: 2131317887}
   refreshRate: 0.025
   dissolveRate: 0.025
   needAppear: 1
@@ -2781,11 +2781,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 257159642}
   m_CullTransparentMesh: 1
---- !u!1 &262800482 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
-  m_PrefabInstance: {fileID: 2131317885}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &269190676
 GameObject:
   m_ObjectHideFlags: 0
@@ -9177,11 +9172,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 900661013}
   m_CullTransparentMesh: 1
---- !u!1 &946834189 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
-  m_PrefabInstance: {fileID: 1252403362}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &953202266
 GameObject:
   m_ObjectHideFlags: 0
@@ -9257,11 +9247,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953202266}
   m_CullTransparentMesh: 1
---- !u!1 &958668601 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
-  m_PrefabInstance: {fileID: 1419217502}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &980325836
 GameObject:
   m_ObjectHideFlags: 0
@@ -16238,11 +16223,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1816563540}
   m_CullTransparentMesh: 1
---- !u!1 &1838536287 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
-  m_PrefabInstance: {fileID: 543565605}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1840754500
 GameObject:
   m_ObjectHideFlags: 0
@@ -17880,11 +17860,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2108348040}
   m_CullTransparentMesh: 1
---- !u!1 &2111294707 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
-  m_PrefabInstance: {fileID: 2092067458}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2128369124
 GameObject:
   m_ObjectHideFlags: 0
