@@ -17,6 +17,7 @@ public class CharacterPlayer : CharacterBase
     public bool isInventoryOpen;
     public CharacterBase otherCharacterToMakeSkill;
     public CharacterPlayerCamera characterPlayerCamera;
+    public Dissolve dissolve;
     public bool hideWeaponsInHand;
     public override void OnEnableHandle()
     {
@@ -75,6 +76,7 @@ public class CharacterPlayer : CharacterBase
         if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
         {
             isChangingCharacter = true;
+            dissolve.NeedAppear();
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.white;
             characterIndex = (int)context.ReadValue<float>();
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;

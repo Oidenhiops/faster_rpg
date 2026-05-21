@@ -20,6 +20,7 @@ public class Dissolve : MonoBehaviour
         }
         if (needAppear) NeedAppear();
     }
+    [NaughtyAttributes.Button]
     public void NeedAppear()
     {
         for (int i = 0; i < materials.Count; i++)
