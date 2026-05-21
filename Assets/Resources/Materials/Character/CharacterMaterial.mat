@@ -57,10 +57,11 @@ Material:
     m_Floats:
     - _ApplyOutline: 0
     - _DissolveAmount: 0
-    - _DissolveScale: 0
+    - _DissolveScale: 500
     - _DisssolveColor: 0.02
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Thickness: 0.05
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DissolveColor: {r: 2.129867, g: 0.8605422, b: 5.884999, a: 0}

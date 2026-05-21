@@ -16,6 +16,8 @@ public class CharacterPlayer : CharacterBase
     public bool isChangingCharacter;
     public bool isInventoryOpen;
     public CharacterBase otherCharacterToMakeSkill;
+    public CharacterPlayerCamera characterPlayerCamera;
+    public bool hideWeaponsInHand;
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
@@ -25,6 +27,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.ChangeFastItem.performed += OnHandleChangeFastItem;
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
         inputActions.Player.UseSkill.performed += OnHandleUseSkill;
+        inputActions.Player.MoveCamera.performed += MoveCamera;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -81,6 +84,14 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.RefreshStatusEffects();
         }
     }
+    public void MoveCamera(InputAction.CallbackContext context)
+    {
+        if (isInventoryOpen) return;
+        if (inputActions.Player.UnlockCamera.ReadValue<float>() == 1)
+        {
+            characterPlayerCamera.MoveCamera(context);
+        }
+    }
     async Awaitable ChangeCharacterAction()
     {
         await characterPlayerHud.ChangeCharacterPortrait();
@@ -93,11 +104,11 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleUseFastItem(InputAction.CallbackContext context)
     {
-        UseItem();
+        if (!isInventoryOpen) UseItem();
     }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
     {
-        UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
+        if (!isInventoryOpen) UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
     }
     public override void UseSkill(int skillIndex)
     {

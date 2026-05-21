@@ -10,6 +10,7 @@ public class ItemBaseSO : ScriptableObject
     public GeneralTypeObject generalTypeObject;
     public TypeObject typeObject;
     public TypeWeapon typeWeapon;
+    public Sprite weaponSprite;
     public string animationName;
     public int maxStack;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
