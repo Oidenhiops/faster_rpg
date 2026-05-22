@@ -89,6 +89,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
 
     public async Awaitable MakeDash()
     {
+        characterBase.dissolve.NeedAppear();
         characterBase.isDashing = true;
         characterBase.characterAnimations.MakeAnimation("Dash");
         await Awaitable.WaitForSecondsAsync(0.1f);

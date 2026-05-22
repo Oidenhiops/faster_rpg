@@ -5,8 +5,7 @@ using UnityEngine;
 public class Dissolve : MonoBehaviour
 {
     [SerializeField] Renderer[] objectsToDisolve;
-    public float refreshRate = 0.025f;
-    public float dissolveRate = 0.0125f;
+    public float dissolveDuration = 1f;
     public bool needAppear = false;
     private void Awake()
     {
@@ -35,15 +34,16 @@ public class Dissolve : MonoBehaviour
     {
         if (objectsToDisolve.Length > 0)
         {
-            float counter = 0;
-            while (objectsToDisolve[0].material.GetFloat("_DissolveAmount") < 1)
+            float elapsed = 0f;
+                while (elapsed < dissolveDuration)
             {
-                counter += dissolveRate;
+                elapsed += Time.deltaTime;
+                float normalizedValue = Mathf.Clamp01(elapsed / dissolveDuration);
                 for (int i = 0; i < objectsToDisolve.Length; i++)
                 {
-                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", counter);
+                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", normalizedValue);
                 }
-                yield return new WaitForSeconds(refreshRate);
+                yield return null;
             }
         }
     }
@@ -51,15 +51,16 @@ public class Dissolve : MonoBehaviour
     {
         if (objectsToDisolve.Length > 0)
         {
-            float counter = 1;
-            while (objectsToDisolve[0].material.GetFloat("_DissolveAmount") > 0)
+            float elapsed = 0f;
+            while (elapsed < dissolveDuration)
             {
-                counter -= dissolveRate;
+                elapsed += Time.deltaTime;
+                float normalizedValue = Mathf.Clamp01(1f - (elapsed / dissolveDuration));
                 for (int i = 0; i < objectsToDisolve.Length; i++)
                 {
-                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", counter);
+                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", normalizedValue);
                 }
-                yield return new WaitForSeconds(refreshRate);
+                yield return null;
             }
         }
     }

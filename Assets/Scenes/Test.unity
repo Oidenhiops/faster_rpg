@@ -2233,8 +2233,7 @@ MonoBehaviour:
   - {fileID: 1252403364}
   - {fileID: 543565607}
   - {fileID: 2131317887}
-  refreshRate: 0.025
-  dissolveRate: 0.025
+  dissolveDuration: 0.5
   needAppear: 1
 --- !u!1 &219281684
 GameObject:

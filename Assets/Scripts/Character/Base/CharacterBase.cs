@@ -21,6 +21,7 @@ public class CharacterBase : MonoBehaviour
     public CharacterPlayerHud characterPlayerHud;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
+    public Dissolve dissolve;
     public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
     public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
     List<int> statusEffectsCharacterKeysToRemove = new();

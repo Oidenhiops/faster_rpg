@@ -17,7 +17,6 @@ public class CharacterPlayer : CharacterBase
     public bool isInventoryOpen;
     public CharacterBase otherCharacterToMakeSkill;
     public CharacterPlayerCamera characterPlayerCamera;
-    public Dissolve dissolve;
     public bool hideWeaponsInHand;
     public override void OnEnableHandle()
     {
