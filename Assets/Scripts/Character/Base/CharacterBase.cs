@@ -33,6 +33,20 @@ public class CharacterBase : MonoBehaviour
     public bool isGrounded => SetGrounded();
     public bool isDashing;
     public bool isJumping;
+    public bool isInCanalization;
+    public bool _cancelCanalization;
+    public bool cancelCanalization
+    {
+        get => _cancelCanalization;
+        set
+        {
+            _cancelCanalization = value;
+            if (value)
+            {
+                StartCoroutine(ResetCancelCanalization());
+            }
+        }
+    }
     public void OnEnable()
     {
         if (isInitialize) characterAnimations.MakeAnimation("Idle");
@@ -70,7 +84,7 @@ public class CharacterBase : MonoBehaviour
     public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
     public virtual void UseItem() { }
     public virtual void UseItem(int bagSlotIndex) { }
-    public virtual void UseSkill(int skillIndex) { }
+    public virtual async Awaitable UseSkill(int skillIndex) { }
     protected bool SetGrounded()
     {
         return Physics.OverlapBox
@@ -372,6 +386,11 @@ public class CharacterBase : MonoBehaviour
         public Transform leftHand;
         public Transform rightHand;
         public Mesh originalMesh;
+    }
+    IEnumerator ResetCancelCanalization()
+    {
+        yield return null;
+        cancelCanalization = false;
     }
     [Serializable]
     public class StatusEffect

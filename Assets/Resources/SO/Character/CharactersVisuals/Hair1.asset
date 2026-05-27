@@ -22,5 +22,7 @@ MonoBehaviour:
       Value: {fileID: 2800000, guid: 489ec95dee51acd4db3574269292afe8, type: 3}
     - Key: Dash
       Value: {fileID: 2800000, guid: c2ae12cb5e93e8c429a5d61898872815, type: 3}
+    - Key: Canalization
+      Value: {fileID: 2800000, guid: 8f7335c1cf333794eba2475b99da16c7, type: 3}
     - Key: SwordAttack
       Value: {fileID: 2800000, guid: c780d8bd48e50574a8d747f79f325eee, type: 3}

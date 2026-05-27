@@ -109,36 +109,35 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
     {
-        if (!isInventoryOpen) UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
+        if (!isInventoryOpen) _ = UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
     }
-    public override void UseSkill(int skillIndex)
+    public override async Awaitable UseSkill(int skillIndex)
     {
+
         if (charactersData[characterIndex].skills[skillIndex].skillsBaseSO != null &&
             !(skillsCd.ContainsKey(characterIndex) && skillsCd[characterIndex].ContainsKey(skillIndex)) &&
-            charactersData[characterIndex].skills[skillIndex].skillsBaseSO.ValidateCanUseSkill(this, characterIndex, charactersData[characterIndex].skills[skillIndex].level))
+            charactersData[characterIndex].skills[skillIndex].skillsBaseSO.ValidateCanUseSkill(new SkillsBaseSO.CharacterMakeSkillData(this, characterIndex), charactersData[characterIndex].skills[skillIndex].level))
         {
-            if (charactersData[characterIndex].skills[skillIndex].skillsBaseSO.UseSkill(this, otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, skillIndex))
+            await charactersData[characterIndex].skills[skillIndex].skillsBaseSO.UseSkill(new SkillsBaseSO.CharacterMakeSkillData(this, characterIndex), otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, charactersData[characterIndex].skills[skillIndex].level);
+            if (skillsCd.ContainsKey(characterIndex))
             {
-                if (skillsCd.ContainsKey(characterIndex))
+                skillsCd[characterIndex].Add(0, new SkillCd
                 {
-                    skillsCd[characterIndex].Add(0, new SkillCd 
-                    { 
+                    maxCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
+                    currentCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue
+                });
+            }
+            else
+            {
+                skillsCd.Add(characterIndex, new SerializedDictionary<int, SkillCd> { { 0, new SkillCd
+                    {
                         maxCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
                         currentCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue
-                    });
-                }
-                else
-                {
-                    skillsCd.Add(characterIndex, new SerializedDictionary<int, SkillCd> { { 0, new SkillCd 
-                    { 
-                        maxCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue,
-                        currentCd = charactersData[characterIndex].skills[skillIndex].skillsBaseSO.statistics[charactersData[characterIndex].skills[skillIndex].level][CharacterData.TypeStatistic.Cd].baseValue 
                     }}});
-                }
-                if (handleUseSkillCoroutine == null)
-                {
-                    handleUseSkillCoroutine = StartCoroutine(HandleUseSkill());
-                }
+            }
+            if (handleUseSkillCoroutine == null)
+            {
+                handleUseSkillCoroutine = StartCoroutine(HandleUseSkill());
             }
         }
     }

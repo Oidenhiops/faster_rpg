@@ -2033,6 +2033,7 @@ MonoBehaviour:
   characterPlayerHud: {fileID: 211714511}
   characterMovement: {fileID: 211714506}
   characterAnimations: {fileID: 211714503}
+  dissolve: {fileID: 211714512}
   statusEffects:
     _serializedList: []
   statusToRemove:
@@ -2043,6 +2044,8 @@ MonoBehaviour:
     _serializedList: []
   isDashing: 0
   isJumping: 0
+  isInCanalization: 0
+  _cancelCanalization: 0
   interactableBannerPrefab: {fileID: 1398121657027770714, guid: bc98a0c87e9c98a49a7144748c5c1581, type: 3}
   interactables:
     _serializedList: []
@@ -2050,7 +2053,6 @@ MonoBehaviour:
   isInventoryOpen: 0
   otherCharacterToMakeSkill: {fileID: 0}
   characterPlayerCamera: {fileID: 211714509}
-  dissolve: {fileID: 211714512}
   hideWeaponsInHand: 0
 --- !u!114 &211714511
 MonoBehaviour:
@@ -9518,6 +9520,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d19f31202f69ba94b8ec951a6ecfa746, type: 2}
     - target: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
       propertyPath: m_Name
       value: ItemRightHand
@@ -17498,6 +17508,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d19f31202f69ba94b8ec951a6ecfa746, type: 2}
     - target: {fileID: 919132149155446097, guid: acb41ac991dd0db488c1498a2f76e131, type: 3}
       propertyPath: m_Name
       value: ItemLeftHand

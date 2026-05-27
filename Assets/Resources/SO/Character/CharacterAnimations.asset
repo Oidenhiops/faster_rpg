@@ -63,6 +63,18 @@ MonoBehaviour:
         frameToInstance: 0
         instanceObj: {fileID: 0}
         instance: {fileID: 0}
+    - Key: Canalization
+      Value:
+        name: Canalization
+        linkAnimation: 
+        amountSprites: 4
+        animationsEffects:
+          _serializedList: []
+        loop: 1
+        needInstance: 0
+        frameToInstance: 0
+        instanceObj: {fileID: 0}
+        instance: {fileID: 0}
     - Key: Die
       Value:
         name: Die

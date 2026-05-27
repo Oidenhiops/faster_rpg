@@ -17,8 +17,9 @@ MonoBehaviour:
   icon: {fileID: -343937895, guid: bfc3823bac79ab14e80720571aa0d782, type: 3}
   animationSkillName: 
   generalAnimationSkillName: 
-  skillVFXPrefab: {fileID: 0}
+  skillVFXPrefab: {fileID: 2420060085027401915, guid: c32dbe8bbf79e144ba730ec635bab52c, type: 3}
   skillVFXDuration: 1
+  canalizationEffect: {fileID: 11400000, guid: 1a8049e88fff51f408d91ac164592413, type: 2}
   statistics:
     _serializedList:
     - Key: 0
