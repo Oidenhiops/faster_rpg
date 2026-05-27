@@ -3,7 +3,6 @@ using UnityEngine;
 // Adjunta este componente a cualquier GameObject que represente un bloque del mapa.
 // El GridBaker lo recoge en Awake y crea el Block correspondiente en el GridMap.
 // En el editor dibuja gizmos: verde = cara abierta, rojo = cara cerrada (pasamanos, muro, etc.)
-[ExecuteAlways]
 public class BlockMarker : MonoBehaviour
 {
     [Header("Configuración del bloque")]
@@ -15,11 +14,6 @@ public class BlockMarker : MonoBehaviour
     [Tooltip("Si este bloque es una escalera diagonal, marca hacia qué dirección horizontal SUBE. " +
              "Dejar en None para bloques planos. Un solo cardinal: North, South, East u West.")]
     public BlockFace stairUpDirection = BlockFace.None;
-
-    [Header("Snap automático al grid")]
-    [Tooltip("En modo edición: al mover el cubo en la escena, se snapea automáticamente al centro de la celda más cercana. " +
-             "No afecta en runtime (solo se ejecuta cuando no estás en Play).")]
-    public bool snapToGridInEditor = true;
 
     [Header("Bloque dinámico (runtime)")]
     [Tooltip("Si está marcado, este bloque se registra solo en OnEnable y actualiza su celda cuando se mueve. " +
@@ -141,40 +135,13 @@ public class BlockMarker : MonoBehaviour
         lastSampledPos = transform.position;
     }
 
-    // ---------- Update: snap en editor + tracking dinámico en runtime ----------
+    // ---------- Update: solo tracking dinámico en runtime ----------
 
     void Update()
     {
-#if UNITY_EDITOR
-        if (!Application.isPlaying)
-        {
-            if (snapToGridInEditor) SnapToGridCenter();
-            return;
-        }
-#endif
-        // Runtime
+        if (!Application.isPlaying) return;
         if (dynamic) UpdateDynamicCellIfMoved();
     }
-
-#if UNITY_EDITOR
-    void SnapToGridCenter()
-    {
-        GridMap map = GridMap.Instance;
-        float blockSize = map != null ? map.blockSize : 1f;
-        Vector3 gridOrigin = map != null ? map.gridOrigin : Vector3.zero;
-
-        Vector3Int cell = ResolveGridPos(blockSize, gridOrigin);
-        Vector3 cellCenter = gridOrigin + new Vector3(
-            (cell.x + 0.5f) * blockSize,
-            (cell.y + 0.5f) * blockSize,
-            (cell.z + 0.5f) * blockSize);
-
-        if ((transform.position - cellCenter).sqrMagnitude > 0.0001f)
-        {
-            transform.position = cellCenter;
-        }
-    }
-#endif
 
 #if UNITY_EDITOR
     void OnDrawGizmos()
