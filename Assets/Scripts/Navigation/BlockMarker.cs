@@ -16,10 +16,19 @@ public class BlockMarker : MonoBehaviour
              "Dejar en None para bloques planos. Un solo cardinal: North, South, East u West.")]
     public BlockFace stairUpDirection = BlockFace.None;
 
-    [Header("Override de posición en grilla")]
-    [Tooltip("Si está marcado, usa overrideGridPos en vez de inferir desde transform.position.")]
-    public bool useOverridePos = false;
-    public Vector3Int overrideGridPos;
+    [Header("Snap automático al grid")]
+    [Tooltip("En modo edición: al mover el cubo en la escena, se snapea automáticamente al centro de la celda más cercana. " +
+             "No afecta en runtime (solo se ejecuta cuando no estás en Play).")]
+    public bool snapToGridInEditor = true;
+
+    [Header("Bloque dinámico (runtime)")]
+    [Tooltip("Si está marcado, este bloque se registra solo en OnEnable y actualiza su celda cuando se mueve. " +
+             "Útil para plataformas móviles, puertas que se desplazan, bloques empujables por el jugador. " +
+             "Los markers con dynamic = false los registra el GridBaker al iniciar la escena.")]
+    public bool dynamic = false;
+
+    [Tooltip("Solo si dynamic = true. Distancia mínima que tiene que moverse el transform antes de re-evaluar la celda.")]
+    public float dynamicMoveThreshold = 0.1f;
 
     [Header("Gizmos")]
     public bool drawGizmos = true;
@@ -29,15 +38,143 @@ public class BlockMarker : MonoBehaviour
     [HideInInspector] public Vector3Int cachedGridPos;
     [HideInInspector] public float cachedBlockSize = 1f;
 
+    // Estado dinámico en runtime.
+    Vector3Int registeredCell;
+    bool isRegistered;
+    Vector3 lastSampledPos;
+
     public Vector3Int ResolveGridPos(float blockSize, Vector3 gridOrigin)
     {
-        if (useOverridePos) return overrideGridPos;
         Vector3 local = (transform.position - gridOrigin) / blockSize;
         return new Vector3Int(
             Mathf.FloorToInt(local.x),
             Mathf.FloorToInt(local.y),
             Mathf.FloorToInt(local.z));
     }
+
+    // ---------- Ciclo de vida en runtime para bloques dinámicos ----------
+
+    void OnEnable()
+    {
+        if (!Application.isPlaying) return;
+        if (!dynamic) return;          // estáticos los maneja el GridBaker
+        RegisterDynamicInGrid();
+    }
+
+    void OnDisable()
+    {
+        if (!Application.isPlaying) return;
+        if (!dynamic) return;
+        UnregisterDynamicFromGrid();
+    }
+
+    void RegisterDynamicInGrid()
+    {
+        if (isRegistered) return;
+        GridMap map = GridMap.Instance;
+        if (map == null) return;
+
+        Vector3Int cell = ResolveGridPos(map.blockSize, map.gridOrigin);
+        if (map.HasBlock(cell))
+        {
+            Debug.LogWarning($"[BlockMarker] '{name}' no se registra en celda {cell}: ya existe otro bloque ahí.", this);
+            return;
+        }
+
+        Block b = new Block(cell, openFaces, isWalkable, moveCost)
+        {
+            sourceObject = gameObject,
+            stairUpDirection = stairUpDirection
+        };
+        map.AddBlock(b);
+
+        registeredCell = cell;
+        cachedGridPos = cell;
+        cachedBlockSize = map.blockSize;
+        lastSampledPos = transform.position;
+        isRegistered = true;
+    }
+
+    void UnregisterDynamicFromGrid()
+    {
+        if (!isRegistered) return;
+        GridMap.Instance?.RemoveBlock(registeredCell);
+        isRegistered = false;
+    }
+
+    void UpdateDynamicCellIfMoved()
+    {
+        if (!isRegistered) { RegisterDynamicInGrid(); return; }
+        if ((transform.position - lastSampledPos).sqrMagnitude < dynamicMoveThreshold * dynamicMoveThreshold) return;
+
+        GridMap map = GridMap.Instance;
+        if (map == null) return;
+
+        Vector3Int newCell = ResolveGridPos(map.blockSize, map.gridOrigin);
+        if (newCell != registeredCell)
+        {
+            // Reutilizamos el Block existente (no perdemos su sourceObject ni isOccupiedOnTop)
+            Block existing = map.GetBlock(registeredCell);
+            if (existing == null)
+            {
+                isRegistered = false;
+                RegisterDynamicInGrid();
+                return;
+            }
+
+            // Si la nueva celda ya tiene otro bloque, no movemos lógicamente — quedamos "fuera del grid"
+            // hasta que se libere. La pathfinding no contará con este bloque mientras tanto.
+            if (map.HasBlock(newCell))
+            {
+                map.RemoveBlock(registeredCell);
+                isRegistered = false;
+                lastSampledPos = transform.position;
+                return;
+            }
+
+            map.RemoveBlock(registeredCell);
+            existing.gridPos = newCell;
+            map.AddBlock(existing);
+            registeredCell = newCell;
+            cachedGridPos = newCell;
+        }
+        lastSampledPos = transform.position;
+    }
+
+    // ---------- Update: snap en editor + tracking dinámico en runtime ----------
+
+    void Update()
+    {
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            if (snapToGridInEditor) SnapToGridCenter();
+            return;
+        }
+#endif
+        // Runtime
+        if (dynamic) UpdateDynamicCellIfMoved();
+    }
+
+#if UNITY_EDITOR
+    void SnapToGridCenter()
+    {
+        GridMap map = GridMap.Instance;
+        float blockSize = map != null ? map.blockSize : 1f;
+        Vector3 gridOrigin = map != null ? map.gridOrigin : Vector3.zero;
+
+        Vector3Int cell = ResolveGridPos(blockSize, gridOrigin);
+        Vector3 cellCenter = gridOrigin + new Vector3(
+            (cell.x + 0.5f) * blockSize,
+            (cell.y + 0.5f) * blockSize,
+            (cell.z + 0.5f) * blockSize);
+
+        if ((transform.position - cellCenter).sqrMagnitude > 0.0001f)
+        {
+            transform.position = cellCenter;
+        }
+    }
+#endif
 
 #if UNITY_EDITOR
     void OnDrawGizmos()

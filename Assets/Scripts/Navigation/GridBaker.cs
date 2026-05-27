@@ -79,6 +79,9 @@ public class GridBaker : MonoBehaviour
 
             if (region.HasValue && !region.Value.Contains(m.transform.position)) continue;
 
+            // Los bloques dinámicos se registran solos en OnEnable. El baker los ignora para evitar doble registro.
+            if (m.dynamic) continue;
+
             Vector3Int pos = m.ResolveGridPos(gridMap.blockSize, gridMap.gridOrigin);
 
             if (gridMap.HasBlock(pos))
