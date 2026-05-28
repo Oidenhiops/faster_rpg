@@ -172,21 +172,30 @@ public class GridMap : MonoBehaviour
             int faceIdx = (int)i + 2; // los horizontales en FaceOrder son índices 2..5: North,South,East,West
             Vector3Int dOffset = BlockFaceExtensions.NeighborOffsets[faceIdx];
 
-            // Diagonal arriba: pos + D + Up. Requiere stairUp == D en cualquiera de los dos extremos.
-            TryAddStairEdge(pos, dOffset + Vector3Int.up, dir, current);
+            // Diagonal arriba: pos + D + Up. Movimiento cardinal = D. Stair debe apuntar hacia D.
+            TryAddStairEdge(pos, dOffset + Vector3Int.up, dir, dir, current);
 
-            // Diagonal abajo: pos + D + Down. Requiere stairUp == opposite(D) en cualquiera de los dos extremos.
-            TryAddStairEdge(pos, dOffset + Vector3Int.down, dir.Opposite(), current);
+            // Diagonal abajo: pos + D + Down. Movimiento cardinal = D. Stair debe apuntar hacia opposite(D).
+            TryAddStairEdge(pos, dOffset + Vector3Int.down, dir, dir.Opposite(), current);
         }
 
         return _neighborBuffer;
     }
 
-    void TryAddStairEdge(Vector3Int pos, Vector3Int totalOffset, BlockFace requiredStairDir, Block current)
+    // cardinalDir   = dirección horizontal del movimiento (lo que la openFaces necesita permitir)
+    // requiredStairDir = dirección hacia donde debe apuntar la escalera para que la conexión exista
+    void TryAddStairEdge(Vector3Int pos, Vector3Int totalOffset, BlockFace cardinalDir, BlockFace requiredStairDir, Block current)
     {
         Vector3Int target = pos + totalOffset;
         if (!blocks.TryGetValue(target, out Block neighbor)) return;
         if (!IsTraversable(target)) return;
+
+        // openFaces bidireccional, igual que las aristas cardinales:
+        //   - salgo de current por la cara cardinalDir
+        //   - entro a neighbor por la cara opuesta
+        // Esto deja cerrar pasamanos/muros en escaleras vía openFaces, sin lógica extra.
+        if (!current.openFaces.HasFace(cardinalDir)) return;
+        if (!neighbor.openFaces.HasFace(cardinalDir.Opposite())) return;
 
         bool valid = current.stairUpDirection == requiredStairDir
                   || neighbor.stairUpDirection == requiredStairDir;
