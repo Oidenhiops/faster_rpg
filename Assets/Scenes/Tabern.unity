@@ -173,7 +173,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &3209303
@@ -308,7 +307,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &28211763
@@ -443,7 +441,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &77764396
@@ -578,7 +575,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &83724565
@@ -713,7 +709,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &88681995
@@ -848,7 +843,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &90256865
@@ -983,7 +977,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &113627642
@@ -1118,7 +1111,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &133985092
@@ -1253,7 +1245,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &177467730
@@ -1388,7 +1379,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &274857252
@@ -1523,7 +1513,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &291393022
@@ -1658,7 +1647,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &294689791
@@ -1793,7 +1781,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &357942617
@@ -1928,7 +1915,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &364806803
@@ -2063,7 +2049,6 @@ MonoBehaviour:
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &367686768
@@ -2198,7 +2183,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &370471227
@@ -2333,7 +2317,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &393717084
@@ -2468,7 +2451,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &462061908
@@ -2578,12 +2560,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1544768251}
-  - {fileID: 796268723}
-  - {fileID: 782642119}
-  - {fileID: 996264195}
-  - {fileID: 1701583616}
-  - {fileID: 2095506591}
+  - {fileID: 962967544}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &476656127
@@ -2640,7 +2617,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &476656130
@@ -2775,7 +2751,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &525326836
@@ -2910,7 +2885,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &546398668
@@ -3182,7 +3156,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &635957486
@@ -3317,7 +3290,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &673502160
@@ -3564,7 +3536,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &729055785
@@ -3699,7 +3670,6 @@ MonoBehaviour:
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &737182777
@@ -3834,7 +3804,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &754344453
@@ -4096,7 +4065,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &776017517
@@ -4177,134 +4145,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 776017514}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &782642118
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 782642119}
-  - component: {fileID: 782642123}
-  - component: {fileID: 782642122}
-  - component: {fileID: 782642121}
-  - component: {fileID: 782642120}
-  m_Layer: 0
-  m_Name: Cube (8)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &782642119
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782642118}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2, y: 1, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 468178489}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &782642120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782642118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734a34eea8b02fa4480f9c622a668932, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridOccupant
-  dynamic: 1
-  moveThreshold: 0.1
-  footOffset: {x: 0, y: -0.05, z: 0}
---- !u!65 &782642121
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782642118}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &782642122
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782642118}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &782642123
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782642118}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &783187187
 GameObject:
   m_ObjectHideFlags: 0
@@ -4359,7 +4199,6 @@ MonoBehaviour:
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &783187190
@@ -4494,7 +4333,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &783629093
@@ -4575,134 +4413,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 783629090}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &796268722
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 796268723}
-  - component: {fileID: 796268727}
-  - component: {fileID: 796268726}
-  - component: {fileID: 796268725}
-  - component: {fileID: 796268724}
-  m_Layer: 0
-  m_Name: Cube (7)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &796268723
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796268722}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2, y: 1, z: 2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 468178489}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &796268724
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796268722}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734a34eea8b02fa4480f9c622a668932, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridOccupant
-  dynamic: 1
-  moveThreshold: 0.1
-  footOffset: {x: 0, y: -0.05, z: 0}
---- !u!65 &796268725
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796268722}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &796268726
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796268722}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &796268727
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796268722}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &820737169
 GameObject:
   m_ObjectHideFlags: 0
@@ -4757,7 +4467,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &820737172
@@ -4885,14 +4594,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 31
+  openFaces: 12
   isWalkable: 1
-  moveCost: 2
+  moveCost: 1
   stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &822761742
@@ -5027,7 +4735,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &868974067
@@ -5162,7 +4869,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &874466528
@@ -5297,7 +5003,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &876113605
@@ -5432,7 +5137,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &884916616
@@ -5625,7 +5329,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &996264194
+--- !u!1 &962967543
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5633,40 +5337,40 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 996264195}
-  - component: {fileID: 996264199}
-  - component: {fileID: 996264198}
-  - component: {fileID: 996264197}
-  - component: {fileID: 996264196}
+  - component: {fileID: 962967544}
+  - component: {fileID: 962967548}
+  - component: {fileID: 962967547}
+  - component: {fileID: 962967546}
+  - component: {fileID: 962967545}
   m_Layer: 0
-  m_Name: Cube (6)
+  m_Name: Ocuppant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &996264195
+--- !u!4 &962967544
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 996264194}
+  m_GameObject: {fileID: 962967543}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3, y: 1, z: 2}
+  m_LocalPosition: {x: 3, y: 1, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 468178489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &996264196
+--- !u!114 &962967545
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 996264194}
+  m_GameObject: {fileID: 962967543}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 734a34eea8b02fa4480f9c622a668932, type: 3}
@@ -5674,14 +5378,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GridOccupant
   dynamic: 1
   moveThreshold: 0.1
-  footOffset: {x: 0, y: -0.05, z: 0}
---- !u!65 &996264197
+  footOffset: {x: 0, y: -0.55, z: 0}
+  logRegistration: 1
+--- !u!65 &962967546
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 996264194}
+  m_GameObject: {fileID: 962967543}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -5696,13 +5401,13 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &996264198
+--- !u!23 &962967547
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 996264194}
+  m_GameObject: {fileID: 962967543}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -5745,13 +5450,13 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &996264199
+--- !u!33 &962967548
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 996264194}
+  m_GameObject: {fileID: 962967543}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1066706463
 GameObject:
@@ -5807,7 +5512,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1066706466
@@ -5942,7 +5646,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1076379785
@@ -6157,7 +5860,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1106610803
@@ -6292,7 +5994,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1121279324
@@ -6427,7 +6128,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1138263963
@@ -6562,7 +6262,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1151575803
@@ -6697,7 +6396,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1156732373
@@ -6832,7 +6530,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1170080490
@@ -6967,7 +6664,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1181254402
@@ -7102,7 +6798,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1183701682
@@ -7237,7 +6932,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1285476080
@@ -7372,7 +7066,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1357069168
@@ -7507,7 +7200,6 @@ MonoBehaviour:
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1521413194
@@ -7588,134 +7280,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521413191}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1544768250
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1544768251}
-  - component: {fileID: 1544768255}
-  - component: {fileID: 1544768254}
-  - component: {fileID: 1544768253}
-  - component: {fileID: 1544768252}
-  m_Layer: 0
-  m_Name: Cube (5)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1544768251
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544768250}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3, y: 1, z: 2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 468178489}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1544768252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544768250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734a34eea8b02fa4480f9c622a668932, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridOccupant
-  dynamic: 1
-  moveThreshold: 0.1
-  footOffset: {x: 0, y: -0.05, z: 0}
---- !u!65 &1544768253
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544768250}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1544768254
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544768250}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1544768255
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544768250}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1556319005
 GameObject:
   m_ObjectHideFlags: 0
@@ -7770,7 +7334,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1556319008
@@ -7865,7 +7428,7 @@ GameObject:
   - component: {fileID: 1557127738}
   - component: {fileID: 1557127737}
   m_Layer: 0
-  m_Name: Cube (20)
+  m_Name: BlockMarker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7905,7 +7468,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1557127738
@@ -8040,7 +7602,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1578980400
@@ -8175,7 +7736,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1586812260
@@ -8310,7 +7870,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1591679362
@@ -8445,7 +8004,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1635002073
@@ -8617,7 +8175,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1679334462
@@ -8698,134 +8255,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1679334459}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1701583615
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1701583616}
-  - component: {fileID: 1701583620}
-  - component: {fileID: 1701583619}
-  - component: {fileID: 1701583618}
-  - component: {fileID: 1701583617}
-  m_Layer: 0
-  m_Name: Cube (9)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1701583616
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701583615}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2, y: 1, z: 2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 468178489}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1701583617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701583615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734a34eea8b02fa4480f9c622a668932, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridOccupant
-  dynamic: 1
-  moveThreshold: 0.1
-  footOffset: {x: 0, y: -0.05, z: 0}
---- !u!65 &1701583618
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701583615}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1701583619
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701583615}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1701583620
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701583615}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1707297329
 GameObject:
   m_ObjectHideFlags: 0
@@ -8880,7 +8309,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1707297332
@@ -9015,7 +8443,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1743791062
@@ -9195,7 +8622,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1754982588
@@ -9330,7 +8756,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1813790846
@@ -9465,7 +8890,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1834757333
@@ -9600,7 +9024,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1844806117
@@ -9735,7 +9158,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1884891253
@@ -9870,7 +9292,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1924732222
@@ -10005,7 +9426,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1961094794
@@ -10140,7 +9560,6 @@ MonoBehaviour:
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &1994668032
@@ -10275,7 +9694,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &2015263625
@@ -10410,7 +9828,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &2018218103
@@ -10545,7 +9962,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &2024778355
@@ -10796,7 +10212,6 @@ MonoBehaviour:
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
-  gizmoFaceInset: 0.05
   cachedGridPos: {x: 0, y: 0, z: 0}
   cachedBlockSize: 1
 --- !u!65 &2090479101
@@ -10876,134 +10291,6 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2090479098}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &2095506590
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2095506591}
-  - component: {fileID: 2095506595}
-  - component: {fileID: 2095506594}
-  - component: {fileID: 2095506593}
-  - component: {fileID: 2095506592}
-  m_Layer: 0
-  m_Name: Cube (10)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2095506591
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095506590}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2, y: 1, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 468178489}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2095506592
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095506590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 734a34eea8b02fa4480f9c622a668932, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridOccupant
-  dynamic: 1
-  moveThreshold: 0.1
-  footOffset: {x: 0, y: -0.05, z: 0}
---- !u!65 &2095506593
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095506590}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &2095506594
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095506590}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &2095506595
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095506590}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

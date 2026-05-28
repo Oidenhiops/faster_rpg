@@ -4,7 +4,6 @@ using UnityEngine;
 // Construye el GridMap recorriendo los BlockMarker presentes en la escena.
 // No usa Physics: openFaces y demás se configuran manualmente en cada BlockMarker (o en sus prefabs).
 // La ocupación dinámica (cofres, items, NPCs) se maneja vía GridOccupant, no por overlap.
-[DefaultExecutionOrder(-100)]
 public class GridBaker : MonoBehaviour
 {
     [Header("Referencia al GridMap")]
