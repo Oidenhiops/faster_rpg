@@ -8,6 +8,7 @@ public class GridMap : MonoBehaviour
 
     public float blockSize = 1f;
     public Vector3 gridOrigin = Vector3.zero;
+    public bool requireHeadroom = true;
 
     Dictionary<Vector3Int, Block> blocks = new Dictionary<Vector3Int, Block>();
     Dictionary<Vector3Int, int> occupancyCount = new Dictionary<Vector3Int, int>();
@@ -50,7 +51,9 @@ public class GridMap : MonoBehaviour
     {
         if (!blocks.TryGetValue(pos, out Block b)) return false;
         if (!b.IsTraversable) return false;
-        return GetOccupancyCount(pos) == 0;
+        if (GetOccupancyCount(pos) > 0) return false;
+        if (requireHeadroom && blocks.ContainsKey(pos + Vector3Int.up)) return false;
+        return true;
     }
 
     public int GetOccupancyCount(Vector3Int pos)
