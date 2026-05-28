@@ -204,7 +204,8 @@ public class BlockMarker : MonoBehaviour
         Gizmos.color = isWalkable ? new Color(1f, 1f, 1f, 0.3f) : new Color(0.4f, 0.4f, 0.4f, 0.3f);
         Gizmos.DrawWireCube(center, Vector3.one * size);
 
-        // Si es escalera, dibuja la pendiente como línea amarilla diagonal y una flechita en la dirección de subida.
+        // Si es escalera, dibuja UNA sola flecha amarilla a 45° saliendo del centro del bloque
+        // hacia arriba en la dirección de subida. Incluye cabeza de flecha en el plano del slope.
         if (stairUpDirection != BlockFace.None)
         {
             int stairIdx = -1;
@@ -215,17 +216,26 @@ public class BlockMarker : MonoBehaviour
             if (stairIdx >= 0)
             {
                 Vector3 dir = BlockFaceExtensions.NeighborOffsets[stairIdx];
-                Vector3 backLow   = center - dir * (half * 0.9f) - Vector3.up * (half * 0.9f);
-                Vector3 frontHigh = center + dir * (half * 0.9f) + Vector3.up * (half * 0.9f);
-                Gizmos.color = new Color(1f, 0.9f, 0.1f, 0.95f);
+
+                // tiltedDir = vector unitario a 45° (horizontal + vertical) en la dirección de subida.
+                Vector3 tiltedDir = (dir + Vector3.up).normalized;
+
+                // Base hacia atrás-abajo, tip hacia adelante-arriba, ambos sobre la diagonal del bloque.
+                float reach = half * 0.85f;
+                Vector3 backLow   = center - tiltedDir * reach;
+                Vector3 frontHigh = center + tiltedDir * reach;
+
+                Gizmos.color = new Color(1f, 0.85f, 0.1f, 1f);
                 Gizmos.DrawLine(backLow, frontHigh);
-                // Flecha arriba del bloque indicando dirección de subida.
-                Vector3 arrowBase = center + Vector3.up * (half + 0.05f);
-                Vector3 arrowTip  = arrowBase + dir * (size * 0.4f);
-                Gizmos.DrawLine(arrowBase, arrowTip);
-                Vector3 perp = Vector3.Cross(dir, Vector3.up).normalized * (size * 0.1f);
-                Gizmos.DrawLine(arrowTip, arrowTip - dir * (size * 0.15f) + perp);
-                Gizmos.DrawLine(arrowTip, arrowTip - dir * (size * 0.15f) - perp);
+
+                // Cabeza de flecha en el plano vertical del slope.
+                // perpInSlopePlane es perpendicular a tiltedDir y vive en el mismo plano vertical (contiene dir y Up).
+                // Identidad: (dir + Up) · (dir - Up) = |dir|² - |Up|² = 0, así que (dir - Up) es perpendicular.
+                Vector3 perpInSlopePlane = (dir - Vector3.up).normalized;
+                float headLen = size * 0.18f;
+                Vector3 back = frontHigh - tiltedDir * headLen;
+                Gizmos.DrawLine(frontHigh, back + perpInSlopePlane * headLen * 0.6f);
+                Gizmos.DrawLine(frontHigh, back - perpInSlopePlane * headLen * 0.6f);
             }
         }
     }
