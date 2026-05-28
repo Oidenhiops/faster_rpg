@@ -26,7 +26,6 @@ public class BlockMarker : MonoBehaviour
 
     [Header("Gizmos")]
     public bool drawGizmos = true;
-    public float gizmoFaceInset = 0.05f;
 
     // El baker calcula esto al registrar el bloque; lo guardamos para que el gizmo lo use sin recalcular.
     [HideInInspector] public Vector3Int cachedGridPos;
@@ -164,27 +163,41 @@ public class BlockMarker : MonoBehaviour
         }
 
         float half = size * 0.5f;
-        float inset = gizmoFaceInset;
 
-        // Solo dibujamos las 4 caras horizontales (índices 2..5: N, S, E, W).
-        // Up/Down quedaron fuera de la navegación, así que mostrarlos sería engañoso.
+        // Dibujamos las direcciones transitables como flechas SOBRE la cara superior del bloque.
+        // Quedarse a 70% del borde evita solape con los gizmos del bloque vecino.
+        // Solo se dibujan las caras abiertas (verde) — la ausencia indica que está cerrada.
+        // Se muestra también una pequeña marca roja en el borde para caras cerradas, así no es ambiguo.
+        Vector3 topCenter = center + Vector3.up * (half + 0.01f); // +0.01 evita z-fighting con el mesh
+        float arrowReach = half * 0.7f;
+        float headSize   = half * 0.18f;
+
         for (int i = 2; i < BlockFaceExtensions.FaceOrder.Length; i++)
         {
             BlockFace face = BlockFaceExtensions.FaceOrder[i];
-            Vector3 offset = BlockFaceExtensions.NeighborOffsets[i];
-            Vector3 faceCenter = center + offset * (half - inset);
-
-            // Tamaño del quad de cara (perpendicular al offset).
-            Vector3 quadSize = new Vector3(size - inset * 2, size - inset * 2, size - inset * 2);
-            if (offset.x != 0) quadSize.x = 0.02f;
-            if (offset.y != 0) quadSize.y = 0.02f;
-            if (offset.z != 0) quadSize.z = 0.02f;
-
+            Vector3 dir = BlockFaceExtensions.NeighborOffsets[i];
             bool open = openFaces.HasFace(face);
-            Gizmos.color = open
-                ? new Color(0.2f, 1f, 0.2f, 0.35f)
-                : new Color(1f, 0.2f, 0.2f, 0.55f);
-            Gizmos.DrawCube(faceCenter, quadSize);
+
+            if (open)
+            {
+                Vector3 tip = topCenter + dir * arrowReach;
+                Gizmos.color = new Color(0.2f, 1f, 0.5f, 0.95f);
+                Gizmos.DrawLine(topCenter, tip);
+
+                // Cabeza de flecha: dos pequeñas líneas perpendiculares.
+                Vector3 perp = Vector3.Cross(dir, Vector3.up).normalized * headSize;
+                Vector3 back = tip - dir * headSize;
+                Gizmos.DrawLine(tip, back + perp);
+                Gizmos.DrawLine(tip, back - perp);
+            }
+            else
+            {
+                // Marca roja corta perpendicular a la dirección, en el borde, indicando "bloqueado".
+                Vector3 edge = topCenter + dir * arrowReach;
+                Vector3 perp = Vector3.Cross(dir, Vector3.up).normalized * (half * 0.22f);
+                Gizmos.color = new Color(1f, 0.25f, 0.25f, 0.9f);
+                Gizmos.DrawLine(edge - perp, edge + perp);
+            }
         }
 
         // Outline del bloque para ubicarlo visualmente.
