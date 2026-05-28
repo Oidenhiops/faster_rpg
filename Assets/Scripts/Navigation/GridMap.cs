@@ -1,21 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-200)]
 public class GridMap : MonoBehaviour
 {
     public static GridMap Instance { get; private set; }
 
-    // Tamaño en mundo de un bloque (lado del cubo). 1f = un cubo unitario por nodo.
     public float blockSize = 1f;
-
-    // Offset del origen de la grilla en coordenadas de mundo. La esquina inferior-suroeste-baja del bloque (0,0,0).
     public Vector3 gridOrigin = Vector3.zero;
 
-    // Almacenamiento principal. Lookup O(1) por Vector3Int.
     Dictionary<Vector3Int, Block> blocks = new Dictionary<Vector3Int, Block>();
-
-    // Contador de ocupantes por celda. Permite que múltiples objetos (cofre + item dropeado) cohabiten temporalmente
-    // sin que al quitar uno se "limpie" la ocupación del otro. La celda es transitable solo cuando el contador es 0.
     Dictionary<Vector3Int, int> occupancyCount = new Dictionary<Vector3Int, int>();
 
     public int BlockCount => blocks.Count;
@@ -36,8 +30,6 @@ public class GridMap : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    // ---------- API de consulta ----------
-
     public Block GetBlock(Vector3Int pos)
     {
         blocks.TryGetValue(pos, out Block b);
@@ -54,7 +46,6 @@ public class GridMap : MonoBehaviour
         return blocks.ContainsKey(pos);
     }
 
-    // Caminable AHORA: existe, es walkable, no tiene ningún ocupante registrado y su flag manual está limpio.
     public bool IsTraversable(Vector3Int pos)
     {
         if (!blocks.TryGetValue(pos, out Block b)) return false;
@@ -66,8 +57,6 @@ public class GridMap : MonoBehaviour
     {
         return occupancyCount.TryGetValue(pos, out int n) ? n : 0;
     }
-
-    // ---------- API de mutación ----------
 
     public void AddBlock(Block block)
     {
@@ -86,8 +75,6 @@ public class GridMap : MonoBehaviour
         occupancyCount.Clear();
     }
 
-    // Flag manual de ocupación (uso desde inspector o lógica de gameplay puntual).
-    // Para objetos dinámicos prefiere AddOccupancy/RemoveOccupancy del componente GridOccupant.
     public void MarkOccupiedOnTop(Vector3Int pos, bool value)
     {
         if (blocks.TryGetValue(pos, out Block b))
@@ -96,16 +83,12 @@ public class GridMap : MonoBehaviour
         }
     }
 
-    // ---------- API de ocupación por referencia ----------
-
-    // Suma 1 al contador. Si el bloque pasaba de 0 a 1 cae a no transitable.
     public void AddOccupancy(Vector3Int pos)
     {
         occupancyCount.TryGetValue(pos, out int n);
         occupancyCount[pos] = n + 1;
     }
 
-    // Resta 1 al contador. No baja de cero por seguridad.
     public void RemoveOccupancy(Vector3Int pos)
     {
         if (!occupancyCount.TryGetValue(pos, out int n)) return;
@@ -113,17 +96,11 @@ public class GridMap : MonoBehaviour
         else occupancyCount[pos] = n - 1;
     }
 
-    // ---------- Adyacencia ----------
-
-    // Devuelve los vecinos transitables desde `pos`, respetando la regla bidireccional:
-    // A->B es válido sólo si A.openFaces permite salir hacia B Y B.openFaces permite recibir desde A.
     public IEnumerable<Block> GetTraversableNeighbors(Vector3Int pos)
     {
         if (!blocks.ContainsKey(pos)) yield break;
         if (!IsTraversable(pos)) yield break;
 
-        // Reutiliza la lógica completa de aristas (cardinales + diagonales de escalera).
-        // Hacemos una copia local porque el buffer es estático y podría reusarse durante la iteración.
         var edges = GetNeighborEdges(pos);
         int count = edges.Count;
         Block[] copy = new Block[count];
@@ -131,11 +108,8 @@ public class GridMap : MonoBehaviour
         for (int e = 0; e < count; e++) yield return copy[e];
     }
 
-    // Variante que devuelve también el costo de la arista (útil para A*).
-    // Sin allocations: usa un buffer interno reusable.
     static readonly List<NeighborEdge> _neighborBuffer = new List<NeighborEdge>(10);
 
-    // 4 caras horizontales para iterar aristas diagonales de escalera.
     static readonly BlockFace[] _horizontalFaces = new BlockFace[] {
         BlockFace.North, BlockFace.South, BlockFace.East, BlockFace.West
     };
@@ -146,10 +120,6 @@ public class GridMap : MonoBehaviour
         if (!blocks.TryGetValue(pos, out Block current)) return _neighborBuffer;
         if (!IsTraversable(pos)) return _neighborBuffer;
 
-        // ---------- Aristas cardinales (4 direcciones horizontales) ----------
-        // Up y Down se omiten porque en un RPG 3D típico no se camina cardinalmente arriba/abajo
-        // (las transiciones verticales reales pasan por escaleras vía stairUpDirection).
-        // Los índices 2..5 de FaceOrder corresponden a North, South, East, West.
         for (int i = 2; i < BlockFaceExtensions.FaceOrder.Length; i++)
         {
             BlockFace face = BlockFaceExtensions.FaceOrder[i];
@@ -163,40 +133,25 @@ public class GridMap : MonoBehaviour
             _neighborBuffer.Add(new NeighborEdge { neighbor = neighbor, cost = neighbor.moveCost });
         }
 
-        // ---------- Aristas diagonales de escalera (horizontal + vertical) ----------
-        // Para cada dirección horizontal D, se considera un diagonal-arriba (pos + D + Up) y un diagonal-abajo (pos + D + Down).
-        // La conexión es válida si:
-        //   - el bloque actual es una escalera apuntando en la dirección correcta, O
-        //   - el bloque destino es una escalera apuntando hacia el actual.
-        // Cuesta 2 * moveCost para mantener la heurística Manhattan admisible (un paso diagonal cubre 2 unidades de Manhattan).
         for (int i = 0; i < _horizontalFaces.Length; i++)
         {
             BlockFace dir = _horizontalFaces[i];
-            int faceIdx = (int)i + 2; // los horizontales en FaceOrder son índices 2..5: North,South,East,West
+            int faceIdx = (int)i + 2;
             Vector3Int dOffset = BlockFaceExtensions.NeighborOffsets[faceIdx];
 
-            // Diagonal arriba: pos + D + Up. Movimiento cardinal = D. Stair debe apuntar hacia D.
             TryAddStairEdge(pos, dOffset + Vector3Int.up, dir, dir, current);
-
-            // Diagonal abajo: pos + D + Down. Movimiento cardinal = D. Stair debe apuntar hacia opposite(D).
             TryAddStairEdge(pos, dOffset + Vector3Int.down, dir, dir.Opposite(), current);
         }
 
         return _neighborBuffer;
     }
 
-    // cardinalDir   = dirección horizontal del movimiento (lo que la openFaces necesita permitir)
-    // requiredStairDir = dirección hacia donde debe apuntar la escalera para que la conexión exista
     void TryAddStairEdge(Vector3Int pos, Vector3Int totalOffset, BlockFace cardinalDir, BlockFace requiredStairDir, Block current)
     {
         Vector3Int target = pos + totalOffset;
         if (!blocks.TryGetValue(target, out Block neighbor)) return;
         if (!IsTraversable(target)) return;
 
-        // openFaces bidireccional, igual que las aristas cardinales:
-        //   - salgo de current por la cara cardinalDir
-        //   - entro a neighbor por la cara opuesta
-        // Esto deja cerrar pasamanos/muros en escaleras vía openFaces, sin lógica extra.
         if (!current.openFaces.HasFace(cardinalDir)) return;
         if (!neighbor.openFaces.HasFace(cardinalDir.Opposite())) return;
 
@@ -213,8 +168,6 @@ public class GridMap : MonoBehaviour
         public float cost;
     }
 
-    // ---------- Conversiones mundo <-> grilla ----------
-
     public Vector3Int WorldToGrid(Vector3 world)
     {
         Vector3 local = (world - gridOrigin) / blockSize;
@@ -224,7 +177,6 @@ public class GridMap : MonoBehaviour
             Mathf.FloorToInt(local.z));
     }
 
-    // Devuelve el centro del bloque en mundo (donde se ubica el "pie" del personaje).
     public Vector3 GridToWorld(Vector3Int grid)
     {
         return gridOrigin + new Vector3(

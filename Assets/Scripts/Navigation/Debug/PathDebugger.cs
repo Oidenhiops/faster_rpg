@@ -1,24 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Herramienta de depuración para visualizar pathfinding sin necesidad de un personaje.
-// Asigna un Transform de start y otro de end (cubos vacíos en la escena), y verás el path en gizmos.
-//
-// Modos:
-//   - autoRecompute = true: recomputa cada vez que se mueve un transform en el editor (Update).
-//   - autoRecompute = false: usa el botón "Recompute Now" del context menu.
 public class PathDebugger : MonoBehaviour
 {
-    [Header("Endpoints")]
     public Transform startPoint;
     public Transform endPoint;
 
-    [Header("Comportamiento")]
     public bool autoRecompute = true;
     public bool applySmoothing = true;
     [Range(1, 16)] public int smoothSamplesPerUnit = 4;
 
-    [Header("Visualización")]
     public bool showExploredNodes = true;
     public bool showPath = true;
     public float pathLineThickness = 0.05f;
@@ -28,7 +19,6 @@ public class PathDebugger : MonoBehaviour
     public Color startColor     = new Color(0.2f, 0.8f, 1f, 1f);
     public Color endColor       = new Color(1f, 0.3f, 0.8f, 1f);
 
-    [Header("Stats (read-only)")]
     [SerializeField] int statsNodesExplored;
     [SerializeField] int statsPathLength;
     [SerializeField] bool statsFound;

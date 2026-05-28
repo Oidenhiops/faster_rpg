@@ -1,23 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// A* sobre GridMap. Estático y sin estado externo: todos los buffers internos se reusan entre llamadas
-// para no presionar el GC cuando hay muchas peticiones por segundo (varios NPCs pidiendo path).
-//
-// Uso:
-//   List<Vector3> path = Pathfinder.FindPath(player.position, target.position);
-//   if (path != null) seguir waypoints;
-//
-// Devuelve null si no hay ruta posible. Devuelve una lista con un solo punto si start y end están en el mismo bloque.
 public static class Pathfinder
 {
-    // Buffers reusables. Se limpian al inicio de cada FindPath en vez de reasignarse.
     static readonly Dictionary<Vector3Int, float>      gScore   = new Dictionary<Vector3Int, float>(256);
     static readonly Dictionary<Vector3Int, Vector3Int> cameFrom = new Dictionary<Vector3Int, Vector3Int>(256);
     static readonly HashSet<Vector3Int>                closed   = new HashSet<Vector3Int>();
     static readonly BinaryHeap<Vector3Int>             open     = new BinaryHeap<Vector3Int>(256);
 
-    // Para que Pathfinder no instancie List<Vector3> nuevas si el caller le pasa una.
     static readonly List<Vector3> _pathScratch = new List<Vector3>(64);
 
     public struct Stats
@@ -27,8 +17,6 @@ public static class Pathfinder
         public bool found;
     }
     public static Stats LastStats { get; private set; }
-
-    // ---------- API pública ----------
 
     public static List<Vector3> FindPath(Vector3 startWorld, Vector3 endWorld, GridMap map = null, List<Vector3Int> exploredOut = null)
     {
@@ -52,7 +40,6 @@ public static class Pathfinder
 
         LastStats = default;
 
-        // Si el start o end no son transitables, intentamos snap al vecino transitable más cercano.
         if (!map.IsTraversable(start))
         {
             if (!TryFindNearestTraversable(start, map, out start)) return null;
@@ -90,7 +77,7 @@ public static class Pathfinder
                 return path;
             }
 
-            if (!closed.Add(current)) continue; // si ya estaba cerrado (entrada duplicada en heap), saltamos
+            if (!closed.Add(current)) continue;
             explored++;
             exploredOut?.Add(current);
 
@@ -118,10 +105,6 @@ public static class Pathfinder
         return null;
     }
 
-    // ---------- Internas ----------
-
-    // Manhattan 3D. Admisible y consistente para movimiento en 6 direcciones cardinales con costos >= 1.
-    // Si en el futuro permitimos diagonales, cambiar a octile 3D.
     static float Heuristic(Vector3Int a, Vector3Int b)
     {
         int dx = Mathf.Abs(a.x - b.x);
@@ -143,12 +126,9 @@ public static class Pathfinder
         }
 
         _pathScratch.Reverse();
-        // Copia a una lista nueva para devolverla al caller — el scratch se reusa en la próxima llamada.
         return new List<Vector3>(_pathScratch);
     }
 
-    // BFS muy corto alrededor del punto buscando un bloque transitable. Útil cuando el caller pasa una posición
-    // de mundo que cayó en un bloque ocupado (ej. el destino está dentro de un cofre).
     static readonly Queue<Vector3Int> _snapQueue = new Queue<Vector3Int>();
     static readonly HashSet<Vector3Int> _snapVisited = new HashSet<Vector3Int>();
     const int SnapMaxNodes = 32;
@@ -183,10 +163,6 @@ public static class Pathfinder
         return false;
     }
 
-    // ---------- Path smoothing por line-of-sight ----------
-
-    // Reduce el path eliminando waypoints intermedios cuando hay línea recta libre entre i e i+2 según el grid.
-    // No usa Physics: muestrea el segmento contra el GridMap. Devuelve un nuevo List<Vector3> con menos puntos.
     public static List<Vector3> SmoothPath(List<Vector3> path, GridMap map = null, int samplesPerUnit = 4)
     {
         if (path == null || path.Count <= 2) return path;
@@ -201,7 +177,6 @@ public static class Pathfinder
         {
             if (!HasGridLineOfSight(path[anchor], path[i], map, samplesPerUnit))
             {
-                // Cierra el segmento en el waypoint anterior.
                 result.Add(path[i - 1]);
                 anchor = i - 1;
             }

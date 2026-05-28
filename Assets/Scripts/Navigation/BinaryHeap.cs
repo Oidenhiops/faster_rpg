@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 
-// Min-heap binario genérico. Lo usa el Pathfinder como open set de A*.
-// Es independiente para que A* funcione en cualquier versión de Unity (PriorityQueue<,> solo existe en 2022.2+).
 public class BinaryHeap<T>
 {
     struct Node

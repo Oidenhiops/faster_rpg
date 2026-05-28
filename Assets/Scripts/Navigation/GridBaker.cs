@@ -1,22 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Construye el GridMap recorriendo los BlockMarker presentes en la escena.
-// No usa Physics: openFaces y demás se configuran manualmente en cada BlockMarker (o en sus prefabs).
-// La ocupación dinámica (cofres, items, NPCs) se maneja vía GridOccupant, no por overlap.
+[DefaultExecutionOrder(-100)]
 public class GridBaker : MonoBehaviour
 {
-    [Header("Referencia al GridMap")]
     public GridMap gridMap;
-
-    [Header("Cuándo bakear")]
     public bool bakeOnAwake = true;
     public bool bakeOnStart = false;
-
-    [Header("Opciones de scan")]
-    [Tooltip("Si está marcado, también incluye markers en GameObjects desactivados.")]
     public bool includeInactiveMarkers = false;
-    [Tooltip("Si está marcado, dos markers que caen en la misma celda solo conservan el primero (resto se ignora).")]
     public bool warnOnDuplicateCells = true;
 
     void Awake()
@@ -44,8 +35,6 @@ public class GridBaker : MonoBehaviour
         Debug.Log($"[GridBaker] Bake completo. {gridMap.BlockCount} bloques registrados.");
     }
 
-    // Rebake parcial: borra los bloques cuyos centros caen dentro de `region` y vuelve a registrar los markers de esa zona.
-    // Útil cuando se destruye un bloque o se abre una puerta sin tener que recorrer el mapa entero.
     public void Rebake(Bounds region)
     {
         if (gridMap == null) return;
@@ -61,8 +50,6 @@ public class GridBaker : MonoBehaviour
         BakeMarkers(region);
     }
 
-    // ---------- Internas ----------
-
     void BakeMarkers(Bounds? region)
     {
         BlockMarker[] markers = includeInactiveMarkers
@@ -73,12 +60,10 @@ public class GridBaker : MonoBehaviour
         {
             BlockMarker m = markers[i];
             if (m == null) continue;
-            // Cuando se usa FindObjectsOfTypeAll, también aparecen prefabs en disco. Filtramos por escena válida.
             if (!m.gameObject.scene.IsValid()) continue;
 
             if (region.HasValue && !region.Value.Contains(m.transform.position)) continue;
 
-            // Los bloques dinámicos se registran solos en OnEnable. El baker los ignora para evitar doble registro.
             if (m.dynamic) continue;
 
             Vector3Int pos = m.ResolveGridPos(gridMap.blockSize, gridMap.gridOrigin);

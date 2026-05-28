@@ -1,16 +1,12 @@
 using UnityEngine;
 
-// Dibuja el GridMap completo con gizmos en el editor. Color por estado del bloque.
-// Ponlo en el mismo GameObject que el GridMap (o en cualquier objeto de la escena).
 [ExecuteAlways]
 public class GridGizmoDrawer : MonoBehaviour
 {
-    [Header("Qué mostrar")]
     public bool drawBlocks = true;
     public bool drawConnections = false;
     public bool onlyWhenSelected = false;
 
-    [Header("Estilo")]
     [Range(0.05f, 1f)] public float blockScale = 0.85f;
     [Range(0f, 1f)]    public float alpha = 0.25f;
     public Color walkableColor   = new Color(0.3f, 1f, 0.5f, 1f);
@@ -65,7 +61,6 @@ public class GridGizmoDrawer : MonoBehaviour
                 Gizmos.color = connectionColor;
                 foreach (Block neighbor in map.GetTraversableNeighbors(pos))
                 {
-                    // Dibujamos solo una vez por par (cuando el hash del actual es menor).
                     if (PosHash(pos) < PosHash(neighbor.gridPos))
                     {
                         Gizmos.DrawLine(center, map.GridToWorld(neighbor.gridPos));
