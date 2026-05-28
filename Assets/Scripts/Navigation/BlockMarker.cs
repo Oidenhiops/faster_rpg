@@ -166,7 +166,9 @@ public class BlockMarker : MonoBehaviour
         float half = size * 0.5f;
         float inset = gizmoFaceInset;
 
-        for (int i = 0; i < BlockFaceExtensions.FaceOrder.Length; i++)
+        // Solo dibujamos las 4 caras horizontales (índices 2..5: N, S, E, W).
+        // Up/Down quedaron fuera de la navegación, así que mostrarlos sería engañoso.
+        for (int i = 2; i < BlockFaceExtensions.FaceOrder.Length; i++)
         {
             BlockFace face = BlockFaceExtensions.FaceOrder[i];
             Vector3 offset = BlockFaceExtensions.NeighborOffsets[i];

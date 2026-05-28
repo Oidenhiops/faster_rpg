@@ -146,8 +146,11 @@ public class GridMap : MonoBehaviour
         if (!blocks.TryGetValue(pos, out Block current)) return _neighborBuffer;
         if (!IsTraversable(pos)) return _neighborBuffer;
 
-        // ---------- Aristas cardinales (6 direcciones) ----------
-        for (int i = 0; i < BlockFaceExtensions.FaceOrder.Length; i++)
+        // ---------- Aristas cardinales (4 direcciones horizontales) ----------
+        // Up y Down se omiten porque en un RPG 3D típico no se camina cardinalmente arriba/abajo
+        // (las transiciones verticales reales pasan por escaleras vía stairUpDirection).
+        // Los índices 2..5 de FaceOrder corresponden a North, South, East, West.
+        for (int i = 2; i < BlockFaceExtensions.FaceOrder.Length; i++)
         {
             BlockFace face = BlockFaceExtensions.FaceOrder[i];
             if (!current.openFaces.HasFace(face)) continue;
