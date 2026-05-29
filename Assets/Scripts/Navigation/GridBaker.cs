@@ -77,8 +77,7 @@ public class GridBaker : MonoBehaviour
 
             Block b = new Block(pos, m.openFaces, m.isWalkable, m.moveCost)
             {
-                sourceObject = m.gameObject,
-                stairUpDirection = m.stairUpDirection
+                sourceObject = m.gameObject
             };
 
             gridMap.AddBlock(b);

@@ -6,7 +6,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
     public InputSystem_Actions inputActions;
     public Rigidbody rb;
     public Vector2 inputsDirection;
-    public override void HandleAwake()
+    public override void HandleInitialize()
     {
         inputActions = new InputSystem_Actions();
         inputActions.Player.Enable();

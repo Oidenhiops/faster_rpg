@@ -9,7 +9,6 @@ public class Block
     public bool isOccupiedOnTop;
     public bool isWalkable = true;
     public float moveCost = 1f;
-    public BlockFace stairUpDirection = BlockFace.None;
 
     [NonSerialized] public GameObject sourceObject;
 

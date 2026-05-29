@@ -56,6 +56,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
             await characterPlayerHud.InitializeInventory();
             await InitializeAnimations();
+            characterMovement.HandleInitialize();
             isInitialize = true;
         }
         catch (Exception ex)

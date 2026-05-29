@@ -6,8 +6,6 @@ public class BlockMarker : MonoBehaviour
     public bool isWalkable = true;
     [Min(0.01f)] public float moveCost = 1f;
 
-    public BlockFace stairUpDirection = BlockFace.None;
-
     public bool dynamic = false;
     public float dynamicMoveThreshold = 0.1f;
 
@@ -58,8 +56,7 @@ public class BlockMarker : MonoBehaviour
 
         Block b = new Block(cell, openFaces, isWalkable, moveCost)
         {
-            sourceObject = gameObject,
-            stairUpDirection = stairUpDirection
+            sourceObject = gameObject
         };
         map.AddBlock(b);
 
@@ -172,34 +169,6 @@ public class BlockMarker : MonoBehaviour
 
         Gizmos.color = isWalkable ? new Color(1f, 1f, 1f, 0.3f) : new Color(0.4f, 0.4f, 0.4f, 0.3f);
         Gizmos.DrawWireCube(center, Vector3.one * size);
-
-        if (stairUpDirection != BlockFace.None)
-        {
-            int stairIdx = -1;
-            for (int i = 0; i < BlockFaceExtensions.FaceOrder.Length; i++)
-            {
-                if (BlockFaceExtensions.FaceOrder[i] == stairUpDirection) { stairIdx = i; break; }
-            }
-            if (stairIdx >= 0)
-            {
-                Vector3 dir = BlockFaceExtensions.NeighborOffsets[stairIdx];
-
-                Vector3 tiltedDir = (dir + Vector3.up).normalized;
-
-                float reach = half * 0.85f;
-                Vector3 backLow   = center - tiltedDir * reach;
-                Vector3 frontHigh = center + tiltedDir * reach;
-
-                Gizmos.color = new Color(1f, 0.85f, 0.1f, 1f);
-                Gizmos.DrawLine(backLow, frontHigh);
-
-                Vector3 perpInSlopePlane = (dir - Vector3.up).normalized;
-                float headLen = size * 0.18f;
-                Vector3 back = frontHigh - tiltedDir * headLen;
-                Gizmos.DrawLine(frontHigh, back + perpInSlopePlane * headLen * 0.6f);
-                Gizmos.DrawLine(frontHigh, back - perpInSlopePlane * headLen * 0.6f);
-            }
-        }
     }
 #endif
 }

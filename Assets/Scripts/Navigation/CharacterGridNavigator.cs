@@ -5,6 +5,8 @@ using UnityEngine;
 [DefaultExecutionOrder(-40)]
 public class CharacterGridNavigator : MonoBehaviour
 {
+    public CharacterBase character;
+
     public bool smoothPath = true;
     [Range(1, 16)] public int smoothSamplesPerUnit = 4;
 
@@ -41,7 +43,8 @@ public class CharacterGridNavigator : MonoBehaviour
             return false;
         }
 
-        List<Vector3> path = Pathfinder.FindPath(transform.position, destination, map);
+        int jumpDistance = ResolveJumpDistance();
+        List<Vector3> path = Pathfinder.FindPath(transform.position, destination, jumpDistance, map);
         if (path == null)
         {
             ClearPath();
@@ -132,6 +135,16 @@ public class CharacterGridNavigator : MonoBehaviour
         float dx = a.x - b.x;
         float dz = a.z - b.z;
         return dx * dx + dz * dz;
+    }
+
+    int ResolveJumpDistance()
+    {
+        if (character == null) return 0;
+        if (character.charactersData == null || character.charactersData.Length == 0) return 0;
+        var data = character.charactersData[character.characterIndex];
+        if (data == null || data.statistics == null) return 0;
+        if (!data.statistics.TryGetValue(CharacterData.TypeStatistic.JumpDistance, out var stat)) return 0;
+        return stat.currentValue;
     }
 
 #if UNITY_EDITOR

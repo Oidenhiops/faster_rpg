@@ -99,70 +99,49 @@ public class GridMap : MonoBehaviour
         else occupancyCount[pos] = n - 1;
     }
 
-    public IEnumerable<Block> GetTraversableNeighbors(Vector3Int pos)
+    public IEnumerable<Block> GetTraversableNeighbors(Vector3Int pos, int jumpDistance = 0)
     {
         if (!blocks.ContainsKey(pos)) yield break;
         if (!IsTraversable(pos)) yield break;
 
-        var edges = GetNeighborEdges(pos);
+        var edges = GetNeighborEdges(pos, jumpDistance);
         int count = edges.Count;
         Block[] copy = new Block[count];
         for (int e = 0; e < count; e++) copy[e] = edges[e].neighbor;
         for (int e = 0; e < count; e++) yield return copy[e];
     }
 
-    static readonly List<NeighborEdge> _neighborBuffer = new List<NeighborEdge>(10);
+    static readonly List<NeighborEdge> _neighborBuffer = new List<NeighborEdge>(16);
 
-    static readonly BlockFace[] _horizontalFaces = new BlockFace[] {
-        BlockFace.North, BlockFace.South, BlockFace.East, BlockFace.West
-    };
-
-    public List<NeighborEdge> GetNeighborEdges(Vector3Int pos)
+    public List<NeighborEdge> GetNeighborEdges(Vector3Int pos, int jumpDistance = 0)
     {
         _neighborBuffer.Clear();
         if (!blocks.TryGetValue(pos, out Block current)) return _neighborBuffer;
         if (!IsTraversable(pos)) return _neighborBuffer;
+
+        if (jumpDistance < 0) jumpDistance = 0;
 
         for (int i = 2; i < BlockFaceExtensions.FaceOrder.Length; i++)
         {
             BlockFace face = BlockFaceExtensions.FaceOrder[i];
             if (!current.openFaces.HasFace(face)) continue;
 
-            Vector3Int neighborPos = pos + BlockFaceExtensions.NeighborOffsets[i];
-            if (!blocks.TryGetValue(neighborPos, out Block neighbor)) continue;
-            if (!IsTraversable(neighborPos)) continue;
-            if (!neighbor.openFaces.HasFace(face.Opposite())) continue;
+            Vector3Int dOffset = BlockFaceExtensions.NeighborOffsets[i];
+            BlockFace opposite = face.Opposite();
 
-            _neighborBuffer.Add(new NeighborEdge { neighbor = neighbor, cost = neighbor.moveCost });
-        }
+            for (int dy = -jumpDistance; dy <= jumpDistance; dy++)
+            {
+                Vector3Int neighborPos = pos + dOffset + Vector3Int.up * dy;
+                if (!blocks.TryGetValue(neighborPos, out Block neighbor)) continue;
+                if (!IsTraversable(neighborPos)) continue;
+                if (!neighbor.openFaces.HasFace(opposite)) continue;
 
-        for (int i = 0; i < _horizontalFaces.Length; i++)
-        {
-            BlockFace dir = _horizontalFaces[i];
-            int faceIdx = (int)i + 2;
-            Vector3Int dOffset = BlockFaceExtensions.NeighborOffsets[faceIdx];
-
-            TryAddStairEdge(pos, dOffset + Vector3Int.up, dir, dir, current);
-            TryAddStairEdge(pos, dOffset + Vector3Int.down, dir, dir.Opposite(), current);
+                float cost = neighbor.moveCost + Mathf.Abs(dy);
+                _neighborBuffer.Add(new NeighborEdge { neighbor = neighbor, cost = cost });
+            }
         }
 
         return _neighborBuffer;
-    }
-
-    void TryAddStairEdge(Vector3Int pos, Vector3Int totalOffset, BlockFace cardinalDir, BlockFace requiredStairDir, Block current)
-    {
-        Vector3Int target = pos + totalOffset;
-        if (!blocks.TryGetValue(target, out Block neighbor)) return;
-        if (!IsTraversable(target)) return;
-
-        if (!current.openFaces.HasFace(cardinalDir)) return;
-        if (!neighbor.openFaces.HasFace(cardinalDir.Opposite())) return;
-
-        bool valid = current.stairUpDirection == requiredStairDir
-                  || neighbor.stairUpDirection == requiredStairDir;
-        if (!valid) return;
-
-        _neighborBuffer.Add(new NeighborEdge { neighbor = neighbor, cost = 2f * neighbor.moveCost });
     }
 
     public struct NeighborEdge

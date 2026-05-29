@@ -169,7 +169,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -303,7 +302,6 @@ MonoBehaviour:
   openFaces: 59
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -437,7 +435,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -571,7 +568,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -705,7 +701,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -839,7 +834,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -973,7 +967,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1107,7 +1100,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1238,10 +1230,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 47
+  openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1375,7 +1366,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1509,7 +1499,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1643,7 +1632,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1777,7 +1765,6 @@ MonoBehaviour:
   openFaces: 59
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -1911,7 +1898,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2045,7 +2031,6 @@ MonoBehaviour:
   openFaces: 47
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2179,7 +2164,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2313,7 +2297,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2447,7 +2430,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2612,7 +2594,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2746,7 +2727,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -2880,7 +2860,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -3151,7 +3130,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -3285,7 +3263,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -3381,6 +3358,7 @@ GameObject:
   - component: {fileID: 697571153}
   - component: {fileID: 697571152}
   - component: {fileID: 697571151}
+  - component: {fileID: 697571155}
   m_Layer: 0
   m_Name: End
   m_TagString: Untagged
@@ -3475,12 +3453,80 @@ Transform:
   m_GameObject: {fileID: 697571150}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 1.5, z: 2.5}
+  m_LocalPosition: {x: 0.5, y: 4.5, z: -2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &697571155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697571150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7fedfccbcd84d478a8d0dc1a33f823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterBase
+  isInitialize: 0
+  isCharacterPlayer: 0
+  autoInit: 0
+  characterModel:
+    meshRenderers:
+      _serializedList: []
+    modelTransform: {fileID: 0}
+    leftHand: {fileID: 0}
+    rightHand: {fileID: 0}
+    originalMesh: {fileID: 0}
+  charactersData:
+  - level: 0
+    name: 
+    statistics:
+      _serializedList:
+      - Key: 14
+        Value:
+          baseValue: 0
+          aptitudeValue: 0
+          itemValue: 0
+          buffValue:
+            _serializedList: []
+          currentValue: 1
+          maxValue: 0
+    equipments:
+      _serializedList: []
+    consumables:
+      _serializedList: []
+    bag:
+      _serializedList: []
+    skills:
+      _serializedList: []
+    skins:
+      _serializedList: []
+  characterIndex: 0
+  currentFastItemIndex: 0
+  directionAnimation: {x: 0, y: 0, z: 0}
+  floatingTextPrefab: {fileID: 0}
+  dieEffectPrefab: {fileID: 0}
+  itempDroppedPrefab: {fileID: 0}
+  characterPlayerHud: {fileID: 0}
+  characterMovement: {fileID: 0}
+  characterAnimations: {fileID: 0}
+  dissolve: {fileID: 0}
+  statusEffects:
+    _serializedList: []
+  statusToRemove:
+    _serializedList: []
+  skillsCd:
+    _serializedList: []
+  skillsToRemove:
+    _serializedList: []
+  isDashing: 0
+  isJumping: 0
+  isInCanalization: 0
+  _cancelCanalization: 0
 --- !u!1 &729055782
 GameObject:
   m_ObjectHideFlags: 0
@@ -3531,7 +3577,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -3665,7 +3710,6 @@ MonoBehaviour:
   openFaces: 31
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -3799,7 +3843,6 @@ MonoBehaviour:
   openFaces: 59
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4060,7 +4103,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4194,7 +4236,6 @@ MonoBehaviour:
   openFaces: 47
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4328,7 +4369,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4462,7 +4502,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4596,7 +4635,6 @@ MonoBehaviour:
   openFaces: 12
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4730,7 +4768,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4864,7 +4901,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -4998,7 +5034,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -5132,7 +5167,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -5228,6 +5262,8 @@ GameObject:
   - component: {fileID: 959708017}
   - component: {fileID: 959708016}
   - component: {fileID: 959708015}
+  - component: {fileID: 959708019}
+  - component: {fileID: 959708020}
   m_Layer: 0
   m_Name: Start
   m_TagString: Untagged
@@ -5322,12 +5358,99 @@ Transform:
   m_GameObject: {fileID: 959708014}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 4.5, z: -2.5}
+  m_LocalPosition: {x: 0.5, y: 1.5, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &959708019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959708014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7fedfccbcd84d478a8d0dc1a33f823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterBase
+  isInitialize: 0
+  isCharacterPlayer: 0
+  autoInit: 0
+  characterModel:
+    meshRenderers:
+      _serializedList: []
+    modelTransform: {fileID: 0}
+    leftHand: {fileID: 0}
+    rightHand: {fileID: 0}
+    originalMesh: {fileID: 0}
+  charactersData:
+  - level: 0
+    name: 
+    statistics:
+      _serializedList:
+      - Key: 14
+        Value:
+          baseValue: 0
+          aptitudeValue: 0
+          itemValue: 0
+          buffValue:
+            _serializedList: []
+          currentValue: 1
+          maxValue: 0
+    equipments:
+      _serializedList: []
+    consumables:
+      _serializedList: []
+    bag:
+      _serializedList: []
+    skills:
+      _serializedList: []
+    skins:
+      _serializedList: []
+  characterIndex: 0
+  currentFastItemIndex: 0
+  directionAnimation: {x: 0, y: 0, z: 0}
+  floatingTextPrefab: {fileID: 0}
+  dieEffectPrefab: {fileID: 0}
+  itempDroppedPrefab: {fileID: 0}
+  characterPlayerHud: {fileID: 0}
+  characterMovement: {fileID: 0}
+  characterAnimations: {fileID: 0}
+  dissolve: {fileID: 0}
+  statusEffects:
+    _serializedList: []
+  statusToRemove:
+    _serializedList: []
+  skillsCd:
+    _serializedList: []
+  skillsToRemove:
+    _serializedList: []
+  isDashing: 0
+  isJumping: 0
+  isInCanalization: 0
+  _cancelCanalization: 0
+--- !u!114 &959708020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959708014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4962828e85f1648b4254fc98689d00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterGridNavigator
+  character: {fileID: 959708019}
+  smoothPath: 1
+  smoothSamplesPerUnit: 4
+  waypointThreshold: 0.15
+  ignoreYWhenAdvancing: 1
+  recomputeOnBlocked: 1
+  recomputeMinInterval: 0.25
 --- !u!1 &1066706463
 GameObject:
   m_ObjectHideFlags: 0
@@ -5378,7 +5501,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -5512,7 +5634,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -5726,7 +5847,6 @@ MonoBehaviour:
   openFaces: 59
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -5860,7 +5980,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -5994,7 +6113,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6128,7 +6246,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6262,7 +6379,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6396,7 +6512,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6530,7 +6645,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6664,7 +6778,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6798,7 +6911,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -6932,7 +7044,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7066,7 +7177,6 @@ MonoBehaviour:
   openFaces: 47
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7200,7 +7310,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7334,7 +7443,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7468,7 +7576,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7602,7 +7709,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7736,7 +7842,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -7870,7 +7975,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8041,7 +8145,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8175,7 +8278,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8309,7 +8411,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8488,7 +8589,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8622,7 +8722,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8756,7 +8855,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -8890,7 +8988,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9024,7 +9121,6 @@ MonoBehaviour:
   openFaces: 59
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9158,7 +9254,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9292,7 +9387,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9426,7 +9520,6 @@ MonoBehaviour:
   openFaces: 31
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 8
   dynamic: 1
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9560,7 +9653,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9694,7 +9786,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -9828,7 +9919,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 1
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1
@@ -10012,8 +10102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bce5557255d6b8c498a869c172f36373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PathDebugger
-  startPoint: {fileID: 959708018}
-  endPoint: {fileID: 697571154}
+  startCharacter: {fileID: 959708019}
+  endCharacter: {fileID: 697571155}
   autoRecompute: 1
   applySmoothing: 1
   smoothSamplesPerUnit: 4
@@ -10029,6 +10119,7 @@ MonoBehaviour:
   statsPathLength: 0
   statsFound: 0
   statsLastComputeMs: 0
+  statsJumpDistance: 0
 --- !u!1 &2090479098
 GameObject:
   m_ObjectHideFlags: 0
@@ -10079,7 +10170,6 @@ MonoBehaviour:
   openFaces: -1
   isWalkable: 1
   moveCost: 2
-  stairUpDirection: 0
   dynamic: 0
   dynamicMoveThreshold: 0.1
   drawGizmos: 1

@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class PathDebugger : MonoBehaviour
 {
-    public Transform startPoint;
-    public Transform endPoint;
+    public CharacterBase startCharacter;
+    public CharacterBase endCharacter;
 
     public bool autoRecompute = true;
     public bool applySmoothing = true;
@@ -23,30 +23,41 @@ public class PathDebugger : MonoBehaviour
     [SerializeField] int statsPathLength;
     [SerializeField] bool statsFound;
     [SerializeField] float statsLastComputeMs;
+    [SerializeField] int statsJumpDistance;
 
     List<Vector3> rawPath;
     List<Vector3> smoothedPath;
     readonly List<Vector3Int> explored = new List<Vector3Int>(256);
     Vector3 lastStart, lastEnd;
+    int lastJumpDistance;
 
     void Update()
     {
         if (!autoRecompute) return;
-        if (startPoint == null || endPoint == null) return;
-        if (startPoint.position == lastStart && endPoint.position == lastEnd) return;
+        if (startCharacter == null || endCharacter == null) return;
+
+        Vector3 startPos = startCharacter.transform.position;
+        Vector3 endPos = endCharacter.transform.position;
+        int jd = ResolveJumpDistance(startCharacter);
+
+        if (startPos == lastStart && endPos == lastEnd && jd == lastJumpDistance) return;
         Recompute();
     }
 
     [ContextMenu("Recompute Now")]
     public void Recompute()
     {
-        if (startPoint == null || endPoint == null) return;
+        if (startCharacter == null || endCharacter == null) return;
         GridMap map = GridMap.Instance;
         if (map == null) return;
 
+        Vector3 startPos = startCharacter.transform.position;
+        Vector3 endPos = endCharacter.transform.position;
+        int jumpDistance = ResolveJumpDistance(startCharacter);
+
         explored.Clear();
         float t0 = Time.realtimeSinceStartup;
-        rawPath = Pathfinder.FindPath(startPoint.position, endPoint.position, map, showExploredNodes ? explored : null);
+        rawPath = Pathfinder.FindPath(startPos, endPos, jumpDistance, map, showExploredNodes ? explored : null);
         statsLastComputeMs = (Time.realtimeSinceStartup - t0) * 1000f;
 
         smoothedPath = (applySmoothing && rawPath != null && rawPath.Count > 2)
@@ -56,9 +67,21 @@ public class PathDebugger : MonoBehaviour
         statsNodesExplored = Pathfinder.LastStats.nodesExplored;
         statsPathLength = Pathfinder.LastStats.pathLength;
         statsFound = Pathfinder.LastStats.found;
+        statsJumpDistance = jumpDistance;
 
-        lastStart = startPoint.position;
-        lastEnd = endPoint.position;
+        lastStart = startPos;
+        lastEnd = endPos;
+        lastJumpDistance = jumpDistance;
+    }
+
+    static int ResolveJumpDistance(CharacterBase c)
+    {
+        if (c == null) return 0;
+        if (c.charactersData == null || c.charactersData.Length == 0) return 0;
+        var data = c.charactersData[c.characterIndex];
+        if (data == null || data.statistics == null) return 0;
+        if (!data.statistics.TryGetValue(CharacterData.TypeStatistic.JumpDistance, out var stat)) return 0;
+        return stat.currentValue;
     }
 
 #if UNITY_EDITOR
@@ -67,20 +90,22 @@ public class PathDebugger : MonoBehaviour
         GridMap map = GridMap.Instance;
         if (map == null) return;
 
-        if (startPoint != null)
+        if (startCharacter != null)
         {
+            Vector3 startPos = startCharacter.transform.position;
             Gizmos.color = startColor;
-            Gizmos.DrawSphere(startPoint.position, 0.18f);
-            Vector3Int cell = map.WorldToGrid(startPoint.position);
+            Gizmos.DrawSphere(startPos, 0.18f);
+            Vector3Int cell = map.WorldToGrid(startPos);
             Gizmos.color = new Color(startColor.r, startColor.g, startColor.b, 0.25f);
             Gizmos.DrawCube(map.GridToWorld(cell), Vector3.one * map.blockSize * 0.9f);
         }
 
-        if (endPoint != null)
+        if (endCharacter != null)
         {
+            Vector3 endPos = endCharacter.transform.position;
             Gizmos.color = endColor;
-            Gizmos.DrawSphere(endPoint.position, 0.18f);
-            Vector3Int cell = map.WorldToGrid(endPoint.position);
+            Gizmos.DrawSphere(endPos, 0.18f);
+            Vector3Int cell = map.WorldToGrid(endPos);
             Gizmos.color = new Color(endColor.r, endColor.g, endColor.b, 0.25f);
             Gizmos.DrawCube(map.GridToWorld(cell), Vector3.one * map.blockSize * 0.9f);
         }

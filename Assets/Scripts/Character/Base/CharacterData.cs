@@ -184,7 +184,8 @@ public class CharacterData
         Crtv = 10,
         Crtd = 11,
         BagSpace = 12,
-        Cd = 13
+        Cd = 13,
+        JumpDistance = 14,
     }
     public enum TypeSkin
     {
