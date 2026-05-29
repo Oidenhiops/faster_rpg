@@ -227,6 +227,34 @@ public class GridMap : MonoBehaviour
                 if (!IsTraversable(neighborPos)) continue;
                 if (!neighbor.openFaces.HasFace(opposite)) continue;
 
+                if (dy > 0)
+                {
+                    bool blockedAbove = false;
+                    for (int up = 1; up <= dy + 1; up++)
+                    {
+                        if (blocks.ContainsKey(pos + Vector3Int.up * up)) { blockedAbove = true; break; }
+                    }
+                    if (blockedAbove) continue;
+
+                    bool wallInPath = false;
+                    for (int below = 1; below < dy; below++)
+                    {
+                        if (blocks.ContainsKey(pos + dOffset + Vector3Int.up * below)) { wallInPath = true; break; }
+                    }
+                    if (wallInPath) continue;
+
+                    if (blocks.ContainsKey(pos + dOffset + Vector3Int.up * (dy + 1))) continue;
+                }
+                else if (dy < 0)
+                {
+                    bool wallInFallPath = false;
+                    for (int up = 0; up > dy; up--)
+                    {
+                        if (blocks.ContainsKey(pos + dOffset + Vector3Int.up * up)) { wallInFallPath = true; break; }
+                    }
+                    if (wallInFallPath) continue;
+                }
+
                 float cost = neighbor.moveCost + Mathf.Abs(dy);
                 _neighborBuffer.Add(new NeighborEdge { neighbor = neighbor, cost = cost });
             }

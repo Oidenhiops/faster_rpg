@@ -175,7 +175,7 @@ public static class Pathfinder
         int anchor = 0;
         for (int i = 2; i < path.Count; i++)
         {
-            if (!HasGridLineOfSight(path[anchor], path[i], map, samplesPerUnit))
+            if (!CanDirectMove(path[anchor], path[i], map, samplesPerUnit))
             {
                 result.Add(path[i - 1]);
                 anchor = i - 1;
@@ -185,7 +185,7 @@ public static class Pathfinder
         return result;
     }
 
-    static bool HasGridLineOfSight(Vector3 a, Vector3 b, GridMap map, int samplesPerUnit)
+    static bool CanDirectMove(Vector3 a, Vector3 b, GridMap map, int samplesPerUnit)
     {
         float dist = Vector3.Distance(a, b);
         int samples = Mathf.Max(2, Mathf.CeilToInt(dist * samplesPerUnit));
@@ -196,6 +196,34 @@ public static class Pathfinder
             Vector3Int g = map.WorldToGrid(p);
             if (!map.IsTraversable(g)) return false;
         }
+
+        Vector3Int aCell = map.WorldToGrid(a);
+        Vector3Int bCell = map.WorldToGrid(b);
+        Vector3Int diff = bCell - aCell;
+
+        if (diff.x != 0 && diff.z != 0)
+        {
+            int sx = diff.x > 0 ? 1 : -1;
+            int sz = diff.z > 0 ? 1 : -1;
+
+            Vector3Int xCorner = aCell + new Vector3Int(sx, 0, 0);
+            Vector3Int zCorner = aCell + new Vector3Int(0, 0, sz);
+            if (!map.IsTraversable(xCorner)) return false;
+            if (!map.IsTraversable(zCorner)) return false;
+
+            Block aBlock = map.GetBlock(aCell);
+            Block bBlock = map.GetBlock(bCell);
+            if (aBlock == null || bBlock == null) return false;
+
+            BlockFace xDir = sx > 0 ? BlockFace.East : BlockFace.West;
+            BlockFace zDir = sz > 0 ? BlockFace.North : BlockFace.South;
+
+            if (!aBlock.openFaces.HasFace(xDir)) return false;
+            if (!aBlock.openFaces.HasFace(zDir)) return false;
+            if (!bBlock.openFaces.HasFace(xDir.Opposite())) return false;
+            if (!bBlock.openFaces.HasFace(zDir.Opposite())) return false;
+        }
+
         return true;
     }
 }
