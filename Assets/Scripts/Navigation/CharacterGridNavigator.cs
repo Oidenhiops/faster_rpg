@@ -121,6 +121,8 @@ public class CharacterGridNavigator : CharacterMovementBase
             path = Pathfinder.SmoothPath(path, map, smoothSamplesPerUnit);
         }
 
+        if (path.Count > 0) path[0] = transform.position;
+
         CurrentPath = path;
         CurrentWaypointIndex = 0;
         lastRecomputeTime = Time.time;

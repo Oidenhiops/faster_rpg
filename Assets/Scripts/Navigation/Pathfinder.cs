@@ -187,6 +187,12 @@ public static class Pathfinder
 
     static bool CanDirectMove(Vector3 a, Vector3 b, GridMap map, int samplesPerUnit)
     {
+        Vector3Int aCell = map.WorldToGrid(a);
+        Vector3Int bCell = map.WorldToGrid(b);
+        Vector3Int diff = bCell - aCell;
+
+        if (diff.y != 0) return false;
+
         float dist = Vector3.Distance(a, b);
         int samples = Mathf.Max(2, Mathf.CeilToInt(dist * samplesPerUnit));
         for (int s = 1; s < samples; s++)
@@ -196,10 +202,6 @@ public static class Pathfinder
             Vector3Int g = map.WorldToGrid(p);
             if (!map.IsTraversable(g)) return false;
         }
-
-        Vector3Int aCell = map.WorldToGrid(a);
-        Vector3Int bCell = map.WorldToGrid(b);
-        Vector3Int diff = bCell - aCell;
 
         if (diff.x != 0 && diff.z != 0)
         {

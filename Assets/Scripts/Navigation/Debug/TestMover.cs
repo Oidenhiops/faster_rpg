@@ -1,10 +1,22 @@
+using System.Collections;
 using UnityEngine;
 
 public class TestMover : MonoBehaviour
 {
     public CharacterGridNavigator navigator;
     public Transform testTarget;
-
+    void Start()
+    {
+        StartCoroutine(MoveToTargetWithDelay());
+    }
+    public IEnumerator MoveToTargetWithDelay()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.5f);
+            MoveToTarget();
+        }
+    }
     [NaughtyAttributes.Button]
     public void MoveToTarget()
     {

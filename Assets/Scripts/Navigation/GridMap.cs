@@ -248,11 +248,20 @@ public class GridMap : MonoBehaviour
                 else if (dy < 0)
                 {
                     bool wallInFallPath = false;
+
                     for (int up = 0; up > dy; up--)
                     {
                         if (blocks.ContainsKey(pos + dOffset + Vector3Int.up * up)) { wallInFallPath = true; break; }
                     }
                     if (wallInFallPath) continue;
+
+                    for (int up = -1; up > dy; up--)
+                    {
+                        if (blocks.ContainsKey(pos + Vector3Int.up * up)) { wallInFallPath = true; break; }
+                    }
+                    if (wallInFallPath) continue;
+
+                    if (blocks.ContainsKey(pos + dOffset + Vector3Int.up)) continue;
                 }
 
                 float cost = neighbor.moveCost + Mathf.Abs(dy);
