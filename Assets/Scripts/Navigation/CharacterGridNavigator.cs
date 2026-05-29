@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [DefaultExecutionOrder(-40)]
-public class CharacterGridNavigator : MonoBehaviour
+public class CharacterGridNavigator : CharacterMovementBase
 {
-    public CharacterBase character;
-
     public bool smoothPath = true;
     [Range(1, 16)] public int smoothSamplesPerUnit = 4;
 
@@ -30,6 +28,10 @@ public class CharacterGridNavigator : MonoBehaviour
     public event Action OnPathFailed;
 
     float lastRecomputeTime;
+
+    public override void HandleInitialize() { }
+
+    public override void HandleMovement() { }
 
     public bool MoveTo(Vector3 destination)
     {
@@ -139,9 +141,9 @@ public class CharacterGridNavigator : MonoBehaviour
 
     int ResolveJumpDistance()
     {
-        if (character == null) return 0;
-        if (character.charactersData == null || character.charactersData.Length == 0) return 0;
-        var data = character.charactersData[character.characterIndex];
+        if (characterBase == null) return 0;
+        if (characterBase.charactersData == null || characterBase.charactersData.Length == 0) return 0;
+        var data = characterBase.charactersData[characterBase.characterIndex];
         if (data == null || data.statistics == null) return 0;
         if (!data.statistics.TryGetValue(CharacterData.TypeStatistic.JumpDistance, out var stat)) return 0;
         return stat.currentValue;

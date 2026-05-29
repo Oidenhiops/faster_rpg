@@ -49,7 +49,7 @@ public class CharacterBase : MonoBehaviour
     }
     public void OnEnable()
     {
-        if (isInitialize) characterAnimations.MakeAnimation("Idle");
+        if (isInitialize) characterAnimations?.MakeAnimation("Idle");
         OnEnableHandle();
     }
     public void Awake()

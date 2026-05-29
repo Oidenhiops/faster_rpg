@@ -5261,9 +5261,11 @@ GameObject:
   - component: {fileID: 959708018}
   - component: {fileID: 959708017}
   - component: {fileID: 959708016}
-  - component: {fileID: 959708015}
+  - component: {fileID: 959708024}
+  - component: {fileID: 959708022}
   - component: {fileID: 959708019}
-  - component: {fileID: 959708020}
+  - component: {fileID: 959708021}
+  - component: {fileID: 959708023}
   m_Layer: 0
   m_Name: Start
   m_TagString: Untagged
@@ -5271,27 +5273,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!65 &959708015
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 959708014}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &959708016
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5376,7 +5357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f7fedfccbcd84d478a8d0dc1a33f823, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterBase
-  isInitialize: 0
+  isInitialize: 1
   isCharacterPlayer: 0
   autoInit: 0
   characterModel:
@@ -5391,6 +5372,15 @@ MonoBehaviour:
     name: 
     statistics:
       _serializedList:
+      - Key: 8
+        Value:
+          baseValue: 0
+          aptitudeValue: 0
+          itemValue: 0
+          buffValue:
+            _serializedList: []
+          currentValue: 1
+          maxValue: 0
       - Key: 14
         Value:
           baseValue: 0
@@ -5417,7 +5407,7 @@ MonoBehaviour:
   dieEffectPrefab: {fileID: 0}
   itempDroppedPrefab: {fileID: 0}
   characterPlayerHud: {fileID: 0}
-  characterMovement: {fileID: 0}
+  characterMovement: {fileID: 959708021}
   characterAnimations: {fileID: 0}
   dissolve: {fileID: 0}
   statusEffects:
@@ -5432,7 +5422,7 @@ MonoBehaviour:
   isJumping: 0
   isInCanalization: 0
   _cancelCanalization: 0
---- !u!114 &959708020
+--- !u!114 &959708021
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5441,16 +5431,81 @@ MonoBehaviour:
   m_GameObject: {fileID: 959708014}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e4962828e85f1648b4254fc98689d00, type: 3}
+  m_Script: {fileID: 11500000, guid: f8f9bea7628ccb944942763db541a68a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterGridNavigator
-  character: {fileID: 959708019}
+  m_EditorClassIdentifier: Assembly-CSharp::NPCGridMovement
+  characterBase: {fileID: 959708019}
   smoothPath: 1
   smoothSamplesPerUnit: 4
   waypointThreshold: 0.15
   ignoreYWhenAdvancing: 1
   recomputeOnBlocked: 1
   recomputeMinInterval: 0.25
+  rb: {fileID: 959708022}
+--- !u!54 &959708022
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959708014}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
+--- !u!114 &959708023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959708014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033981a7d7c50e24aa4b28e19d99aad7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestMover
+  navigator: {fileID: 959708021}
+  testTarget: {fileID: 697571154}
+--- !u!136 &959708024
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959708014}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1066706463
 GameObject:
   m_ObjectHideFlags: 0
