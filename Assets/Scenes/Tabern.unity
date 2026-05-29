@@ -5442,6 +5442,9 @@ MonoBehaviour:
   recomputeOnBlocked: 1
   recomputeMinInterval: 0.25
   rb: {fileID: 959708022}
+  jumpForce: 5
+  verticalReachThreshold: 0.3
+  jumpCooldown: 0.25
 --- !u!54 &959708022
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5490,7 +5493,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 959708014}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: dfc6b229e5259b749acb0bf0fdecbab8, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

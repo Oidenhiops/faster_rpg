@@ -141,12 +141,9 @@ public class CharacterGridNavigator : CharacterMovementBase
 
     int ResolveJumpDistance()
     {
-        if (characterBase == null) return 0;
-        if (characterBase.charactersData == null || characterBase.charactersData.Length == 0) return 0;
-        var data = characterBase.charactersData[characterBase.characterIndex];
-        if (data == null || data.statistics == null) return 0;
-        if (!data.statistics.TryGetValue(CharacterData.TypeStatistic.JumpDistance, out var stat)) return 0;
-        return stat.currentValue;
+        return characterBase.charactersData[characterBase.characterIndex]
+                            .statistics[CharacterData.TypeStatistic.JumpDistance]
+                            .currentValue;
     }
 
 #if UNITY_EDITOR
