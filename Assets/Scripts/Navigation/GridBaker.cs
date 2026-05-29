@@ -122,8 +122,7 @@ public class GridBaker : MonoBehaviour
 
             Block b = new Block(pos, m.openFaces, m.isWalkable, m.moveCost)
             {
-                sourceObject = m.gameObject,
-                blockType = m.blockType
+                sourceObject = m.gameObject
             };
 
             gridMap.AddBlock(b);

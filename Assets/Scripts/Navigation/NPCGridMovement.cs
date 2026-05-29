@@ -44,22 +44,7 @@ public class NPCGridMovement : CharacterGridNavigator
         velocity.x = dir.x * speed;
         velocity.z = dir.z * speed;
 
-        bool nextIsSlope = false;
-        bool currentIsSlope = false;
-        if (GridMap.Instance != null)
-        {
-            Vector3Int nextCell = GridMap.Instance.WorldToGrid(wp);
-            Block nextBlock = GridMap.Instance.GetBlock(nextCell);
-            if (nextBlock != null && nextBlock.blockType == BlockType.Slope) nextIsSlope = true;
-
-            Vector3Int currentCell = GridMap.Instance.WorldToGrid(transform.position);
-            Block currentBlock = GridMap.Instance.GetBlock(currentCell);
-            if (currentBlock != null && currentBlock.blockType == BlockType.Slope) currentIsSlope = true;
-        }
-
-        bool needsJump = !nextIsSlope
-                      && !currentIsSlope
-                      && wp.y - transform.position.y > verticalReachThreshold;
+        bool needsJump = wp.y - transform.position.y > verticalReachThreshold;
         bool canJump = characterBase != null
                     && characterBase.isGrounded
                     && !characterBase.isJumping
