@@ -1,6 +1,12 @@
 using System;
 using UnityEngine;
 
+public enum BlockType
+{
+    Block,
+    Slope
+}
+
 [Serializable]
 public class Block
 {
@@ -9,6 +15,7 @@ public class Block
     public bool isOccupiedOnTop;
     public bool isWalkable = true;
     public float moveCost = 1f;
+    public BlockType blockType = BlockType.Block;
 
     [NonSerialized] public GameObject sourceObject;
 

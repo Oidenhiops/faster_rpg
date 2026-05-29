@@ -5,6 +5,7 @@ public class BlockMarker : MonoBehaviour
     public BlockFace openFaces = BlockFace.All;
     public bool isWalkable = true;
     [Min(0.01f)] public float moveCost = 1f;
+    public BlockType blockType = BlockType.Block;
 
     public bool dynamic = false;
     public float dynamicMoveThreshold = 0.1f;
@@ -56,7 +57,8 @@ public class BlockMarker : MonoBehaviour
 
         Block b = new Block(cell, openFaces, isWalkable, moveCost)
         {
-            sourceObject = gameObject
+            sourceObject = gameObject,
+            blockType = blockType
         };
         map.AddBlock(b);
 
