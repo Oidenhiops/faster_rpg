@@ -18,6 +18,11 @@ public class BlockMarker : MonoBehaviour
     bool isRegistered;
     Vector3 lastSampledPos;
 
+    Block trackedBlock;
+    BlockFace lastOpenFaces;
+    bool lastIsWalkable;
+    float lastMoveCost;
+
     public Vector3Int ResolveGridPos(float blockSize, Vector3 gridOrigin)
     {
         Vector3 local = (transform.position - gridOrigin) / blockSize;
@@ -65,6 +70,36 @@ public class BlockMarker : MonoBehaviour
         cachedBlockSize = map.blockSize;
         lastSampledPos = transform.position;
         isRegistered = true;
+        TrackBlock(b);
+    }
+
+    public void TrackBlock(Block b)
+    {
+        trackedBlock = b;
+        lastOpenFaces = openFaces;
+        lastIsWalkable = isWalkable;
+        lastMoveCost = moveCost;
+    }
+
+    void SyncPropertiesIfChanged()
+    {
+        if (trackedBlock == null) return;
+
+        bool changed = openFaces != lastOpenFaces
+                    || isWalkable != lastIsWalkable
+                    || !Mathf.Approximately(moveCost, lastMoveCost);
+        if (!changed) return;
+
+        trackedBlock.openFaces = openFaces;
+        trackedBlock.isWalkable = isWalkable;
+        trackedBlock.moveCost = moveCost;
+
+        lastOpenFaces = openFaces;
+        lastIsWalkable = isWalkable;
+        lastMoveCost = moveCost;
+
+        GridMap map = GridMap.Instance;
+        if (map != null) map.MarkChunkDirty(map.CellToChunk(trackedBlock.gridPos));
     }
 
     void UnregisterDynamicFromGrid()
@@ -114,6 +149,7 @@ public class BlockMarker : MonoBehaviour
     {
         if (!Application.isPlaying) return;
         if (dynamic) UpdateDynamicCellIfMoved();
+        SyncPropertiesIfChanged();
     }
 
 #if UNITY_EDITOR

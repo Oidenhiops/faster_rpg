@@ -129,6 +129,7 @@ public class GridBaker : MonoBehaviour
 
             m.cachedGridPos = pos;
             m.cachedBlockSize = gridMap.blockSize;
+            m.TrackBlock(b);
         }
     }
 }
