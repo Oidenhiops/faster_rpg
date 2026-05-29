@@ -101,15 +101,15 @@ public class GridOccupant : MonoBehaviour
         {
             Vector3 local = (transform.position + footOffset - origin) / size;
             cell = new Vector3Int(
-                Mathf.FloorToInt(local.x),
-                Mathf.FloorToInt(local.y),
-                Mathf.FloorToInt(local.z));
+                Mathf.RoundToInt(local.x),
+                Mathf.RoundToInt(local.y),
+                Mathf.RoundToInt(local.z));
         }
 
         Vector3 center = origin + new Vector3(
-            (cell.x + 0.5f) * size,
-            (cell.y + 0.5f) * size,
-            (cell.z + 0.5f) * size);
+            cell.x * size,
+            cell.y * size,
+            cell.z * size);
 
         Gizmos.color = new Color(0.95f, 0.35f, 0.05f, 0.35f);
         Gizmos.DrawCube(center, Vector3.one * size * 0.95f);

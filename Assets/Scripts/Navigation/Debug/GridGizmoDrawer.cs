@@ -7,8 +7,8 @@ public class GridGizmoDrawer : MonoBehaviour
     public bool drawConnections = false;
     public bool onlyWhenSelected = false;
 
-    [Range(0.05f, 1f)] public float blockScale = 0.85f;
-    [Range(0f, 1f)]    public float alpha = 0.25f;
+    [Range(0.02f, 0.5f)] public float markerRadius = 0.12f;
+
     public Color walkableColor   = new Color(0.3f, 1f, 0.5f, 1f);
     public Color unwalkableColor = new Color(0.6f, 0.6f, 0.6f, 1f);
     public Color occupiedColor   = new Color(1f, 0.4f, 0.2f, 1f);
@@ -33,8 +33,6 @@ public class GridGizmoDrawer : MonoBehaviour
         if (map == null) return;
         if (map.BlockCount == 0) return;
 
-        float size = map.blockSize * blockScale;
-
         foreach (var kv in map.Blocks)
         {
             Vector3Int pos = kv.Key;
@@ -46,14 +44,10 @@ public class GridGizmoDrawer : MonoBehaviour
             else if (b.isOccupiedOnTop || map.GetOccupancyCount(pos) > 0) c = occupiedColor;
             else c = walkableColor;
 
-            c.a = alpha;
-
             if (drawBlocks)
             {
                 Gizmos.color = c;
-                Gizmos.DrawCube(center, Vector3.one * size);
-                Gizmos.color = new Color(c.r, c.g, c.b, Mathf.Min(1f, alpha * 2.5f));
-                Gizmos.DrawWireCube(center, Vector3.one * size);
+                Gizmos.DrawSphere(center, markerRadius);
             }
 
             if (drawConnections)

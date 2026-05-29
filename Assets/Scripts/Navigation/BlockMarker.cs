@@ -22,9 +22,9 @@ public class BlockMarker : MonoBehaviour
     {
         Vector3 local = (transform.position - gridOrigin) / blockSize;
         return new Vector3Int(
-            Mathf.FloorToInt(local.x),
-            Mathf.FloorToInt(local.y),
-            Mathf.FloorToInt(local.z));
+            Mathf.RoundToInt(local.x),
+            Mathf.RoundToInt(local.y),
+            Mathf.RoundToInt(local.z));
     }
 
     void OnEnable()
@@ -124,20 +124,8 @@ public class BlockMarker : MonoBehaviour
         float size = cachedBlockSize > 0f ? cachedBlockSize : 1f;
         if (GridMap.Instance != null) size = GridMap.Instance.blockSize;
 
-        Vector3 center;
-        if (GridMap.Instance != null)
-        {
-            Vector3Int gridPos = ResolveGridPos(size, GridMap.Instance.gridOrigin);
-            center = GridMap.Instance.GridToWorld(gridPos);
-        }
-        else
-        {
-            center = transform.position;
-        }
-
         float half = size * 0.5f;
-
-        Vector3 topCenter = center + Vector3.up * (half + 0.01f);
+        Vector3 topCenter = transform.position;
         float arrowReach = half * 0.7f;
         float headSize   = half * 0.18f;
 
@@ -166,9 +154,6 @@ public class BlockMarker : MonoBehaviour
                 Gizmos.DrawLine(edge - perp, edge + perp);
             }
         }
-
-        Gizmos.color = isWalkable ? new Color(1f, 1f, 1f, 0.3f) : new Color(0.4f, 0.4f, 0.4f, 0.3f);
-        Gizmos.DrawWireCube(center, Vector3.one * size);
     }
 #endif
 }

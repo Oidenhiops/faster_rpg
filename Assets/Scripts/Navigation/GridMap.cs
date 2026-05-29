@@ -134,12 +134,13 @@ public class GridMap : MonoBehaviour
 
     public Bounds ChunkWorldBounds(Vector3Int chunkCoord)
     {
-        Vector3 min = gridOrigin + new Vector3(
-            chunkCoord.x * chunkSize * blockSize,
-            chunkCoord.y * chunkSize * blockSize,
-            chunkCoord.z * chunkSize * blockSize);
-        Vector3 size = Vector3.one * (chunkSize * blockSize);
-        return new Bounds(min + size * 0.5f, size);
+        float chunkWorldSize = chunkSize * blockSize;
+        float halfBlock = blockSize * 0.5f;
+        Vector3 center = gridOrigin + new Vector3(
+            chunkCoord.x * chunkWorldSize + chunkWorldSize * 0.5f - halfBlock,
+            chunkCoord.y * chunkWorldSize + chunkWorldSize * 0.5f - halfBlock,
+            chunkCoord.z * chunkWorldSize + chunkWorldSize * 0.5f - halfBlock);
+        return new Bounds(center, Vector3.one * chunkWorldSize);
     }
 
     GridChunk GetOrCreateChunk(Vector3Int coord)
@@ -244,17 +245,17 @@ public class GridMap : MonoBehaviour
     {
         Vector3 local = (world - gridOrigin) / blockSize;
         return new Vector3Int(
-            Mathf.FloorToInt(local.x),
-            Mathf.FloorToInt(local.y),
-            Mathf.FloorToInt(local.z));
+            Mathf.RoundToInt(local.x),
+            Mathf.RoundToInt(local.y),
+            Mathf.RoundToInt(local.z));
     }
 
     public Vector3 GridToWorld(Vector3Int grid)
     {
         return gridOrigin + new Vector3(
-            (grid.x + 0.5f) * blockSize,
-            (grid.y + 0.5f) * blockSize,
-            (grid.z + 0.5f) * blockSize);
+            grid.x * blockSize,
+            grid.y * blockSize,
+            grid.z * blockSize);
     }
 }
 
