@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[DefaultExecutionOrder(-100)]
 public class GridBaker : MonoBehaviour
 {
     public GridMap gridMap;
@@ -9,6 +8,8 @@ public class GridBaker : MonoBehaviour
     public bool bakeOnStart = false;
     public bool includeInactiveMarkers = false;
     public bool warnOnDuplicateCells = true;
+
+    public bool autoRegenerateDirtyChunks = false;
 
     void Awake()
     {
@@ -19,6 +20,13 @@ public class GridBaker : MonoBehaviour
     void Start()
     {
         if (bakeOnStart) Bake();
+    }
+
+    void LateUpdate()
+    {
+        if (!autoRegenerateDirtyChunks) return;
+        if (gridMap == null || gridMap.DirtyChunkCount == 0) return;
+        RegenerateAllDirtyChunks();
     }
 
     [ContextMenu("Bake")]
@@ -32,7 +40,13 @@ public class GridBaker : MonoBehaviour
 
         gridMap.Clear();
         BakeMarkers(null);
-        Debug.Log($"[GridBaker] Bake completo. {gridMap.BlockCount} bloques registrados.");
+
+        foreach (var coord in new List<Vector3Int>(gridMap.DirtyChunks))
+        {
+            gridMap.MarkChunkClean(coord);
+        }
+
+        Debug.Log($"[GridBaker] Bake completo. {gridMap.BlockCount} bloques en {gridMap.ChunkCount} chunks.");
     }
 
     public void Rebake(Bounds region)
@@ -48,6 +62,37 @@ public class GridBaker : MonoBehaviour
         for (int i = 0; i < toRemove.Count; i++) gridMap.RemoveBlock(toRemove[i]);
 
         BakeMarkers(region);
+    }
+
+    [ContextMenu("Regenerate All Dirty Chunks")]
+    public void RegenerateAllDirtyChunks()
+    {
+        if (gridMap == null) return;
+        if (gridMap.DirtyChunkCount == 0) return;
+
+        var snapshot = new List<Vector3Int>(gridMap.DirtyChunks);
+        for (int i = 0; i < snapshot.Count; i++)
+        {
+            RegenerateChunk(snapshot[i]);
+        }
+    }
+
+    public void RegenerateChunk(Vector3Int chunkCoord)
+    {
+        if (gridMap == null) return;
+
+        Bounds bounds = gridMap.ChunkWorldBounds(chunkCoord);
+
+        List<Vector3Int> toRemove = new List<Vector3Int>();
+        foreach (var kv in gridMap.Blocks)
+        {
+            if (gridMap.CellToChunk(kv.Key) == chunkCoord) toRemove.Add(kv.Key);
+        }
+        for (int i = 0; i < toRemove.Count; i++) gridMap.RemoveBlock(toRemove[i]);
+
+        BakeMarkers(bounds);
+
+        gridMap.MarkChunkClean(chunkCoord);
     }
 
     void BakeMarkers(Bounds? region)

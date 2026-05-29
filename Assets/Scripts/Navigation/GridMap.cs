@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[DefaultExecutionOrder(-200)]
 public class GridMap : MonoBehaviour
 {
     public static GridMap Instance { get; private set; }
@@ -9,12 +9,22 @@ public class GridMap : MonoBehaviour
     public float blockSize = 1f;
     public Vector3 gridOrigin = Vector3.zero;
     public bool requireHeadroom = true;
+    [Min(1)] public int chunkSize = 16;
 
     Dictionary<Vector3Int, Block> blocks = new Dictionary<Vector3Int, Block>();
     Dictionary<Vector3Int, int> occupancyCount = new Dictionary<Vector3Int, int>();
+    Dictionary<Vector3Int, GridChunk> chunks = new Dictionary<Vector3Int, GridChunk>();
+    HashSet<Vector3Int> dirtyChunks = new HashSet<Vector3Int>();
 
     public int BlockCount => blocks.Count;
+    public int ChunkCount => chunks.Count;
+    public int DirtyChunkCount => dirtyChunks.Count;
     public IReadOnlyDictionary<Vector3Int, Block> Blocks => blocks;
+    public IReadOnlyDictionary<Vector3Int, GridChunk> Chunks => chunks;
+    public IEnumerable<Vector3Int> DirtyChunks => dirtyChunks;
+
+    public event Action<Vector3Int> OnChunkDirty;
+    public event Action<Vector3Int> OnChunkRegenerated;
 
     void Awake()
     {
@@ -65,17 +75,29 @@ public class GridMap : MonoBehaviour
     {
         if (block == null) return;
         blocks[block.gridPos] = block;
+        GetOrCreateChunk(CellToChunk(block.gridPos)).cells.Add(block.gridPos);
+        MarkChunkDirty(CellToChunk(block.gridPos));
     }
 
     public void RemoveBlock(Vector3Int pos)
     {
-        blocks.Remove(pos);
+        if (!blocks.Remove(pos)) return;
+        Vector3Int chunkCoord = CellToChunk(pos);
+        if (chunks.TryGetValue(chunkCoord, out GridChunk chunk))
+        {
+            chunk.cells.Remove(pos);
+            MarkChunkDirty(chunkCoord);
+            if (chunk.cells.Count == 0) chunks.Remove(chunkCoord);
+        }
     }
 
     public void Clear()
     {
         blocks.Clear();
         occupancyCount.Clear();
+        foreach (var c in chunks.Values) c.cells.Clear();
+        chunks.Clear();
+        dirtyChunks.Clear();
     }
 
     public void MarkOccupiedOnTop(Vector3Int pos, bool value)
@@ -83,6 +105,7 @@ public class GridMap : MonoBehaviour
         if (blocks.TryGetValue(pos, out Block b))
         {
             b.isOccupiedOnTop = value;
+            MarkChunkDirty(CellToChunk(pos));
         }
     }
 
@@ -90,6 +113,7 @@ public class GridMap : MonoBehaviour
     {
         occupancyCount.TryGetValue(pos, out int n);
         occupancyCount[pos] = n + 1;
+        MarkChunkDirty(CellToChunk(pos));
     }
 
     public void RemoveOccupancy(Vector3Int pos)
@@ -97,6 +121,72 @@ public class GridMap : MonoBehaviour
         if (!occupancyCount.TryGetValue(pos, out int n)) return;
         if (n <= 1) occupancyCount.Remove(pos);
         else occupancyCount[pos] = n - 1;
+        MarkChunkDirty(CellToChunk(pos));
+    }
+
+    public Vector3Int CellToChunk(Vector3Int cell)
+    {
+        return new Vector3Int(
+            FloorDiv(cell.x, chunkSize),
+            FloorDiv(cell.y, chunkSize),
+            FloorDiv(cell.z, chunkSize));
+    }
+
+    public Bounds ChunkWorldBounds(Vector3Int chunkCoord)
+    {
+        Vector3 min = gridOrigin + new Vector3(
+            chunkCoord.x * chunkSize * blockSize,
+            chunkCoord.y * chunkSize * blockSize,
+            chunkCoord.z * chunkSize * blockSize);
+        Vector3 size = Vector3.one * (chunkSize * blockSize);
+        return new Bounds(min + size * 0.5f, size);
+    }
+
+    GridChunk GetOrCreateChunk(Vector3Int coord)
+    {
+        if (!chunks.TryGetValue(coord, out GridChunk chunk))
+        {
+            chunk = new GridChunk { coord = coord };
+            chunks[coord] = chunk;
+        }
+        return chunk;
+    }
+
+    public bool IsChunkDirty(Vector3Int chunkCoord) => dirtyChunks.Contains(chunkCoord);
+
+    public void MarkChunkDirty(Vector3Int chunkCoord)
+    {
+        if (dirtyChunks.Add(chunkCoord))
+        {
+            if (chunks.TryGetValue(chunkCoord, out GridChunk chunk)) chunk.isDirty = true;
+            OnChunkDirty?.Invoke(chunkCoord);
+        }
+    }
+
+    public void MarkChunkClean(Vector3Int chunkCoord)
+    {
+        if (dirtyChunks.Remove(chunkCoord))
+        {
+            if (chunks.TryGetValue(chunkCoord, out GridChunk chunk)) chunk.isDirty = false;
+            OnChunkRegenerated?.Invoke(chunkCoord);
+        }
+    }
+
+    public IEnumerable<Block> GetChunkBlocks(Vector3Int chunkCoord)
+    {
+        if (!chunks.TryGetValue(chunkCoord, out GridChunk chunk)) yield break;
+        foreach (Vector3Int cell in chunk.cells)
+        {
+            if (blocks.TryGetValue(cell, out Block b)) yield return b;
+        }
+    }
+
+    static int FloorDiv(int a, int b)
+    {
+        int q = a / b;
+        int r = a % b;
+        if ((r != 0) && ((r < 0) != (b < 0))) q--;
+        return q;
     }
 
     public IEnumerable<Block> GetTraversableNeighbors(Vector3Int pos, int jumpDistance = 0)
@@ -166,4 +256,11 @@ public class GridMap : MonoBehaviour
             (grid.y + 0.5f) * blockSize,
             (grid.z + 0.5f) * blockSize);
     }
+}
+
+public class GridChunk
+{
+    public Vector3Int coord;
+    public HashSet<Vector3Int> cells = new HashSet<Vector3Int>();
+    public bool isDirty;
 }

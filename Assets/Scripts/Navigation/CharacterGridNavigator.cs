@@ -29,9 +29,71 @@ public class CharacterGridNavigator : CharacterMovementBase
 
     float lastRecomputeTime;
 
+    readonly HashSet<Vector3Int> _pathChunks = new HashSet<Vector3Int>();
+    bool _pendingRecompute;
+    bool _subscribed;
+
     public override void HandleInitialize() { }
 
     public override void HandleMovement() { }
+
+    void OnEnable()
+    {
+        TrySubscribe();
+    }
+
+    void Start()
+    {
+        if (!_subscribed) TrySubscribe();
+    }
+
+    void OnDisable()
+    {
+        TryUnsubscribe();
+    }
+
+    void Update()
+    {
+        if (_pendingRecompute && Time.time - lastRecomputeTime >= recomputeMinInterval)
+        {
+            _pendingRecompute = false;
+            MoveTo(FinalDestination);
+        }
+    }
+
+    void TrySubscribe()
+    {
+        if (_subscribed) return;
+        if (GridMap.Instance == null) return;
+        GridMap.Instance.OnChunkDirty += HandleChunkDirty;
+        _subscribed = true;
+    }
+
+    void TryUnsubscribe()
+    {
+        if (!_subscribed) return;
+        if (GridMap.Instance != null) GridMap.Instance.OnChunkDirty -= HandleChunkDirty;
+        _subscribed = false;
+    }
+
+    void HandleChunkDirty(Vector3Int chunkCoord)
+    {
+        if (!recomputeOnBlocked) return;
+        if (!HasPath || IsAtDestination) return;
+        if (_pathChunks.Contains(chunkCoord)) _pendingRecompute = true;
+    }
+
+    void RebuildPathChunks()
+    {
+        _pathChunks.Clear();
+        GridMap map = GridMap.Instance;
+        if (map == null) return;
+        for (int i = 0; i < CurrentPath.Count; i++)
+        {
+            Vector3Int cell = map.WorldToGrid(CurrentPath[i]);
+            _pathChunks.Add(map.CellToChunk(cell));
+        }
+    }
 
     public bool MoveTo(Vector3 destination)
     {
@@ -62,6 +124,7 @@ public class CharacterGridNavigator : CharacterMovementBase
         CurrentPath = path;
         CurrentWaypointIndex = 0;
         lastRecomputeTime = Time.time;
+        RebuildPathChunks();
         OnPathReady?.Invoke(path);
         return true;
     }
@@ -111,6 +174,7 @@ public class CharacterGridNavigator : CharacterMovementBase
     {
         CurrentPath.Clear();
         CurrentWaypointIndex = 0;
+        _pathChunks.Clear();
     }
 
     void MaybeRecomputeIfBlocked()
