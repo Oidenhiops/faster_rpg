@@ -24,12 +24,14 @@ public class PathDebugger : MonoBehaviour
     [SerializeField] bool statsFound;
     [SerializeField] float statsLastComputeMs;
     [SerializeField] int statsJumpDistance;
+    [SerializeField] int statsDropDistance;
 
     List<Vector3> rawPath;
     List<Vector3> smoothedPath;
     readonly List<Vector3Int> explored = new List<Vector3Int>(256);
     Vector3 lastStart, lastEnd;
     int lastJumpDistance;
+    int lastDropDistance;
 
     void Update()
     {
@@ -38,9 +40,10 @@ public class PathDebugger : MonoBehaviour
 
         Vector3 startPos = startCharacter.transform.position;
         Vector3 endPos = endCharacter.transform.position;
-        int jd = ResolveJumpDistance(startCharacter);
+        int jd = ResolveStat(startCharacter, CharacterData.TypeStatistic.JumpDistance);
+        int dd = ResolveStat(startCharacter, CharacterData.TypeStatistic.DropDistance);
 
-        if (startPos == lastStart && endPos == lastEnd && jd == lastJumpDistance) return;
+        if (startPos == lastStart && endPos == lastEnd && jd == lastJumpDistance && dd == lastDropDistance) return;
         Recompute();
     }
 
@@ -53,11 +56,12 @@ public class PathDebugger : MonoBehaviour
 
         Vector3 startPos = startCharacter.transform.position;
         Vector3 endPos = endCharacter.transform.position;
-        int jumpDistance = ResolveJumpDistance(startCharacter);
+        int jumpDistance = ResolveStat(startCharacter, CharacterData.TypeStatistic.JumpDistance);
+        int dropDistance = ResolveStat(startCharacter, CharacterData.TypeStatistic.DropDistance);
 
         explored.Clear();
         float t0 = Time.realtimeSinceStartup;
-        rawPath = Pathfinder.FindPath(startPos, endPos, jumpDistance, map, showExploredNodes ? explored : null);
+        rawPath = Pathfinder.FindPath(startPos, endPos, jumpDistance, dropDistance, map, showExploredNodes ? explored : null);
         statsLastComputeMs = (Time.realtimeSinceStartup - t0) * 1000f;
 
         smoothedPath = (applySmoothing && rawPath != null && rawPath.Count > 2)
@@ -68,19 +72,21 @@ public class PathDebugger : MonoBehaviour
         statsPathLength = Pathfinder.LastStats.pathLength;
         statsFound = Pathfinder.LastStats.found;
         statsJumpDistance = jumpDistance;
+        statsDropDistance = dropDistance;
 
         lastStart = startPos;
         lastEnd = endPos;
         lastJumpDistance = jumpDistance;
+        lastDropDistance = dropDistance;
     }
 
-    static int ResolveJumpDistance(CharacterBase c)
+    static int ResolveStat(CharacterBase c, CharacterData.TypeStatistic type)
     {
         if (c == null) return 0;
         if (c.charactersData == null || c.charactersData.Length == 0) return 0;
         var data = c.charactersData[c.characterIndex];
         if (data == null || data.statistics == null) return 0;
-        if (!data.statistics.TryGetValue(CharacterData.TypeStatistic.JumpDistance, out var stat)) return 0;
+        if (!data.statistics.TryGetValue(type, out var stat)) return 0;
         return stat.currentValue;
     }
 

@@ -2232,7 +2232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 63
+  openFaces: 59
   isWalkable: 1
   moveCost: 1
   dynamic: 0
@@ -3051,7 +3051,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 63
+  openFaces: 59
   isWalkable: 1
   moveCost: 1
   dynamic: 0
@@ -5379,6 +5379,15 @@ MonoBehaviour:
             _serializedList: []
           currentValue: 1
           maxValue: 0
+      - Key: 15
+        Value:
+          baseValue: 0
+          aptitudeValue: 0
+          itemValue: 0
+          buffValue:
+            _serializedList: []
+          currentValue: 10
+          maxValue: 0
     equipments:
       _serializedList: []
     consumables:
@@ -5441,7 +5450,7 @@ Transform:
   m_GameObject: {fileID: 283150452}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 4}
+  m_LocalPosition: {x: 3, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11663,7 +11672,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 63
+  openFaces: 59
   isWalkable: 1
   moveCost: 1
   dynamic: 0
@@ -16104,7 +16113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 63
+  openFaces: 59
   isWalkable: 1
   moveCost: 1
   dynamic: 0
@@ -16764,7 +16773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 63
+  openFaces: 59
   isWalkable: 1
   moveCost: 1
   dynamic: 0
@@ -23275,7 +23284,7 @@ Transform:
   m_GameObject: {fileID: 1602378877}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: -2}
+  m_LocalPosition: {x: 3, y: 1, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -29118,6 +29127,7 @@ MonoBehaviour:
   statsFound: 0
   statsLastComputeMs: 0
   statsJumpDistance: 0
+  statsDropDistance: 0
 --- !u!114 &2030191785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29511,7 +29521,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a14872cf13dabf458793f47d5b9c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockMarker
-  openFaces: 63
+  openFaces: 59
   isWalkable: 1
   moveCost: 1
   dynamic: 0

@@ -190,12 +190,12 @@ public class GridMap : MonoBehaviour
         return q;
     }
 
-    public IEnumerable<Block> GetTraversableNeighbors(Vector3Int pos, int jumpDistance = 0)
+    public IEnumerable<Block> GetTraversableNeighbors(Vector3Int pos, int jumpDistance = 0, int dropDistance = 0)
     {
         if (!blocks.ContainsKey(pos)) yield break;
         if (!IsTraversable(pos)) yield break;
 
-        var edges = GetNeighborEdges(pos, jumpDistance);
+        var edges = GetNeighborEdges(pos, jumpDistance, dropDistance);
         int count = edges.Count;
         Block[] copy = new Block[count];
         for (int e = 0; e < count; e++) copy[e] = edges[e].neighbor;
@@ -204,13 +204,14 @@ public class GridMap : MonoBehaviour
 
     static readonly List<NeighborEdge> _neighborBuffer = new List<NeighborEdge>(16);
 
-    public List<NeighborEdge> GetNeighborEdges(Vector3Int pos, int jumpDistance = 0)
+    public List<NeighborEdge> GetNeighborEdges(Vector3Int pos, int jumpDistance = 0, int dropDistance = 0)
     {
         _neighborBuffer.Clear();
         if (!blocks.TryGetValue(pos, out Block current)) return _neighborBuffer;
         if (!IsTraversable(pos)) return _neighborBuffer;
 
         if (jumpDistance < 0) jumpDistance = 0;
+        if (dropDistance < 0) dropDistance = 0;
 
         for (int i = 2; i < BlockFaceExtensions.FaceOrder.Length; i++)
         {
@@ -220,7 +221,7 @@ public class GridMap : MonoBehaviour
             Vector3Int dOffset = BlockFaceExtensions.NeighborOffsets[i];
             BlockFace opposite = face.Opposite();
 
-            for (int dy = -jumpDistance; dy <= jumpDistance; dy++)
+            for (int dy = -dropDistance; dy <= jumpDistance; dy++)
             {
                 Vector3Int neighborPos = pos + dOffset + Vector3Int.up * dy;
                 if (!blocks.TryGetValue(neighborPos, out Block neighbor)) continue;

@@ -108,7 +108,8 @@ public class CharacterGridNavigator : CharacterMovementBase
         }
 
         int jumpDistance = ResolveJumpDistance();
-        List<Vector3> path = Pathfinder.FindPath(transform.position, destination, jumpDistance, map);
+        int dropDistance = ResolveDropDistance();
+        List<Vector3> path = Pathfinder.FindPath(transform.position, destination, jumpDistance, dropDistance, map);
         if (path == null)
         {
             ClearPath();
@@ -209,6 +210,13 @@ public class CharacterGridNavigator : CharacterMovementBase
     {
         return characterBase.charactersData[characterBase.characterIndex]
                             .statistics[CharacterData.TypeStatistic.JumpDistance]
+                            .currentValue;
+    }
+
+    int ResolveDropDistance()
+    {
+        return characterBase.charactersData[characterBase.characterIndex]
+                            .statistics[CharacterData.TypeStatistic.DropDistance]
                             .currentValue;
     }
 

@@ -18,7 +18,7 @@ public static class Pathfinder
     }
     public static Stats LastStats { get; private set; }
 
-    public static List<Vector3> FindPath(Vector3 startWorld, Vector3 endWorld, int jumpDistance = 0, GridMap map = null, List<Vector3Int> exploredOut = null)
+    public static List<Vector3> FindPath(Vector3 startWorld, Vector3 endWorld, int jumpDistance = 0, int dropDistance = 0, GridMap map = null, List<Vector3Int> exploredOut = null)
     {
         if (map == null) map = GridMap.Instance;
         if (map == null)
@@ -30,10 +30,10 @@ public static class Pathfinder
         Vector3Int startGrid = map.WorldToGrid(startWorld);
         Vector3Int endGrid   = map.WorldToGrid(endWorld);
 
-        return FindPathGrid(startGrid, endGrid, jumpDistance, map, exploredOut);
+        return FindPathGrid(startGrid, endGrid, jumpDistance, dropDistance, map, exploredOut);
     }
 
-    public static List<Vector3> FindPathGrid(Vector3Int start, Vector3Int end, int jumpDistance = 0, GridMap map = null, List<Vector3Int> exploredOut = null)
+    public static List<Vector3> FindPathGrid(Vector3Int start, Vector3Int end, int jumpDistance = 0, int dropDistance = 0, GridMap map = null, List<Vector3Int> exploredOut = null)
     {
         if (map == null) map = GridMap.Instance;
         if (map == null) return null;
@@ -83,7 +83,7 @@ public static class Pathfinder
 
             float currentG = gScore[current];
 
-            List<GridMap.NeighborEdge> edges = map.GetNeighborEdges(current, jumpDistance);
+            List<GridMap.NeighborEdge> edges = map.GetNeighborEdges(current, jumpDistance, dropDistance);
             for (int i = 0; i < edges.Count; i++)
             {
                 Vector3Int neighborPos = edges[i].neighbor.gridPos;
