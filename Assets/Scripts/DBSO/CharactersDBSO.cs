@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharactersDB", menuName = "ScriptableObjects/DB/CharactersDB", order = 1)]
 public class CharactersDBSO : ScriptableObject
 {
-    public SerializedDictionary<int, SerializedDictionary<int, CharacterInfo>> data = new SerializedDictionary<int, SerializedDictionary<int, CharacterInfo>>();
+    public SerializedDictionary<int, CharacterInfo> data = new SerializedDictionary<int, CharacterInfo>();
     [System.Serializable] public class CharacterInfo
     {
         public bool isUnlocked;
@@ -14,7 +14,7 @@ public class CharactersDBSO : ScriptableObject
     public InitialDataSO GetRandomInitialDataSO()
     {
         int randomKey = Random.Range(1, data.Count);
-        return data[randomKey][Random.Range(0, data[randomKey].Count)].initialDataSO;
+        return data[randomKey].initialDataSO;
     }
     public string GenerateFantasyName()
     {

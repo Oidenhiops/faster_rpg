@@ -6,6 +6,8 @@ public class BlockMarker : MonoBehaviour
     public bool isWalkable = true;
     [Min(0.01f)] public float moveCost = 1f;
 
+    public GameObject visual;
+
     public bool dynamic = false;
     public float dynamicMoveThreshold = 0.1f;
 
@@ -30,6 +32,52 @@ public class BlockMarker : MonoBehaviour
             Mathf.RoundToInt(local.x),
             Mathf.RoundToInt(local.y),
             Mathf.RoundToInt(local.z));
+    }
+
+    [NaughtyAttributes.Button]
+    public void RotateClockwise()
+    {
+        if (visual != null) visual.transform.Rotate(0f, 90f, 0f, Space.World);
+        openFaces = RotateFacesClockwise(openFaces);
+        MarkDirty();
+    }
+
+    [NaughtyAttributes.Button]
+    public void RotateCounterClockwise()
+    {
+        if (visual != null) visual.transform.Rotate(0f, -90f, 0f, Space.World);
+        openFaces = RotateFacesCounterClockwise(openFaces);
+        MarkDirty();
+    }
+
+    void MarkDirty()
+    {
+#if UNITY_EDITOR
+        if (Application.isPlaying) return;
+        UnityEditor.EditorUtility.SetDirty(this);
+        if (visual != null) UnityEditor.EditorUtility.SetDirty(visual.transform);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
+#endif
+    }
+
+    static BlockFace RotateFacesClockwise(BlockFace faces)
+    {
+        BlockFace result = faces & (BlockFace.Up | BlockFace.Down);
+        if (faces.HasFace(BlockFace.North)) result |= BlockFace.East;
+        if (faces.HasFace(BlockFace.East))  result |= BlockFace.South;
+        if (faces.HasFace(BlockFace.South)) result |= BlockFace.West;
+        if (faces.HasFace(BlockFace.West))  result |= BlockFace.North;
+        return result;
+    }
+
+    static BlockFace RotateFacesCounterClockwise(BlockFace faces)
+    {
+        BlockFace result = faces & (BlockFace.Up | BlockFace.Down);
+        if (faces.HasFace(BlockFace.North)) result |= BlockFace.West;
+        if (faces.HasFace(BlockFace.East))  result |= BlockFace.North;
+        if (faces.HasFace(BlockFace.South)) result |= BlockFace.East;
+        if (faces.HasFace(BlockFace.West))  result |= BlockFace.South;
+        return result;
     }
 
     void OnEnable()

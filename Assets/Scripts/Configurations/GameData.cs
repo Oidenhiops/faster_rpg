@@ -361,10 +361,10 @@ public class GameData : MonoBehaviour
         };
         List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> characterStatistics = new List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>
         {
-            charactersDBSO.data[1][1].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[1][2].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[1][3].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[1][4].initialDataSO.CloneStatistics()
+            charactersDBSO.data[1].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[1].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[1].initialDataSO.CloneStatistics(),
+            charactersDBSO.data[1].initialDataSO.CloneStatistics()
         };
         GameDataSlot newSlotData = new GameDataSlot
         {

@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb6edb97ddf788d4ab84191197b708e7, type: 3}
-  m_Name: Angel 1
+  m_Name: Warrior
   m_EditorClassIdentifier: Assembly-CSharp::InitialDataSO
   initialStats:
     _serializedList:
     - Key: 1
       Value:
-        baseValue: 2
+        baseValue: 1
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -25,7 +25,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 2
       Value:
-        baseValue: 3
+        baseValue: 2
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -34,7 +34,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 3
       Value:
-        baseValue: 4
+        baseValue: 3
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -43,7 +43,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 4
       Value:
-        baseValue: 5
+        baseValue: 4
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -52,7 +52,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 5
       Value:
-        baseValue: 6
+        baseValue: 5
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -61,7 +61,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 6
       Value:
-        baseValue: 7
+        baseValue: 6
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -70,7 +70,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 7
       Value:
-        baseValue: 8
+        baseValue: 7
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -79,7 +79,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 8
       Value:
-        baseValue: 9
+        baseValue: 3
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -88,7 +88,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 10
       Value:
-        baseValue: 10
+        baseValue: 9
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -97,7 +97,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 11
       Value:
-        baseValue: 11
+        baseValue: 10
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -106,7 +106,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 12
       Value:
-        baseValue: 12
+        baseValue: 11
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -123,6 +123,10 @@ MonoBehaviour:
         currentValue: 0
         maxValue: 12
   initialSkills:
-    _serializedList: []
-  skinId: 2
-  characterAnimationsSO: {fileID: 11400000, guid: d3ad89c378dbcd349b519aa46d7931c4, type: 2}
+    _serializedList:
+    - Key: 1
+      Value:
+        skillId: 1
+        skillsBaseSO: {fileID: 11400000, guid: 7f3fe7183eb82ec47ae2e8db055d0107, type: 2}
+        level: 1
+        cd: 0
