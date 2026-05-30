@@ -65,6 +65,8 @@ public static class Pathfinder
         open.Enqueue(start, Heuristic(start, end));
 
         int explored = 0;
+        Vector3Int closestCell = start;
+        float closestHeuristic = Heuristic(start, end);
 
         while (open.Count > 0)
         {
@@ -80,6 +82,13 @@ public static class Pathfinder
             if (!closed.Add(current)) continue;
             explored++;
             exploredOut?.Add(current);
+
+            float currentHeuristic = Heuristic(current, end);
+            if (currentHeuristic < closestHeuristic)
+            {
+                closestHeuristic = currentHeuristic;
+                closestCell = current;
+            }
 
             float currentG = gScore[current];
 
@@ -99,6 +108,13 @@ public static class Pathfinder
                     open.Enqueue(neighborPos, f);
                 }
             }
+        }
+
+        if (closestCell != start)
+        {
+            List<Vector3> partialPath = ReconstructPath(closestCell, map);
+            LastStats = new Stats { nodesExplored = explored, pathLength = partialPath.Count, found = false };
+            return partialPath;
         }
 
         LastStats = new Stats { nodesExplored = explored, pathLength = 0, found = false };
