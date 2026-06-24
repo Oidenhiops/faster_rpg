@@ -5,7 +5,6 @@ public class CharacterPlayerMovement : CharacterMovementBase
 {
     public InputSystem_Actions inputActions;
     public Rigidbody rb;
-    public Vector2 inputsDirection;
     public override void HandleInitialize()
     {
         inputActions = new InputSystem_Actions();
@@ -15,37 +14,15 @@ public class CharacterPlayerMovement : CharacterMovementBase
     }
     public override void HandleMovement()
     {
-        inputsDirection = inputActions.Player.Move.ReadValue<Vector2>().normalized;
-        CameraInfo.Instance.CamDirection(new Vector3(inputsDirection.x, 0, inputsDirection.y), out Vector3 directionFromCamera);
+        characterBase.directionMovement = inputActions.Player.Move.ReadValue<Vector2>().normalized;
+        CameraInfo.Instance.CamDirection(new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y), out Vector3 directionFromCamera);
         directionFromCamera.y = rb.linearVelocity.y;
         if (!characterBase.isInCanalization)
         {
-            if (inputsDirection != Vector2.zero)
+            if (characterBase.directionMovement != Vector2.zero)
             {
-                if (characterBase.characterAnimations.characterAnimationsSO.isEightDirections)
-                {
-                    characterBase.directionAnimation.x = Mathf.RoundToInt(inputsDirection.x);
-                    characterBase.directionAnimation.z = Mathf.RoundToInt(inputsDirection.y);
-                }
-                else
-                {
-                    if (inputsDirection.x > 0)
-                    {
-                        characterBase.directionAnimation.x = 1;
-                    }
-                    else if (inputsDirection.x < 0)
-                    {
-                        characterBase.directionAnimation.x = -1;
-                    }
-                    if (inputsDirection.y > 0)
-                    {
-                        characterBase.directionAnimation.z = 1;
-                    }
-                    else if (inputsDirection.y < 0)
-                    {
-                        characterBase.directionAnimation.z = -1;
-                    }
-                }
+                characterBase.directionAnimation.x = Mathf.RoundToInt(characterBase.directionMovement.x);
+                characterBase.directionAnimation.z = Mathf.RoundToInt(characterBase.directionMovement.y);
                 if (!characterBase.isDashing && !characterBase.isJumping) characterBase.characterAnimations.MakeAnimation("Walk");
             }
             else if (!characterBase.isDashing && !characterBase.isJumping)
@@ -56,7 +33,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
         if (characterBase.isDashing)
         {
             if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
-            if (inputsDirection != Vector2.zero)
+            if (characterBase.directionMovement != Vector2.zero)
             {
                 directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
                 directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
@@ -77,6 +54,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
             directionFromCamera.x = 0;
             directionFromCamera.z = 0;
         }
+        characterBase.characterDirection.ChangeDirection();
         rb.linearVelocity = directionFromCamera;
     }
     void OnHandleJump(InputAction.CallbackContext context)

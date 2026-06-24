@@ -69,21 +69,8 @@ public class NPCGridMovement : CharacterGridNavigator
     {
         if (characterBase == null) return;
 
-        if (characterBase.characterAnimations != null
-            && characterBase.characterAnimations.characterAnimationsSO != null
-            && characterBase.characterAnimations.characterAnimationsSO.isEightDirections)
-        {
-            characterBase.directionAnimation.x = Mathf.RoundToInt(dir.x);
-            characterBase.directionAnimation.z = Mathf.RoundToInt(dir.z);
-        }
-        else
-        {
-            if (dir.x > 0.1f)      characterBase.directionAnimation.x =  1;
-            else if (dir.x < -0.1f) characterBase.directionAnimation.x = -1;
-
-            if (dir.z > 0.1f)      characterBase.directionAnimation.z =  1;
-            else if (dir.z < -0.1f) characterBase.directionAnimation.z = -1;
-        }
+        characterBase.directionAnimation.x = Mathf.RoundToInt(dir.x);
+        characterBase.directionAnimation.z = Mathf.RoundToInt(dir.z);
 
         if (!characterBase.isDashing && !characterBase.isJumping)
         {

@@ -37,7 +37,6 @@ public class CharacterData
         {TypeSkin.Skin, new CharacterSkinInfo()},
         {TypeSkin.Hair, new CharacterSkinInfo()},
         {TypeSkin.Eyes, new CharacterSkinInfo()},
-        {TypeSkin.Mouth, new CharacterSkinInfo()},
     };
     public void InitializeStatistics()
     {
@@ -192,9 +191,7 @@ public class CharacterData
     {
         None = 0,
         Skin = 1,
-        Hands = 2,
-        Hair = 3,
-        Eyes = 4,
-        Mouth = 5,
+        Hair = 2,
+        Eyes = 3,
     }
 }

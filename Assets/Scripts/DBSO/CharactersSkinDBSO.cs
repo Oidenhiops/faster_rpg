@@ -18,17 +18,6 @@ public class CharactersSkinDBSO : ScriptableObject
             otherSkin = null,
             otherSkinColor = Color.white
         });
-        if (data[CharacterData.TypeSkin.Hands].ContainsKey(skinIndex))
-        {
-            skins.Add(CharacterData.TypeSkin.Hands, new CharacterData.CharacterSkinInfo
-            {
-                originalSkinId = skinIndex,
-                originalSkin = data[CharacterData.TypeSkin.Hands][skinIndex],
-                originalSpriteColor = skinColor,
-                otherSkin = null,
-                otherSkinColor = Color.white
-            });
-        }
         int eyesIndex = Random.Range(1, data[CharacterData.TypeSkin.Eyes].Count - 1);
         skins.Add(CharacterData.TypeSkin.Eyes, new CharacterData.CharacterSkinInfo
         {
@@ -45,18 +34,6 @@ public class CharactersSkinDBSO : ScriptableObject
             {
                 originalSkinId = hairIndex,
                 originalSkin = data[CharacterData.TypeSkin.Hair][hairIndex],
-                originalSpriteColor = RandomColor(),
-                otherSkin = null,
-                otherSkinColor = Color.white
-            });
-        }
-        int mouthIndex = Random.Range(1, data[CharacterData.TypeSkin.Mouth].Count - 1);
-        if (data[CharacterData.TypeSkin.Mouth].ContainsKey(mouthIndex))
-        {
-            skins.Add(CharacterData.TypeSkin.Mouth, new CharacterData.CharacterSkinInfo
-            {
-                originalSkinId = mouthIndex,
-                originalSkin = data[CharacterData.TypeSkin.Mouth][mouthIndex],
                 originalSpriteColor = RandomColor(),
                 otherSkin = null,
                 otherSkinColor = Color.white

@@ -15,12 +15,14 @@ public class CharacterBase : MonoBehaviour
     public int characterIndex;
     public int currentFastItemIndex;
     public Vector3Int directionAnimation = new Vector3Int();
+    public Vector2 directionMovement = new Vector2();
     public GameObject floatingTextPrefab;
     public GameObject dieEffectPrefab;
     public GameObject itempDroppedPrefab;
     public CharacterPlayerHud characterPlayerHud;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
+    public CharacterDirection characterDirection;
     public Dissolve dissolve;
     public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
     public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
@@ -65,18 +67,7 @@ public class CharacterBase : MonoBehaviour
     }
     public virtual void OnEnableHandle() { }
     public async virtual Awaitable InitializeCharacter() { }
-    protected async Awaitable InitializeAnimations()
-    {
-        try
-        {
-            characterAnimations.SetInitialData();
-            await Awaitable.NextFrameAsync();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-        }
-    }
+    protected async Awaitable InitializeAnimations() { }
     public void MoveCharacter()
     {
         characterMovement.HandleMovement();
@@ -165,22 +156,21 @@ public class CharacterBase : MonoBehaviour
             directionAnimation.z = startPos.z < finalPos.z ? 1 : -1;
         }
     }
-    public async Awaitable TakeDamage(CharacterBase characterMakeDamage, int damage, string otherAnimation = "")
+    public async Awaitable TakeDamage(CharacterBase characterMakeDamage, int damage)
     {
         characterAnimations.MakeAnimation("TakeDamage");
-        characterAnimations.animationAfterEnd = otherAnimation;
         FloatingText floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity).GetComponent<FloatingText>();
         _ = floatingText.SendText(damage.ToString(), Color.red, false);
         if (charactersData[characterIndex].statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))
         {
             characterTakedDamageStatistic.currentValue -= damage;
         }
-        characterAnimations.MakeEffect(CharacterAnimator.TypeAnimationsEffects.Shake);
-        characterAnimations.MakeEffect(CharacterAnimator.TypeAnimationsEffects.Blink);
-        if (charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Hp].currentValue <= 0) await Die(characterMakeDamage, otherAnimation);
+        characterAnimations.MakeEffect(AnimationEffectsSO.TypeAnimationsEffects.Shake);
+        characterAnimations.MakeEffect(AnimationEffectsSO.TypeAnimationsEffects.Blink);
+        if (charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Hp].currentValue <= 0) await Die(characterMakeDamage);
         await Awaitable.NextFrameAsync();
     }
-    public virtual async Awaitable Die(CharacterBase characterMakeDamage, string lastAnimation = "")
+    public virtual async Awaitable Die(CharacterBase characterMakeDamage)
     {
         await Awaitable.WaitForSecondsAsync(0.3f);
         GameObject dieEffect = Instantiate(dieEffectPrefab, transform.position, Quaternion.identity);
@@ -385,7 +375,6 @@ public class CharacterBase : MonoBehaviour
         public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;
-        public Mesh originalMesh;
     }
     IEnumerator ResetCancelCanalization()
     {
