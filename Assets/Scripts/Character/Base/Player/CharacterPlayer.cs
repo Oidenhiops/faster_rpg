@@ -499,9 +499,7 @@ public class CharacterPlayer : CharacterBase
     }
     void LaunchDropItem(ItemDropped itemDropped)
     {
-        Vector3 launchDirection = directionMovement != Vector2.zero ? new Vector3(directionMovement.x, 0, directionMovement.y) : characterModel.modelTransform.forward;
-        launchDirection.Normalize();
         itemDropped.rb.linearVelocity = Vector3.zero;
-        itemDropped.rb.AddForce(launchDirection * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
+        itemDropped.rb.AddForce(characterModel.modelTransform.forward.normalized * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
     }
 }

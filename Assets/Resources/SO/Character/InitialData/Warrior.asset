@@ -79,7 +79,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 8
       Value:
-        baseValue: 5
+        baseValue: 10
         aptitudeValue: 100
         itemValue: 0
         buffValue:

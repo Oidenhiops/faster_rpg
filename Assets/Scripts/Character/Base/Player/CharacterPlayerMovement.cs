@@ -38,9 +38,18 @@ public class CharacterPlayerMovement : CharacterMovementBase
             }
             else
             {
-                Vector3 launchDirection = characterBase.directionMovement != Vector2.zero ? new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y) : characterBase.characterModel.modelTransform.forward;
-                CameraInfo.Instance.CamDirection(new Vector3(launchDirection.x, 0, launchDirection.z), out Vector3 directionFromCameraByAnimation);
-                directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
+                if (characterBase.directionMovement != Vector2.zero)
+                {
+                    Vector3 launchDirection = new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y);
+                    CameraInfo.Instance.CamDirection(new Vector3(launchDirection.x, 0, launchDirection.z), out Vector3 directionFromCameraByAnimation);
+                    directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
+                }
+                else
+                {
+                    Vector3 launchDirection = characterBase.characterModel.modelTransform.forward;
+                    launchDirection.y = 0;
+                    directionFromCamera = launchDirection * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
+                }
             }
         }
         else if (!characterBase.isInCanalization)
