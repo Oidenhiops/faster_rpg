@@ -75,13 +75,13 @@ public class CharacterBase : MonoBehaviour
                 if (skinInfo.meshId != 0)
                 {
                     model.Value.meshFilter.mesh = GameData.Instance.charactersModelDBSO.data[model.Key][skinInfo.meshId];
-                    foreach (Material material in model.Value.meshRenderer.materials)
+                    Material[] materials = model.Value.meshRenderer.materials;
+                    int colorCount = Mathf.Min(materials.Length, skinInfo.colors.Count);
+                    for (int i = 0; i < colorCount; i++)
                     {
-                        for (int i = 0; i < skinInfo.colors.Count; i++)
-                        {
-                            material.SetColor("_Color", skinInfo.colors[i]);
-                        }
+                        materials[i].SetColor("_Color", skinInfo.colors[i]);
                     }
+                    model.Value.meshRenderer.materials = materials;
                     model.Value.meshFilter.gameObject.SetActive(true);
                 }
                 else

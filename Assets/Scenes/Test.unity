@@ -2273,7 +2273,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DissolvePlayer
   objectsToDisolve: []
-  dissolveDuration: 1
+  dissolveDuration: 0.5
   needAppear: 0
   characterBase: {fileID: 211714510}
 --- !u!1 &219281684
@@ -11384,7 +11384,7 @@ MonoBehaviour:
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
   OrbitStyle: 0
-  Radius: 3.5
+  Radius: 8
   Orbits:
     Top:
       Radius: 2
@@ -11408,7 +11408,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -9.1
+    Value: 10
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -11478,8 +11478,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1242420443}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.07932904, y: 0, z: 0, w: 0.9968485}
-  m_LocalPosition: {x: 0, y: 0.9464468, z: -3.4559484}
+  m_LocalRotation: {x: 0.08715575, y: 0, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: 0, y: 3.3891854, z: -7.878462}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -16255,7 +16255,7 @@ Transform:
   m_GameObject: {fileID: 1894498718}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
