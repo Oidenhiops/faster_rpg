@@ -1842,24 +1842,40 @@ MonoBehaviour:
   isCharacterPlayer: 1
   autoInit: 1
   characterModel:
-    meshRenderers:
+    meshesData:
       _serializedList:
       - Key: 1
-        Value: {fileID: 1889246819}
+        Value:
+          meshFilter: {fileID: 2015626268}
+          meshRenderer: {fileID: 1889246819}
       - Key: 2
-        Value: {fileID: 1889246818}
+        Value:
+          meshFilter: {fileID: 1889246821}
+          meshRenderer: {fileID: 1889246818}
       - Key: 3
-        Value: {fileID: 1889246817}
+        Value:
+          meshFilter: {fileID: 1889246823}
+          meshRenderer: {fileID: 1889246817}
       - Key: 4
-        Value: {fileID: 1889246816}
+        Value:
+          meshFilter: {fileID: 1268708748}
+          meshRenderer: {fileID: 1889246816}
       - Key: 5
-        Value: {fileID: 1889246815}
+        Value:
+          meshFilter: {fileID: 1704151449}
+          meshRenderer: {fileID: 1889246815}
       - Key: 6
-        Value: {fileID: 1889246814}
+        Value:
+          meshFilter: {fileID: 1726886329}
+          meshRenderer: {fileID: 1889246814}
       - Key: 7
-        Value: {fileID: 1889246813}
+        Value:
+          meshFilter: {fileID: 1966004745}
+          meshRenderer: {fileID: 1889246813}
       - Key: 8
-        Value: {fileID: 1889246812}
+        Value:
+          meshFilter: {fileID: 781276411}
+          meshRenderer: {fileID: 1889246812}
     modelTransform: {fileID: 1889246811}
     leftHand: {fileID: 0}
     rightHand: {fileID: 0}
@@ -1978,48 +1994,40 @@ MonoBehaviour:
           skillsBaseSO: {fileID: 0}
           level: 0
           cd: 0
-    skins:
+    models:
       _serializedList:
-      - Key: 0
-        Value:
-          originalSkinId: 0
-          originalSkin: {fileID: 0}
-          originalColor: []
-          otherSkinId: 0
-          otherSkin: {fileID: 0}
-          otherSkinColor: []
       - Key: 1
         Value:
-          originalSkinId: 0
-          originalSkin: {fileID: 0}
-          originalColor: []
-          otherSkinId: 0
-          otherSkin: {fileID: 0}
-          otherSkinColor: []
+          meshId: 0
+          colors: []
+      - Key: 2
+        Value:
+          meshId: 0
+          colors: []
       - Key: 3
         Value:
-          originalSkinId: 0
-          originalSkin: {fileID: 0}
-          originalColor: []
-          otherSkinId: 0
-          otherSkin: {fileID: 0}
-          otherSkinColor: []
+          meshId: 0
+          colors: []
       - Key: 4
         Value:
-          originalSkinId: 0
-          originalSkin: {fileID: 0}
-          originalColor: []
-          otherSkinId: 0
-          otherSkin: {fileID: 0}
-          otherSkinColor: []
+          meshId: 0
+          colors: []
       - Key: 5
         Value:
-          originalSkinId: 0
-          originalSkin: {fileID: 0}
-          originalColor: []
-          otherSkinId: 0
-          otherSkin: {fileID: 0}
-          otherSkinColor: []
+          meshId: 0
+          colors: []
+      - Key: 6
+        Value:
+          meshId: 0
+          colors: []
+      - Key: 7
+        Value:
+          meshId: 0
+          colors: []
+      - Key: 8
+        Value:
+          meshId: 0
+          colors: []
   characterIndex: 0
   currentFastItemIndex: 0
   directionMovement: {x: 0, y: 0}
@@ -6437,7 +6445,7 @@ MonoBehaviour:
         SFXalue: 0
   allResolutions: []
   charactersDBSO: {fileID: 11400000, guid: 31f29f7787f58d1498b4cb4b30ccb3bf, type: 2}
-  charactersSkinDBSO: {fileID: 11400000, guid: eebd9eedfc97cd340bffc18b2cf3b938, type: 2}
+  charactersModelDBSO: {fileID: 11400000, guid: eebd9eedfc97cd340bffc18b2cf3b938, type: 2}
   itemsDBSO: {fileID: 11400000, guid: bea8bcc675308c243ac4dddf3c06ceb0, type: 2}
   skillsDBSO: {fileID: 11400000, guid: 77e65aa2d03fd4d4fbef9f562c7f3862, type: 2}
 --- !u!114 &545223954
@@ -8106,6 +8114,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 774349234}
   m_CullTransparentMesh: 1
+--- !u!33 &781276411 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -8475861366196391897, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &797539070
 GameObject:
   m_ObjectHideFlags: 0
@@ -11669,6 +11682,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252364678}
   m_CullTransparentMesh: 1
+--- !u!33 &1268708748 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -7165644763385576362, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1294225429
 GameObject:
   m_ObjectHideFlags: 0
@@ -14867,6 +14885,16 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!33 &1704151449 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -5081666267558826650, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &1726886329 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -3387599253219119134, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1733097061
 GameObject:
   m_ObjectHideFlags: 0
@@ -16016,6 +16044,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 4a9b6e4185ad9f443b9bcd6186881018, type: 2}
     - target: {fileID: -5453718785326181456, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -5453718785326181456, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 4a9b6e4185ad9f443b9bcd6186881018, type: 2}
@@ -16043,6 +16075,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 4a9b6e4185ad9f443b9bcd6186881018, type: 2}
+    - target: {fileID: 2803436535603912181, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2803436535603912181, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -16107,6 +16143,16 @@ MeshRenderer:
 --- !u!23 &1889246819 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -5453718785326181456, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &1889246821 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -8002113183021480852, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &1889246823 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: 6691687110978658680, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
   m_PrefabInstance: {fileID: 1889246810}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1894011853
@@ -16670,6 +16716,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1965871529}
   m_CullTransparentMesh: 1
+--- !u!33 &1966004745 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -1851481535225690648, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1974020649
 GameObject:
   m_ObjectHideFlags: 0
@@ -16882,6 +16933,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1980883484}
   m_CullTransparentMesh: 1
+--- !u!33 &2015626268 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -1155399945738260686, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+  m_PrefabInstance: {fileID: 1889246810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2037523785
 GameObject:
   m_ObjectHideFlags: 0

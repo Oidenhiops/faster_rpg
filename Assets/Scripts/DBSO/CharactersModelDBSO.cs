@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharactersModelDB", menuName = "ScriptableObjects/DB/CharactersModelDB", order = 1)]
 public class CharactersModelDBSO : ScriptableObject
 {
-    public SerializedDictionary<TypeModel, SerializedDictionary<int, CharactersModelSO>> data = new SerializedDictionary<TypeModel, SerializedDictionary<int, CharactersModelSO>>();
+    public SerializedDictionary<TypeModel, SerializedDictionary<int, Mesh>> data = new SerializedDictionary<TypeModel, SerializedDictionary<int, Mesh>>();
     public SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo> GenerateRandomModel()
     {
         SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo> model = new SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo>();
@@ -13,66 +13,45 @@ public class CharactersModelDBSO : ScriptableObject
         Color hairColor = RandomColor();
         model.Add(TypeModel.Hair, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = hairIndex,
-            originalSkin = data[TypeModel.Hair][hairIndex],
-            originalColor = new List<Color> { hairColor },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = hairIndex,
+            colors = new List<Color> { hairColor },
         });
         int headIndex = Random.Range(1, data[TypeModel.Head].Count + 1);
         Color skinColor = RandomColor();
         model.Add(TypeModel.Head, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = headIndex,
-            originalSkin = data[TypeModel.Head][headIndex],
-            originalColor = new List<Color> { skinColor },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = headIndex,
+            colors = new List<Color> { skinColor },
         });
         int eyesIndex = Random.Range(1, data[TypeModel.Eyes].Count - 1);
         model.Add(TypeModel.Eyes, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = eyesIndex,
-            originalSkin = data[TypeModel.Eyes][eyesIndex],
-            originalColor = new List<Color> { RandomColor(), RandomColor(), RandomColor() },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = eyesIndex,
+            colors = new List<Color> { RandomColor(), RandomColor(), RandomColor() },
         });
         int eyebrowsIndex = Random.Range(1, data[TypeModel.Eyebrows].Count - 1);
         model.Add(TypeModel.Eyebrows, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = eyebrowsIndex,
-            originalSkin = data[TypeModel.Eyebrows][eyebrowsIndex],
-            originalColor = new List<Color> { RandomColor() },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = eyebrowsIndex,
+            colors = new List<Color> { RandomColor() },
         });
         int bodyIndex = Random.Range(1, data[TypeModel.Body].Count + 1);
         model.Add(TypeModel.Body, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = bodyIndex,
-            originalSkin = data[TypeModel.Body][bodyIndex],
-            originalColor = new List<Color> { skinColor },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = bodyIndex,
+            colors = new List<Color> { skinColor },
         });
         int handsIndex = Random.Range(1, data[TypeModel.Hands].Count + 1);
         model.Add(TypeModel.Hands, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = handsIndex,
-            originalSkin = data[TypeModel.Hands][handsIndex],
-            originalColor = new List<Color> { skinColor },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = handsIndex,
+            colors = new List<Color> { skinColor },
         });
         int feetIndex = Random.Range(1, data[TypeModel.Feets].Count + 1);
         model.Add(TypeModel.Feets, new CharacterData.CharacterSkinInfo
         {
-            originalSkinId = feetIndex,
-            originalSkin = data[TypeModel.Feets][feetIndex],
-            originalColor = new List<Color> { skinColor },
-            otherSkin = null,
-            otherSkinColor = new List<Color>()
+            meshId = feetIndex,
+            colors = new List<Color> { skinColor },
         });
         return model;
     }

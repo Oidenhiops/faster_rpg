@@ -8,9 +8,9 @@ public class DissolvePlayer : Dissolve
     public override void ObtainCharacterModels()
     {
         objectsToDisolve = new List<Renderer>();
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, MeshRenderer> model in characterBase.characterModel.meshRenderers)
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterBase.CharacterModelData> model in characterBase.characterModel.meshesData)
         {
-            objectsToDisolve.Add(model.Value);
+            objectsToDisolve.Add(model.Value.meshRenderer);
         }
     }
 }

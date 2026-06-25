@@ -66,7 +66,31 @@ public class CharacterBase : MonoBehaviour
     }
     public virtual void OnEnableHandle() { }
     public async virtual Awaitable InitializeCharacter() { }
-    protected async Awaitable InitializeAnimations() { }
+    protected async Awaitable InitializeModels()
+    {
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterModelData> model in characterModel.meshesData)
+        {
+            if (charactersData[characterIndex].models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo))
+            {
+                if (skinInfo.meshId != 0)
+                {
+                    model.Value.meshFilter.mesh = GameData.Instance.charactersModelDBSO.data[model.Key][skinInfo.meshId];
+                    foreach (Material material in model.Value.meshRenderer.materials)
+                    {
+                        for (int i = 0; i < skinInfo.colors.Count; i++)
+                        {
+                            material.SetColor("_Color", skinInfo.colors[i]);
+                        }
+                    }
+                    model.Value.meshFilter.gameObject.SetActive(true);
+                }
+                else
+                {
+                    model.Value.meshFilter.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
     public void MoveCharacter()
     {
         characterMovement.HandleMovement();
@@ -351,7 +375,7 @@ public class CharacterBase : MonoBehaviour
     [Serializable]
     public class CharacterModel
     {
-        public SerializedDictionary<CharactersModelDBSO.TypeModel, MeshRenderer> meshRenderers = new SerializedDictionary<CharactersModelDBSO.TypeModel, MeshRenderer>();
+        public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterModelData> meshesData = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterModelData>();
         public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;
@@ -360,6 +384,12 @@ public class CharacterBase : MonoBehaviour
     {
         yield return null;
         cancelCanalization = false;
+    }
+    [Serializable]
+    public class CharacterModelData
+    {
+        public MeshFilter meshFilter;
+        public MeshRenderer meshRenderer;
     }
     [Serializable]
     public class StatusEffect

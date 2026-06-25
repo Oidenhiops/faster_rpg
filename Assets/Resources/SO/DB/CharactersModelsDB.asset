@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b8f3c642bf0794480692cc2850b655, type: 3}
+  m_Name: CharactersModelsDB
+  m_EditorClassIdentifier: Assembly-CSharp::CharactersSkinDBSO
+  data:
+    _serializedList:
+    - Key: 1
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: -8261066796910302577, guid: 4d0eb4703e3c6f44bb547c031f481e85, type: 3}
+        - Key: 2
+          Value: {fileID: -2439352532998724759, guid: 08f6ca0e0f73b3d4f9c03de8971e6a6a, type: 3}
+    - Key: 2
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: -4559681348659797430, guid: adca173cfda56024fa4d598c495f3ba9, type: 3}
+    - Key: 3
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 8872202060522342781, guid: 0913674bf82779f4da1af89b87681727, type: 3}
+    - Key: 4
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 5680302259949675323, guid: 8832a40d5ac901243b91e957a210f854, type: 3}
+    - Key: 5
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 7333069250472279435, guid: 912a73e36013ed34481cc030f3e30ed0, type: 3}
+        - Key: 2
+          Value: {fileID: 4578267072843662122, guid: d5e72d270c20fd549b8fee7dfedf8f98, type: 3}
+    - Key: 6
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 8604045607132181640, guid: 03bce72b8b2b7504bb5816f5462bfd9b, type: 3}
+    - Key: 7
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: -2272216915283732710, guid: e3ed40c7d554c9748bceb96d18e37006, type: 3}
+    - Key: 8
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 5822886286850341725, guid: 3dbdff56ec0c60c46a2a1d8b75b79bb0, type: 3}

@@ -20,6 +20,9 @@ public class Dissolve : MonoBehaviour
         {
             objectsToDisolve[i].material.SetFloat("_DissolveAmount", 1);
         }
+        // Outline (Render Objects): el material de override no esta en el renderer,
+        // asi que sincronizamos su dissolve por variable global.
+        Shader.SetGlobalFloat("_DissolveAmount", 1);
         AppearObject();
     }
     [NaughtyAttributes.Button]
@@ -48,6 +51,7 @@ public class Dissolve : MonoBehaviour
                         objectsToDisolve[i].materials[j].SetFloat("_DissolveAmount", normalizedValue);
                     }
                 }
+                Shader.SetGlobalFloat("_DissolveAmount", normalizedValue);
                 yield return null;
             }
         }
@@ -68,6 +72,7 @@ public class Dissolve : MonoBehaviour
                         objectsToDisolve[i].materials[j].SetFloat("_DissolveAmount", normalizedValue);
                     }
                 }
+                Shader.SetGlobalFloat("_DissolveAmount", normalizedValue);
                 yield return null;
             }
         }

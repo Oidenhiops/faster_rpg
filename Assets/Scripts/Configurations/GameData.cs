@@ -12,7 +12,7 @@ public class GameData : MonoBehaviour
     public List<ResolutionsInfo> allResolutions = new List<ResolutionsInfo>();
     public Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>> locs = new Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>>();
     public CharactersDBSO charactersDBSO;
-    public CharactersModelDBSO charactersSkinDBSO;
+    public CharactersModelDBSO charactersModelDBSO;
     public ItemsDBSO itemsDBSO;
     public SkillsDBSO skillsDBSO;
     void Awake()
@@ -79,14 +79,6 @@ public class GameData : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Error cargando habilidades de los personajes: {e}");
-        }
-        try
-        {
-            InitializeCharacterSkins();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error cargando las skins de los personajes: {e}");
         }
     }
     public void LoadGameDataInfo()
@@ -157,26 +149,6 @@ public class GameData : MonoBehaviour
                     if (skill.Value.skillId != 0)
                     {
                         skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
-                    }
-                }
-            }
-        }
-    }
-    void InitializeCharacterSkins()
-    {
-        foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
-        {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
-            {
-                foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterData.CharacterSkinInfo> skin in characterData.Value.skins)
-                {
-                    if (skin.Value.originalSkinId != 0)
-                    {
-                        skin.Value.originalSkin = charactersSkinDBSO.data[skin.Key][skin.Value.originalSkinId];
-                    }
-                    if (skin.Value.otherSkinId != 0)
-                    {
-                        skin.Value.otherSkin = charactersSkinDBSO.data[skin.Key][skin.Value.otherSkinId];
                     }
                 }
             }
@@ -398,7 +370,7 @@ public class GameData : MonoBehaviour
                             { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
                         },
                         bag = bags[0],
-                        skins = charactersSkinDBSO.GenerateRandomModel()
+                        models = charactersModelDBSO.GenerateRandomModel()
                     }
                 },
                 { randomNames[1], new CharacterData()
@@ -413,7 +385,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[1],
-                        skins = charactersSkinDBSO.GenerateRandomModel()
+                        models = charactersModelDBSO.GenerateRandomModel()
                     }
                 },
                 { randomNames[2], new CharacterData()
@@ -428,7 +400,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[2],
-                        skins = charactersSkinDBSO.GenerateRandomModel()
+                        models = charactersModelDBSO.GenerateRandomModel()
                     }
                 },
                 { randomNames[3], new CharacterData()
@@ -443,7 +415,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[3],
-                        skins = charactersSkinDBSO.GenerateRandomModel()
+                        models = charactersModelDBSO.GenerateRandomModel()
                     }
                 },
             }

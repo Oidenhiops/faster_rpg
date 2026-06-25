@@ -31,7 +31,7 @@ public class CharacterData
         {3, new CharacterSkillInfo()},
         {4, new CharacterSkillInfo()},
     };
-    public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo> skins = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo>
+    public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo> models = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo>
     {
         {CharactersModelDBSO.TypeModel.Hair, new CharacterSkinInfo()},
         {CharactersModelDBSO.TypeModel.Head, new CharacterSkinInfo()},
@@ -154,12 +154,8 @@ public class CharacterData
     [Serializable]
     public class CharacterSkinInfo
     {
-        public int originalSkinId;
-        public CharactersModelSO originalSkin;
-        public List<Color> originalColor;
-        public int otherSkinId;
-        public CharactersModelSO otherSkin;
-        public List<Color> otherSkinColor;
+        public int meshId;
+        public List<Color> colors;
     }
     public enum MasteryRange
     {

@@ -55,7 +55,7 @@ public class CharacterPlayer : CharacterBase
             }
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
             await characterPlayerHud.InitializeInventory();
-            await InitializeAnimations();
+            await InitializeModels();
             characterMovement.HandleInitialize();
             dissolvePlayer.ObtainCharacterModels();
             dissolvePlayer.NeedAppear();
@@ -82,7 +82,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.white;
             characterIndex = (int)context.ReadValue<float>();
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
-            _ = InitializeAnimations();
+            _ = InitializeModels();
             _ = ChangeCharacterAction();
             _ = characterPlayerHud.RefreshCharacterInventory();
             characterPlayerHud.RefreshStatusEffects();
