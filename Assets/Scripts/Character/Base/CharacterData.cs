@@ -31,12 +31,16 @@ public class CharacterData
         {3, new CharacterSkillInfo()},
         {4, new CharacterSkillInfo()},
     };
-    public SerializedDictionary<TypeSkin, CharacterSkinInfo> skins = new SerializedDictionary<TypeSkin, CharacterSkinInfo>
+    public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo> skins = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo>
     {
-        {TypeSkin.None, new CharacterSkinInfo()},
-        {TypeSkin.Skin, new CharacterSkinInfo()},
-        {TypeSkin.Hair, new CharacterSkinInfo()},
-        {TypeSkin.Eyes, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Hair, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Head, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Eyes, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Eyebrows, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Ears, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Body, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Hands, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Feets, new CharacterSkinInfo()},
     };
     public void InitializeStatistics()
     {
@@ -151,11 +155,11 @@ public class CharacterData
     public class CharacterSkinInfo
     {
         public int originalSkinId;
-        public CharactersSkinSO originalSkin;
-        public Color originalSpriteColor;
+        public CharactersModelSO originalSkin;
+        public List<Color> originalColor;
         public int otherSkinId;
-        public CharactersSkinSO otherSkin;
-        public Color otherSkinColor;
+        public CharactersModelSO otherSkin;
+        public List<Color> otherSkinColor;
     }
     public enum MasteryRange
     {
@@ -186,12 +190,5 @@ public class CharacterData
         Cd = 13,
         JumpDistance = 14,
         DropDistance = 15,
-    }
-    public enum TypeSkin
-    {
-        None = 0,
-        Skin = 1,
-        Hair = 2,
-        Eyes = 3,
     }
 }

@@ -4,17 +4,19 @@ using UnityEngine;
 
 public class Dissolve : MonoBehaviour
 {
-    [SerializeField] Renderer[] objectsToDisolve;
+    public List<Renderer> objectsToDisolve;
     public float dissolveDuration = 1f;
     public bool needAppear = false;
     private void Awake()
     {
+        ObtainCharacterModels();
         if (needAppear) NeedAppear();
     }
+    public virtual void ObtainCharacterModels() { }
     [NaughtyAttributes.Button]
     public void NeedAppear()
     {
-        for (int i = 0; i < objectsToDisolve.Length; i++)
+        for (int i = 0; i < objectsToDisolve.Count; i++)
         {
             objectsToDisolve[i].material.SetFloat("_DissolveAmount", 1);
         }
@@ -30,35 +32,41 @@ public class Dissolve : MonoBehaviour
     {
         StartCoroutine(DissolveObj());
     }
-    IEnumerator DissolveObj()
+    public IEnumerator DissolveObj()
     {
-        if (objectsToDisolve.Length > 0)
+        if (objectsToDisolve.Count > 0)
         {
             float elapsed = 0f;
                 while (elapsed < dissolveDuration)
             {
                 elapsed += Time.deltaTime;
                 float normalizedValue = Mathf.Clamp01(elapsed / dissolveDuration);
-                for (int i = 0; i < objectsToDisolve.Length; i++)
+                for (int i = 0; i < objectsToDisolve.Count; i++)
                 {
-                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", normalizedValue);
+                    for (int j = 0; j < objectsToDisolve[i].materials.Length; j++)
+                    {
+                        objectsToDisolve[i].materials[j].SetFloat("_DissolveAmount", normalizedValue);
+                    }
                 }
                 yield return null;
             }
         }
     }
-    IEnumerator AppearObj()
+    public IEnumerator AppearObj()
     {
-        if (objectsToDisolve.Length > 0)
+        if (objectsToDisolve.Count > 0)
         {
             float elapsed = 0f;
             while (elapsed < dissolveDuration)
             {
                 elapsed += Time.deltaTime;
                 float normalizedValue = Mathf.Clamp01(1f - (elapsed / dissolveDuration));
-                for (int i = 0; i < objectsToDisolve.Length; i++)
+                for (int i = 0; i < objectsToDisolve.Count; i++)
                 {
-                    objectsToDisolve[i].material.SetFloat("_DissolveAmount", normalizedValue);
+                    for (int j = 0; j < objectsToDisolve[i].materials.Length; j++)
+                    {
+                        objectsToDisolve[i].materials[j].SetFloat("_DissolveAmount", normalizedValue);
+                    }
                 }
                 yield return null;
             }

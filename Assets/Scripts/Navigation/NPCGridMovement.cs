@@ -69,9 +69,6 @@ public class NPCGridMovement : CharacterGridNavigator
     {
         if (characterBase == null) return;
 
-        characterBase.directionAnimation.x = Mathf.RoundToInt(dir.x);
-        characterBase.directionAnimation.z = Mathf.RoundToInt(dir.z);
-
         if (!characterBase.isDashing && !characterBase.isJumping)
         {
             characterBase.characterAnimations?.MakeAnimation("Walk");

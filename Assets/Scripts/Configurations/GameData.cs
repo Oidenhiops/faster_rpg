@@ -12,7 +12,7 @@ public class GameData : MonoBehaviour
     public List<ResolutionsInfo> allResolutions = new List<ResolutionsInfo>();
     public Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>> locs = new Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>>();
     public CharactersDBSO charactersDBSO;
-    public CharactersSkinDBSO charactersSkinDBSO;
+    public CharactersModelDBSO charactersSkinDBSO;
     public ItemsDBSO itemsDBSO;
     public SkillsDBSO skillsDBSO;
     void Awake()
@@ -168,7 +168,7 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
-                foreach (KeyValuePair<CharacterData.TypeSkin, CharacterData.CharacterSkinInfo> skin in characterData.Value.skins)
+                foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterData.CharacterSkinInfo> skin in characterData.Value.skins)
                 {
                     if (skin.Value.originalSkinId != 0)
                     {
@@ -398,7 +398,7 @@ public class GameData : MonoBehaviour
                             { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
                         },
                         bag = bags[0],
-                        skins = charactersSkinDBSO.GenerateRandomSkin()
+                        skins = charactersSkinDBSO.GenerateRandomModel()
                     }
                 },
                 { randomNames[1], new CharacterData()
@@ -413,7 +413,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[1],
-                        skins = charactersSkinDBSO.GenerateRandomSkin()
+                        skins = charactersSkinDBSO.GenerateRandomModel()
                     }
                 },
                 { randomNames[2], new CharacterData()
@@ -428,7 +428,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[2],
-                        skins = charactersSkinDBSO.GenerateRandomSkin()
+                        skins = charactersSkinDBSO.GenerateRandomModel()
                     }
                 },
                 { randomNames[3], new CharacterData()
@@ -443,7 +443,7 @@ public class GameData : MonoBehaviour
                             { 2, new CharacterData.CharacterItem() },
                         },
                         bag = bags[3],
-                        skins = charactersSkinDBSO.GenerateRandomSkin()
+                        skins = charactersSkinDBSO.GenerateRandomModel()
                     }
                 },
             }

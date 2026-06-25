@@ -25,15 +25,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "UnlockCamera",
-                    "type": "Button",
-                    "id": "ffdf7e9c-15b9-4b2c-a7a0-a5524f836873",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Look",
                     "type": "Value",
                     "id": "6b444451-8a00-4d00-a97e-f47457f736a8",
@@ -430,28 +421,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "MoveCamera",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "5ccaccde-e61f-4a64-aa62-fd05deea6d08",
-                    "path": "<Mouse>/middleButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "UnlockCamera",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "03ff5a69-0d8f-41c3-b96d-e27daf77dd8f",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "UnlockCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

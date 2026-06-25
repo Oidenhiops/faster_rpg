@@ -21,8 +21,6 @@ public class CharacterPlayerMovement : CharacterMovementBase
         {
             if (characterBase.directionMovement != Vector2.zero)
             {
-                characterBase.directionAnimation.x = Mathf.RoundToInt(characterBase.directionMovement.x);
-                characterBase.directionAnimation.z = Mathf.RoundToInt(characterBase.directionMovement.y);
                 if (!characterBase.isDashing && !characterBase.isJumping) characterBase.characterAnimations.MakeAnimation("Walk");
             }
             else if (!characterBase.isDashing && !characterBase.isJumping)
@@ -40,7 +38,8 @@ public class CharacterPlayerMovement : CharacterMovementBase
             }
             else
             {
-                CameraInfo.Instance.CamDirection(new Vector3(characterBase.directionAnimation.x, 0, characterBase.directionAnimation.z), out Vector3 directionFromCameraByAnimation);
+                Vector3 launchDirection = characterBase.directionMovement != Vector2.zero ? new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y) : characterBase.characterModel.modelTransform.forward;
+                CameraInfo.Instance.CamDirection(new Vector3(launchDirection.x, 0, launchDirection.z), out Vector3 directionFromCameraByAnimation);
                 directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
             }
         }
@@ -74,7 +73,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
 
     public async Awaitable MakeDash()
     {
-        characterBase.dissolve.NeedAppear();
+        characterBase.dissolvePlayer.NeedAppear();
         characterBase.isDashing = true;
         characterBase.characterAnimations.MakeAnimation("Dash");
         await Awaitable.WaitForSecondsAsync(0.1f);

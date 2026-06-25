@@ -57,6 +57,8 @@ public class CharacterPlayer : CharacterBase
             await characterPlayerHud.InitializeInventory();
             await InitializeAnimations();
             characterMovement.HandleInitialize();
+            dissolvePlayer.ObtainCharacterModels();
+            dissolvePlayer.NeedAppear();
             isInitialize = true;
         }
         catch (Exception ex)
@@ -76,7 +78,7 @@ public class CharacterPlayer : CharacterBase
         if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
         {
             isChangingCharacter = true;
-            dissolve.NeedAppear();
+            dissolvePlayer.NeedAppear();
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.white;
             characterIndex = (int)context.ReadValue<float>();
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
@@ -89,10 +91,7 @@ public class CharacterPlayer : CharacterBase
     public void MoveCamera(InputAction.CallbackContext context)
     {
         if (isInventoryOpen) return;
-        if (inputActions.Player.UnlockCamera.ReadValue<float>() == 1)
-        {
-            characterPlayerCamera.MoveCamera(context);
-        }
+        characterPlayerCamera.MoveCamera(context);
     }
     async Awaitable ChangeCharacterAction()
     {
@@ -500,12 +499,9 @@ public class CharacterPlayer : CharacterBase
     }
     void LaunchDropItem(ItemDropped itemDropped)
     {
-        CameraInfo.Instance.CamDirection(new Vector3(directionAnimation.x, 0, directionAnimation.z), out Vector3 directionFromCamera);
-        if (directionFromCamera == Vector3.zero)
-            return;
-
-        directionFromCamera.Normalize();
+        Vector3 launchDirection = directionMovement != Vector2.zero ? new Vector3(directionMovement.x, 0, directionMovement.y) : characterModel.modelTransform.forward;
+        launchDirection.Normalize();
         itemDropped.rb.linearVelocity = Vector3.zero;
-        itemDropped.rb.AddForce(directionFromCamera * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
+        itemDropped.rb.AddForce(launchDirection * dropLaunchForce + Vector3.up * dropUpForce, ForceMode.Impulse);
     }
 }

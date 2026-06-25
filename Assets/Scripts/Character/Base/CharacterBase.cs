@@ -14,7 +14,6 @@ public class CharacterBase : MonoBehaviour
     public CharacterData[] charactersData;
     public int characterIndex;
     public int currentFastItemIndex;
-    public Vector3Int directionAnimation = new Vector3Int();
     public Vector2 directionMovement = new Vector2();
     public GameObject floatingTextPrefab;
     public GameObject dieEffectPrefab;
@@ -23,7 +22,7 @@ public class CharacterBase : MonoBehaviour
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
     public CharacterDirection characterDirection;
-    public Dissolve dissolve;
+    public DissolvePlayer dissolvePlayer;
     public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
     public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
     List<int> statusEffectsCharacterKeysToRemove = new();
@@ -136,25 +135,6 @@ public class CharacterBase : MonoBehaviour
         }
 
         return name;
-    }
-    public void LookAt(Vector3Int startPos, Vector3Int finalPos)
-    {
-        if (startPos.x == finalPos.x)
-        {
-            directionAnimation.x = startPos.z < finalPos.z ? 1 : -1;
-        }
-        else
-        {
-            directionAnimation.x = startPos.x < finalPos.x ? -1 : 1;
-        }
-        if (startPos.z == finalPos.z)
-        {
-            directionAnimation.z = startPos.x < finalPos.x ? 1 : -1;
-        }
-        else
-        {
-            directionAnimation.z = startPos.z < finalPos.z ? 1 : -1;
-        }
     }
     public async Awaitable TakeDamage(CharacterBase characterMakeDamage, int damage)
     {
@@ -371,7 +351,7 @@ public class CharacterBase : MonoBehaviour
     [Serializable]
     public class CharacterModel
     {
-        public SerializedDictionary<CharacterData.TypeSkin, MeshRenderer> meshRenderers = new SerializedDictionary<CharacterData.TypeSkin, MeshRenderer>();
+        public SerializedDictionary<CharactersModelDBSO.TypeModel, MeshRenderer> meshRenderers = new SerializedDictionary<CharactersModelDBSO.TypeModel, MeshRenderer>();
         public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;
