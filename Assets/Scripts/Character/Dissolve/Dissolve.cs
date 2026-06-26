@@ -20,8 +20,6 @@ public class Dissolve : MonoBehaviour
         {
             objectsToDisolve[i].material.SetFloat("_DissolveAmount", 1);
         }
-        // Outline (Render Objects): el material de override no esta en el renderer,
-        // asi que sincronizamos su dissolve por variable global.
         Shader.SetGlobalFloat("_DissolveAmount", 1);
         AppearObject();
     }

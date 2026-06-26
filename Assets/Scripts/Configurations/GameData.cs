@@ -569,7 +569,6 @@ public class GameData : MonoBehaviour
         public SerializedDictionary<string, Vector3Int> positionsSave = new SerializedDictionary<string, Vector3Int>();
         public SerializedDictionary<int, CharacterData.CharacterItem> bagItems = new SerializedDictionary<int, CharacterData.CharacterItem>();
         public SerializedDictionary<string, CharacterData> characters = new SerializedDictionary<string, CharacterData>();
-        // public SerializedDictionary<string, InitialBGMSoundsConfigSO.BGMScenesData> bgmSceneData = new SerializedDictionary<string, InitialBGMSoundsConfigSO.BGMScenesData>();
     }
     [Serializable]
     public class ConfigurationsInfo

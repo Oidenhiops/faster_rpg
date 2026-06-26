@@ -164,7 +164,6 @@ public class CharacterBase : MonoBehaviour
     }
     public async Awaitable TakeDamage(CharacterBase characterMakeDamage, int damage)
     {
-        // characterAnimations.MakeAnimation("TakeDamage");
         FloatingText floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity).GetComponent<FloatingText>();
         _ = floatingText.SendText(damage.ToString(), Color.red, false);
         if (charactersData[characterIndex].statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))

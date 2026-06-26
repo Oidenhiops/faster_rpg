@@ -14,18 +14,16 @@ public class CharacterPlayerMovement : CharacterMovementBase
     }
     public override void HandleMovement()
     {
-        characterBase.directionMovement = inputActions.Player.Move.ReadValue<Vector2>().normalized;
+        Vector2 moveInput = inputActions.Player.Move.ReadValue<Vector2>();
+        characterBase.directionMovement = moveInput.normalized;
         CameraInfo.Instance.CamDirection(new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y), out Vector3 directionFromCamera);
         directionFromCamera.y = rb.linearVelocity.y;
         if (!characterBase.isInCanalization)
         {
-            if (characterBase.directionMovement != Vector2.zero)
+            if (!characterBase.isDashing && characterBase.isGrounded)
             {
-                if (!characterBase.isDashing && characterBase.isGrounded) characterBase.characterAnimator.SetBool("isWalking", true);
-            }
-            else if (!characterBase.isDashing && characterBase.isGrounded)
-            {
-                characterBase.characterAnimator.SetBool("isWalking", false);
+                float targetSpeed = Mathf.Clamp01(moveInput.magnitude);
+                characterBase.characterAnimator.SetFloat("speed", targetSpeed, 0.1f, Time.deltaTime);
             }
         }
         if (characterBase.isDashing)
@@ -84,10 +82,8 @@ public class CharacterPlayerMovement : CharacterMovementBase
     {
         characterBase.dissolvePlayer.NeedAppear();
         characterBase.isDashing = true;
-        // characterBase.characterAnimations.characterAnimator.SetBool("isDashing", true);
         await Awaitable.WaitForSecondsAsync(0.1f);
         characterBase.isDashing = false;
-        // characterBase.characterAnimations.characterAnimator.SetBool("isDashing", false);
     }
     public async Awaitable MakeJump()
     {

@@ -55,7 +55,6 @@ public class CharacterAnimator : MonoBehaviour
     }
     int blinkToken;
 
-    // Aplica un color a todos los materiales, tomandolos siempre en vivo desde las referencias.
     void ApplyBlinkColor(Color color)
     {
         foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
@@ -75,7 +74,6 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
-    // Restaura los colores originales leyendolos en vivo desde CharacterData (characterIndex actual).
     void RestoreOriginalColors()
     {
         CharacterData data = characterBase.charactersData[characterBase.characterIndex];
@@ -106,7 +104,6 @@ public class CharacterAnimator : MonoBehaviour
 
     async Awaitable Blink()
     {
-        // Reinicia el efecto: invalida cualquier blink anterior y vuelve a los colores originales.
         int token = ++blinkToken;
         RestoreOriginalColors();
 
@@ -118,7 +115,7 @@ public class CharacterAnimator : MonoBehaviour
 
             for (int b = 0; b < blinkCount; b++)
             {
-                if (token != blinkToken) return; // otro blink tomó el control
+                if (token != blinkToken) return;
 
                 ApplyBlinkColor(info.color);
                 await Awaitable.WaitForSecondsAsync(step);
@@ -135,7 +132,6 @@ public class CharacterAnimator : MonoBehaviour
         }
         finally
         {
-            // Solo el blink activo restaura, para no pisar al que tomó el control.
             if (token == blinkToken) RestoreOriginalColors();
         }
     }
