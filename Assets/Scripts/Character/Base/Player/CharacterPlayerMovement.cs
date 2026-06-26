@@ -21,11 +21,11 @@ public class CharacterPlayerMovement : CharacterMovementBase
         {
             if (characterBase.directionMovement != Vector2.zero)
             {
-                if (!characterBase.isDashing && !characterBase.isJumping) characterBase.characterAnimations.MakeAnimation("Walk");
+                if (!characterBase.isDashing && characterBase.isGrounded) characterBase.characterAnimator.SetBool("isWalking", true);
             }
-            else if (!characterBase.isDashing && !characterBase.isJumping)
+            else if (!characterBase.isDashing && characterBase.isGrounded)
             {
-                characterBase.characterAnimations.MakeAnimation("Idle");
+                characterBase.characterAnimator.SetBool("isWalking", false);
             }
         }
         if (characterBase.isDashing)
@@ -84,27 +84,15 @@ public class CharacterPlayerMovement : CharacterMovementBase
     {
         characterBase.dissolvePlayer.NeedAppear();
         characterBase.isDashing = true;
-        characterBase.characterAnimations.MakeAnimation("Dash");
+        // characterBase.characterAnimations.characterAnimator.SetBool("isDashing", true);
         await Awaitable.WaitForSecondsAsync(0.1f);
         characterBase.isDashing = false;
-        characterBase.characterAnimations.MakeAnimation("Idle");
+        // characterBase.characterAnimations.characterAnimator.SetBool("isDashing", false);
     }
     public async Awaitable MakeJump()
     {
         if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
-        characterBase.isJumping = true;
-        characterBase.characterAnimations.MakeAnimation("Jump");
         rb.AddForce(Vector3.up * 5, ForceMode.Impulse);
         await Awaitable.WaitForSecondsAsync(0.1f);
-        while (characterBase.characterAnimations.name == "Jump")
-        {
-            await Awaitable.NextFrameAsync();
-        }
-        while (!characterBase.isGrounded )
-        {
-            await Awaitable.NextFrameAsync();
-        }
-        characterBase.isJumping = false;
-        characterBase.characterAnimations.MakeAnimation("Idle");
     }
 }

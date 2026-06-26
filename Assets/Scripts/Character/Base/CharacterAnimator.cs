@@ -2,18 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class CharacterAnimator : MonoBehaviour
 {
     public CharacterBase characterBase;
-    public Animator characterAnimator;
     public AnimationEffectsSO animationEffectsSO;
-    public void MakeAnimation(string animationName)
-    {
-        if (characterAnimator.GetCurrentAnimatorStateInfo(0).IsName(animationName)) return;
-        characterAnimator.Play(animationName);
-    }
     public string GetAnimationAttack()
     {
         characterBase.charactersData[characterBase.characterIndex].GetCurrentWeapon(out CharacterData.CharacterItem weapon);
@@ -58,36 +53,91 @@ public class CharacterAnimator : MonoBehaviour
             Debug.LogError(e);
         }
     }
+    int blinkToken;
+
+    // Aplica un color a todos los materiales, tomandolos siempre en vivo desde las referencias.
+    void ApplyBlinkColor(Color color)
+    {
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
+        {
+            if (model.Value == null) continue;
+            foreach (CharacterBase.CharacterModelData modelData in model.Value)
+            {
+                Material[] mats = modelData.meshRenderer.materials;
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    if (mats[i].HasProperty("_Color"))
+                    {
+                        mats[i].SetColor("_Color", color);
+                    }
+                }
+            }
+        }
+    }
+
+    // Restaura los colores originales leyendolos en vivo desde CharacterData (characterIndex actual).
+    void RestoreOriginalColors()
+    {
+        CharacterData data = characterBase.charactersData[characterBase.characterIndex];
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
+        {
+            if (model.Value == null) continue;
+            bool hasSkin = data.models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo);
+            foreach (CharacterBase.CharacterModelData modelData in model.Value)
+            {
+                Material[] mats = modelData.meshRenderer.materials;
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    if (mats[i].HasProperty("_Color"))
+                    {
+                        if (hasSkin && i < skinInfo.colors.Count)
+                        {
+                            mats[i].SetColor("_Color", skinInfo.colors[i]);
+                        }
+                        else
+                        {
+                            mats[i].SetColor("_Color", Color.white);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     async Awaitable Blink()
     {
+        // Reinicia el efecto: invalida cualquier blink anterior y vuelve a los colores originales.
+        int token = ++blinkToken;
+        RestoreOriginalColors();
+
+        AnimationEffectsSO.AnimationEffect info = animationEffectsSO.animationsEffects[AnimationEffectsSO.TypeAnimationsEffects.Blink];
         try
         {
-            // float elapsedTime = 0f;
-            // while (elapsedTime < currentSpritePerTime * currentAnimation.sprites.Count)
-            // {
-            //     if (character.characterModel.characterMeshRenderer.material.color == Color.white)
-            //     {
-            //         character.characterModel.characterMeshRenderer.material.SetColor("_Color", currentAnimation.animationsEffects[TypeAnimationsEffects.Blink].colorBlink);
-            //     }
-            //     else
-            //     {
-            //         character.characterModel.characterMeshRenderer.material.SetColor("_Color", Color.white);
-            //     }
-            //     elapsedTime += currentSpritePerTime;
-            //     await Task.Delay(TimeSpan.FromSeconds(currentSpritePerTime));
-            // }
-            // character.characterModel.characterMeshRenderer.material.SetColor("_Color", Color.white);
+            float step = info.frequency > 0f ? info.frequency : 0.1f;
+            int blinkCount = info.amplitude > 0f ? Mathf.RoundToInt(info.amplitude) : 3;
+
+            for (int b = 0; b < blinkCount; b++)
+            {
+                if (token != blinkToken) return; // otro blink tomó el control
+
+                ApplyBlinkColor(info.color);
+                await Awaitable.WaitForSecondsAsync(step);
+
+                if (token != blinkToken) return;
+
+                RestoreOriginalColors();
+                await Awaitable.WaitForSecondsAsync(step);
+            }
         }
         catch (Exception e)
         {
             Debug.LogError(e);
         }
+        finally
+        {
+            // Solo el blink activo restaura, para no pisar al que tomó el control.
+            if (token == blinkToken) RestoreOriginalColors();
+        }
     }
     #endregion
-    [Serializable] public class AnimationEffectInfo
-    {
-        public float amplitude = 0;
-        public float frequency = 0;
-        public Color colorBlink = Color.white;
-    }
 }

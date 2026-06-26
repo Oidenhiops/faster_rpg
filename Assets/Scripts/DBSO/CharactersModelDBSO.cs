@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharactersModelDB", menuName = "ScriptableObjects/DB/CharactersModelDB", order = 1)]
 public class CharactersModelDBSO : ScriptableObject
 {
-    public SerializedDictionary<TypeModel, SerializedDictionary<int, Mesh>> data = new SerializedDictionary<TypeModel, SerializedDictionary<int, Mesh>>();
+    public SerializedDictionary<TypeModel, SerializedDictionary<int, List<Mesh>>> data = new SerializedDictionary<TypeModel, SerializedDictionary<int, List<Mesh>>>();
     public SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo> GenerateRandomModel()
     {
         SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo> model = new SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo>();
@@ -23,17 +23,23 @@ public class CharactersModelDBSO : ScriptableObject
             meshId = headIndex,
             colors = new List<Color> { skinColor },
         });
-        int eyesIndex = Random.Range(1, data[TypeModel.Eyes].Count - 1);
+        int eyesIndex = Random.Range(1, data[TypeModel.Eyes].Count + 1);
         model.Add(TypeModel.Eyes, new CharacterData.CharacterSkinInfo
         {
             meshId = eyesIndex,
             colors = new List<Color> { RandomColor(), RandomColor(), RandomColor() },
         });
-        int eyebrowsIndex = Random.Range(1, data[TypeModel.Eyebrows].Count - 1);
+        int eyebrowsIndex = Random.Range(1, data[TypeModel.Eyebrows].Count + 1);
         model.Add(TypeModel.Eyebrows, new CharacterData.CharacterSkinInfo
         {
             meshId = eyebrowsIndex,
             colors = new List<Color> { RandomColor() },
+        });
+        int earsIndex = Random.Range(1, data[TypeModel.Ears].Count + 1);
+        model.Add(TypeModel.Ears, new CharacterData.CharacterSkinInfo
+        {
+            meshId = earsIndex,
+            colors = new List<Color> { skinColor },
         });
         int bodyIndex = Random.Range(1, data[TypeModel.Body].Count + 1);
         model.Add(TypeModel.Body, new CharacterData.CharacterSkinInfo

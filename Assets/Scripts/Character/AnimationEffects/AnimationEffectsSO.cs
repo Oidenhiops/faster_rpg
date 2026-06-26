@@ -11,6 +11,7 @@ public class AnimationEffectsSO : ScriptableObject
     {
         public float frequency;
         public float amplitude;
+        public Color color;
     }
     public enum TypeAnimationsEffects
     {

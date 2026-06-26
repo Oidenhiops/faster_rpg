@@ -10,7 +10,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
         bool cancelSkill = false;
         if (canalizationEffect != null)
         {
-            characterMakeSkillData.characterMakeSkill.characterAnimations.MakeAnimation(canalizationEffect.canalizationAnimationName);
+            characterMakeSkillData.characterMakeSkill.characterAnimator.Play(canalizationEffect.canalizationAnimationName, -1, 0f);
             characterMakeSkillData.characterMakeSkill.isInCanalization = true;
             characterMakeSkillData.characterMakeSkill.AddStatusEffect(canalizationEffect);
             while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)

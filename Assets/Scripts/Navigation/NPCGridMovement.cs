@@ -15,13 +15,6 @@ public class NPCGridMovement : CharacterGridNavigator
     {
         if (rb == null) return;
 
-        if (characterBase != null && characterBase.isJumping
-            && characterBase.isGrounded && rb.linearVelocity.y <= 0.01f
-            && Time.time - lastJumpTime > 0.1f)
-        {
-            characterBase.isJumping = false;
-        }
-
         if (!HasPath || IsAtDestination)
         {
             Vector3 stop = rb.linearVelocity;
@@ -29,9 +22,9 @@ public class NPCGridMovement : CharacterGridNavigator
             stop.z = 0f;
             rb.linearVelocity = stop;
 
-            if (characterBase != null && !characterBase.isDashing && !characterBase.isJumping)
+            if (characterBase != null && !characterBase.isDashing && !characterBase.isGrounded)
             {
-                characterBase.characterAnimations?.MakeAnimation("Idle");
+                characterBase.characterAnimator?.SetBool("isWalking", false);
             }
             return;
         }
@@ -47,15 +40,12 @@ public class NPCGridMovement : CharacterGridNavigator
         bool needsJump = wp.y - transform.position.y > verticalReachThreshold;
         bool canJump = characterBase != null
                     && characterBase.isGrounded
-                    && !characterBase.isJumping
                     && Time.time - lastJumpTime > jumpCooldown;
 
         if (needsJump && canJump)
         {
             velocity.y = jumpForce;
-            characterBase.isJumping = true;
             lastJumpTime = Time.time;
-            characterBase.characterAnimations?.MakeAnimation("Jump");
         }
 
         rb.linearVelocity = velocity;
@@ -69,9 +59,9 @@ public class NPCGridMovement : CharacterGridNavigator
     {
         if (characterBase == null) return;
 
-        if (!characterBase.isDashing && !characterBase.isJumping)
+        if (!characterBase.isDashing && !characterBase.isGrounded)
         {
-            characterBase.characterAnimations?.MakeAnimation("Walk");
+            characterBase.characterAnimator?.SetBool("isWalking", true);
         }
     }
 

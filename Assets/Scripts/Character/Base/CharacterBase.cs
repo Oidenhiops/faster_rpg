@@ -23,6 +23,7 @@ public class CharacterBase : MonoBehaviour
     public CharacterAnimator characterAnimations;
     public CharacterDirection characterDirection;
     public DissolvePlayer dissolvePlayer;
+    public Animator characterAnimator;
     public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
     public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
     List<int> statusEffectsCharacterKeysToRemove = new();
@@ -33,7 +34,6 @@ public class CharacterBase : MonoBehaviour
     protected Coroutine handleUseSkillCoroutine;
     public bool isGrounded => SetGrounded();
     public bool isDashing;
-    public bool isJumping;
     public bool isInCanalization;
     public bool _cancelCanalization;
     public bool cancelCanalization
@@ -50,7 +50,6 @@ public class CharacterBase : MonoBehaviour
     }
     public void OnEnable()
     {
-        if (isInitialize) characterAnimations?.MakeAnimation("Idle");
         OnEnableHandle();
     }
     public void Awake()
@@ -68,25 +67,31 @@ public class CharacterBase : MonoBehaviour
     public async virtual Awaitable InitializeCharacter() { }
     protected async Awaitable InitializeModels()
     {
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterModelData> model in characterModel.meshesData)
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterModelData>> model in characterModel.meshesData)
         {
             if (charactersData[characterIndex].models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo))
             {
                 if (skinInfo.meshId != 0)
                 {
-                    model.Value.meshFilter.mesh = GameData.Instance.charactersModelDBSO.data[model.Key][skinInfo.meshId];
-                    Material[] materials = model.Value.meshRenderer.materials;
-                    int colorCount = Mathf.Min(materials.Length, skinInfo.colors.Count);
-                    for (int i = 0; i < colorCount; i++)
+                    for (int i = 0; i < model.Value.Count; i++)
                     {
-                        materials[i].SetColor("_Color", skinInfo.colors[i]);
+                        model.Value[i].meshFilter.mesh = GameData.Instance.charactersModelDBSO.data[model.Key][skinInfo.meshId][i];
+                        Material[] materials = model.Value[i].meshRenderer.materials;
+                        int colorCount = Mathf.Min(materials.Length, skinInfo.colors.Count);
+                        for (int j = 0; j < colorCount; j++)
+                        {
+                            materials[j].SetColor("_Color", skinInfo.colors[j]);
+                        }
+                        model.Value[i].meshRenderer.materials = materials;
+                        model.Value[i].meshFilter.gameObject.SetActive(true);
                     }
-                    model.Value.meshRenderer.materials = materials;
-                    model.Value.meshFilter.gameObject.SetActive(true);
                 }
                 else
                 {
-                    model.Value.meshFilter.gameObject.SetActive(false);
+                    for (int i = 0; i < model.Value.Count; i++)
+                    {
+                        model.Value[i].meshFilter.gameObject.SetActive(false);
+                    }
                 }
             }
         }
@@ -101,12 +106,9 @@ public class CharacterBase : MonoBehaviour
     public virtual async Awaitable UseSkill(int skillIndex) { }
     protected bool SetGrounded()
     {
-        return Physics.OverlapBox
-        (
-            transform.position,
-            new Vector3(0.5f, 0.1f, 0.5f) / 2,
-            Quaternion.identity,
-            LayerMask.GetMask("Map")).Length > 0;
+        bool grounded = Physics.OverlapBox(transform.position, new Vector3(0.5f, 0.1f, 0.5f) / 2, Quaternion.identity, LayerMask.GetMask("Map")).Length > 0;
+        characterAnimator?.SetBool("isGrounded", grounded);
+        return grounded;
     }
     public virtual void TakeExp(CharacterData.Statistic statistic)
     {
@@ -162,7 +164,7 @@ public class CharacterBase : MonoBehaviour
     }
     public async Awaitable TakeDamage(CharacterBase characterMakeDamage, int damage)
     {
-        characterAnimations.MakeAnimation("TakeDamage");
+        // characterAnimations.MakeAnimation("TakeDamage");
         FloatingText floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity).GetComponent<FloatingText>();
         _ = floatingText.SendText(damage.ToString(), Color.red, false);
         if (charactersData[characterIndex].statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))
@@ -375,7 +377,7 @@ public class CharacterBase : MonoBehaviour
     [Serializable]
     public class CharacterModel
     {
-        public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterModelData> meshesData = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterModelData>();
+        public SerializedDictionary<CharactersModelDBSO.TypeModel, List<CharacterModelData>> meshesData = new SerializedDictionary<CharactersModelDBSO.TypeModel, List<CharacterModelData>>();
         public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;
