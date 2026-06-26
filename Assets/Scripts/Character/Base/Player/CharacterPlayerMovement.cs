@@ -23,7 +23,9 @@ public class CharacterPlayerMovement : CharacterMovementBase
             if (!characterBase.isDashing && characterBase.isGrounded)
             {
                 float targetSpeed = Mathf.Clamp01(moveInput.magnitude);
-                characterBase.characterAnimator.SetFloat("speed", targetSpeed, 0.1f, Time.deltaTime);
+                float currentSpeed = characterBase.characterAnimator.GetFloat("speed");
+                float newSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, Time.deltaTime * 10f);
+                characterBase.characterAnimator.SetFloat("speed", newSpeed);
             }
         }
         if (characterBase.isDashing)
