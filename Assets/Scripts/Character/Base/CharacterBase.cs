@@ -34,6 +34,7 @@ public class CharacterBase : MonoBehaviour
     protected Coroutine handleUseSkillCoroutine;
     public bool isGrounded => SetGrounded();
     public bool isDashing;
+    public bool isRunning;
     public bool isInCanalization;
     public bool _cancelCanalization;
     public bool cancelCanalization
@@ -61,6 +62,7 @@ public class CharacterBase : MonoBehaviour
         if (isInitialize)
         {
             MoveCharacter();
+            AnimateCharacter();
         }
     }
     public virtual void OnEnableHandle() { }
@@ -100,15 +102,17 @@ public class CharacterBase : MonoBehaviour
     {
         characterMovement.HandleMovement();
     }
+    public void AnimateCharacter()
+    {
+        characterAnimations.HandleAnimation();
+    }
     public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
     public virtual void UseItem() { }
     public virtual void UseItem(int bagSlotIndex) { }
     public virtual async Awaitable UseSkill(int skillIndex) { }
     protected bool SetGrounded()
-    {
-        bool grounded = Physics.OverlapBox(transform.position, new Vector3(0.5f, 0.1f, 0.5f) / 2, Quaternion.identity, LayerMask.GetMask("Map")).Length > 0;
-        characterAnimator?.SetBool("isGrounded", grounded);
-        return grounded;
+    {        
+        return Physics.OverlapBox(transform.position, new Vector3(0.5f, 0.1f, 0.5f) / 2, Quaternion.identity, LayerMask.GetMask("Map")).Length > 0;
     }
     public virtual void TakeExp(CharacterData.Statistic statistic)
     {

@@ -11,51 +11,33 @@ public class CharacterPlayerMovement : CharacterMovementBase
         inputActions.Player.Enable();
         inputActions.Player.Jump.performed += OnHandleJump;
         inputActions.Player.Dash.performed += OnHandleDash;
+        inputActions.Player.Run.performed += OnHandleRun;
+        inputActions.Player.Run.canceled += OnHandleRun;
     }
     public override void HandleMovement()
     {
-        Vector2 moveInput = inputActions.Player.Move.ReadValue<Vector2>();
-        characterBase.directionMovement = moveInput.normalized;
+        characterBase.directionMovement = inputActions.Player.Move.ReadValue<Vector2>().normalized;
         CameraInfo.Instance.CamDirection(new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y), out Vector3 directionFromCamera);
         directionFromCamera.y = rb.linearVelocity.y;
-        if (!characterBase.isInCanalization)
-        {
-            if (!characterBase.isDashing && characterBase.isGrounded)
-            {
-                float targetSpeed = Mathf.Clamp01(moveInput.magnitude);
-                float currentSpeed = characterBase.characterAnimator.GetFloat("speed");
-                float newSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, Time.deltaTime * 10f);
-                characterBase.characterAnimator.SetFloat("speed", newSpeed);
-            }
-        }
         if (characterBase.isDashing)
         {
             if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
             if (characterBase.directionMovement != Vector2.zero)
             {
-                directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
-                directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4;
+                directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
+                directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
             }
             else
             {
-                if (characterBase.directionMovement != Vector2.zero)
-                {
-                    Vector3 launchDirection = new Vector3(characterBase.directionMovement.x, 0, characterBase.directionMovement.y);
-                    CameraInfo.Instance.CamDirection(new Vector3(launchDirection.x, 0, launchDirection.z), out Vector3 directionFromCameraByAnimation);
-                    directionFromCamera = directionFromCameraByAnimation * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
-                }
-                else
-                {
-                    Vector3 launchDirection = characterBase.characterModel.modelTransform.forward;
-                    launchDirection.y = 0;
-                    directionFromCamera = launchDirection * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
-                }
+                Vector3 launchDirection = characterBase.characterModel.modelTransform.forward;
+                launchDirection.y = 0;
+                directionFromCamera = launchDirection * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
             }
         }
         else if (!characterBase.isInCanalization)
         {
-            directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue;
-            directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue;
+            directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * (characterBase.isRunning ? 1.5f : 1);
+            directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * (characterBase.isRunning ? 1.5f : 1);
         }
         else
         {
@@ -77,6 +59,17 @@ public class CharacterPlayerMovement : CharacterMovementBase
         if (characterBase.isGrounded && !characterBase.isDashing)
         {
             _ = MakeDash();
+        }
+    }
+    void OnHandleRun(InputAction.CallbackContext context)
+    {
+        if (context.performed && characterBase.isGrounded && !characterBase.isDashing)
+        {
+            characterBase.isRunning = true;
+        }
+        else if (context.canceled)
+        {
+            characterBase.isRunning = false;
         }
     }
 

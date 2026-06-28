@@ -16,19 +16,11 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: typeWalk
     m_Mirror: 0
-  - serializedVersion: 2
-    m_Motion: {fileID: -4641945158880342644}
-    m_Threshold: 0.5
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: typeWalk
-    m_Mirror: 0
-  m_BlendParameter: typeMovement
+  m_BlendParameter: speed
   m_BlendParameterY: Blend
   m_MinThreshold: 0
-  m_MaxThreshold: 0.5
-  m_UseAutomaticThresholds: 1
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
 --- !u!206 &-4641945158880342644
@@ -80,11 +72,19 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: -7551964380084998518, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
-    m_Threshold: 1
+    m_Threshold: 0.5
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: typeWalk
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 8349542763059015795, guid: a51e4da65306d3d48b396ae05ec2395c, type: 3}
+    m_Threshold: 1
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: speed
     m_Mirror: 0
   m_BlendParameter: speed
   m_BlendParameterY: Blend
@@ -150,7 +150,7 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: speed
     m_Mirror: 0
-  m_BlendParameter: typeMovement
+  m_BlendParameter: speed
   m_BlendParameterY: TypeWalk
   m_MinThreshold: 0
   m_MaxThreshold: 1
@@ -167,12 +167,6 @@ AnimatorController:
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: speed
-    m_Type: 1
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: typeMovement
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -263,7 +257,7 @@ AnimatorStateMachine:
     m_Position: {x: 260, y: 110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2451271005822073425}
-    m_Position: {x: 260, y: -20, z: 0}
+    m_Position: {x: 260, y: -10, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []

@@ -9,6 +9,19 @@ public class CharacterAnimator : MonoBehaviour
 {
     public CharacterBase characterBase;
     public AnimationEffectsSO animationEffectsSO;
+    float animSpeed;
+    public void HandleAnimation()
+    {
+        animSpeed = Mathf.MoveTowards(characterBase.characterAnimator.GetFloat("speed"), GetAnimationSpeed(), Time.deltaTime * 10f);
+        characterBase.characterAnimator.SetFloat("speed", animSpeed);
+        characterBase.characterAnimator.SetBool("isGrounded", characterBase.isGrounded);
+    }
+    float GetAnimationSpeed()
+    {
+        if (characterBase.directionMovement == Vector2.zero) return 0f;
+        else if (characterBase.isRunning) return 1;
+        else return 0.5f;
+    }
     public string GetAnimationAttack()
     {
         characterBase.charactersData[characterBase.characterIndex].GetCurrentWeapon(out CharacterData.CharacterItem weapon);

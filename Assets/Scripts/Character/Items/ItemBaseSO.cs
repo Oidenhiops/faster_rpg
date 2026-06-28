@@ -6,11 +6,11 @@ public class ItemBaseSO : ScriptableObject
 {
     public int id;
     public string idText;
+    public CharacterData.CharacterSkinInfo modelInfo;
     public Sprite icon;
     public GeneralTypeObject generalTypeObject;
     public TypeObject typeObject;
     public TypeWeapon typeWeapon;
-    public Sprite weaponSprite;
     public string animationName;
     public int maxStack;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
