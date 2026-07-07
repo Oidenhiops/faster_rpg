@@ -8,7 +8,6 @@ using UnityEngine;
 public class CharacterBase : MonoBehaviour
 {
     public bool isInitialize;
-    public bool isCharacterPlayer;
     public bool autoInit;
     public CharacterModel characterModel;
     public CharacterData[] charactersData;
@@ -212,8 +211,6 @@ public class CharacterBase : MonoBehaviour
                             status.Value.statusEffectBaseSO.RemoveEffect(this);
                             if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
                             {
-                                Destroy(characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].gameObject);
-                                characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status.Key);
                                 AddStatusEffectToRemove(statusEffect.Key, status.Key);
                                 if (statusEffect.Value.Count - statusToRemove[statusEffect.Key].Count <= 0)
                                 {
@@ -256,6 +253,8 @@ public class CharacterBase : MonoBehaviour
             foreach (StatusEffectBaseSO status in character.Value)
             {
                 statusEffects[character.Key].Remove(status);
+                Destroy(characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status].gameObject);
+                characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status);
             }
         }
         foreach (int character in statusEffectsCharacterKeysToRemove)

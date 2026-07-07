@@ -360,7 +360,6 @@ public class GameData : MonoBehaviour
                             { ItemBaseSO.TypeObject.Pants, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pants, 1) },
                             { ItemBaseSO.TypeObject.Pendant, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pendant, 1) },
                             { ItemBaseSO.TypeObject.Ring, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Ring, 1) },
-                            { ItemBaseSO.TypeObject.Utility, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Utility, 1) },
                             { ItemBaseSO.TypeObject.Weapon, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 1) },
                         },
                         consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
@@ -368,6 +367,7 @@ public class GameData : MonoBehaviour
                             { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3) },
                             { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2) },
                             { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
+                            { 3, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 4, 1) }
                         },
                         bag = bags[0],
                         models = charactersModelDBSO.GenerateRandomModel()
@@ -383,6 +383,7 @@ public class GameData : MonoBehaviour
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
                             { 2, new CharacterData.CharacterItem() },
+                            { 3, new CharacterData.CharacterItem() }
                         },
                         bag = bags[1],
                         models = charactersModelDBSO.GenerateRandomModel()
@@ -398,6 +399,7 @@ public class GameData : MonoBehaviour
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
                             { 2, new CharacterData.CharacterItem() },
+                            { 3, new CharacterData.CharacterItem() }
                         },
                         bag = bags[2],
                         models = charactersModelDBSO.GenerateRandomModel()
@@ -413,6 +415,7 @@ public class GameData : MonoBehaviour
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
                             { 2, new CharacterData.CharacterItem() },
+                            { 3, new CharacterData.CharacterItem() }
                         },
                         bag = bags[3],
                         models = charactersModelDBSO.GenerateRandomModel()

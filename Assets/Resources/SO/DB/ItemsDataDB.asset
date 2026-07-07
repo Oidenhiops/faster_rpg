@@ -60,14 +60,11 @@ MonoBehaviour:
       Value:
         _serializedList:
         - Key: 1
-          Value: {fileID: 11400000, guid: e12b663c2c20dc9429cf9eb46940e7b1, type: 2}
-    - Key: 10
-      Value:
-        _serializedList:
-        - Key: 1
           Value: {fileID: 11400000, guid: fe738a323d518d246b60c3c30fa13371, type: 2}
         - Key: 2
           Value: {fileID: 11400000, guid: e284ed82025e9944786be88da8bc31e6, type: 2}
         - Key: 3
           Value: {fileID: 11400000, guid: 49ab658a7b01585468db1b83105c0394, type: 2}
+        - Key: 4
+          Value: {fileID: 11400000, guid: e12b663c2c20dc9429cf9eb46940e7b1, type: 2}
   itemsToAdd: []

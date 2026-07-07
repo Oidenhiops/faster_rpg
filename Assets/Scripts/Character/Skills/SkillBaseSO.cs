@@ -17,6 +17,7 @@ public class SkillsBaseSO : ScriptableObject
     public SerializedDictionary<int, SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> statistics = new SerializedDictionary<int, SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>();
     public ItemBaseSO.TypeWeapon weaponForUseSkill;
     public virtual async Awaitable UseSkill(CharacterMakeSkillData characterMakeSkillData, CharacterBase characterToMakeSkill, int skillIndex) { Debug.LogError("UseSkill non implemented");}
+    public virtual async Awaitable UseSkill(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("UseSkill non implemented");}
     public virtual void LevelUpSkill(CharacterBase character, int skillIndex) { Debug.LogError("LevelUpSkill non implemented"); }
     public bool ValidateCanUseSkill(CharacterMakeSkillData characterMakeSkillData, int skillLevel)
     {

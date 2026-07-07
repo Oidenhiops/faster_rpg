@@ -10,12 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 92e423c8b8b4d39469e809663f6c8220, type: 3}
-  m_Name: SkillUtilityItem
+  m_Name: ConsumableSkillItem
   m_EditorClassIdentifier: Assembly-CSharp::SkillUtilitySO
-  id: 1
+  id: 4
   idText: 12
+  modelInfo:
+    meshId: 0
+    colors: []
   icon: {fileID: -1917821749, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
-  generalTypeObject: 1
+  generalTypeObject: 2
   typeObject: 9
   typeWeapon: 0
   animationName: 

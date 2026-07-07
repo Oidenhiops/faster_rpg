@@ -4,33 +4,33 @@ using UnityEngine;
 public class GeneralBuffSkilUtilitySO : SkillsBaseSO
 {
     public StatusEffectBaseSO statusEffectBaseSO;
-    public override async Awaitable UseSkill(CharacterMakeSkillData characterMakeSkillData, CharacterBase characterToMakeSkill, int skillIndex)
+    public override async Awaitable UseSkill(CharacterBase character, CharacterData.CharacterItem characterItem)
     {
         float elapsedTime = 0f;
         bool cancelSkill = false;
         if (canalizationEffect != null)
         {
-            characterMakeSkillData.characterMakeSkill.characterAnimator.Play(canalizationEffect.canalizationAnimationName, -1, 0f);
-            characterMakeSkillData.characterMakeSkill.isInCanalization = true;
-            characterMakeSkillData.characterMakeSkill.AddStatusEffect(canalizationEffect);
+            character.characterAnimator.Play(canalizationEffect.canalizationAnimationName, -1, 0f);
+            character.isInCanalization = true;
+            character.AddStatusEffect(canalizationEffect);
             while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
             {
                 elapsedTime += Time.deltaTime;
-                if (characterMakeSkillData.characterMakeSkill.cancelCanalization)
+                if (character.cancelCanalization)
                 {
-                    characterMakeSkillData.characterMakeSkill.statusEffects[characterMakeSkillData.characterMakeSkillIndex][canalizationEffect].cd = 0;
-                    characterMakeSkillData.characterMakeSkill.AddStatusEffectToRemove(characterMakeSkillData.characterMakeSkillIndex, canalizationEffect);
+                    //character.statusEffects[character.characterIndex][canalizationEffect].cd = 0;
+                    character.AddStatusEffectToRemove(character.characterIndex, canalizationEffect);
                     cancelSkill = true;
                     break;
                 }
                 await Awaitable.NextFrameAsync();
             }
-            characterMakeSkillData.characterMakeSkill.isInCanalization = false;
+            character.isInCanalization = false;
         }
         if (!cancelSkill)
         {
-            statusEffectBaseSO.ApplyEffect(characterMakeSkillData.characterMakeSkill);
-            GameObject effectPrefab = Instantiate(skillVFXPrefab, characterMakeSkillData.characterMakeSkill.transform.position, Quaternion.identity, characterMakeSkillData.characterMakeSkill.transform);
+            statusEffectBaseSO.ApplyEffect(character);
+            GameObject effectPrefab = Instantiate(skillVFXPrefab, character.transform.position, Quaternion.identity, character.transform);
             Destroy(effectPrefab, skillVFXDuration);
         }
     }

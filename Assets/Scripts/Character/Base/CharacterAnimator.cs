@@ -12,6 +12,7 @@ public class CharacterAnimator : MonoBehaviour
     float animSpeed;
     public void HandleAnimation()
     {
+        if (characterBase.isInCanalization) return;
         animSpeed = Mathf.MoveTowards(characterBase.characterAnimator.GetFloat("speed"), GetAnimationSpeed(), Time.deltaTime * 10f);
         characterBase.characterAnimator.SetFloat("speed", animSpeed);
         characterBase.characterAnimator.SetBool("isGrounded", characterBase.isGrounded);

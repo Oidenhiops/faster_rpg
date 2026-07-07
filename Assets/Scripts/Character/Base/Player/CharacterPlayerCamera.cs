@@ -16,5 +16,6 @@ public class CharacterPlayerCamera : MonoBehaviour
     {
         orbital.HorizontalAxis.Value += context.ReadValue<Vector2>().x * speed * Time.deltaTime;
         orbital.VerticalAxis.Value += context.ReadValue<Vector2>().y * (flipYAxis ? -1 : 1) * speed * Time.deltaTime;
+        orbital.VerticalAxis.Value = Mathf.Clamp(orbital.VerticalAxis.Value, orbital.VerticalAxis.Range.x, orbital.VerticalAxis.Range.y);
     }
 }

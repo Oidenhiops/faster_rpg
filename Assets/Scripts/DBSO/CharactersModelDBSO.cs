@@ -76,5 +76,14 @@ public class CharactersModelDBSO : ScriptableObject
         Body = 6,
         Hands = 7,
         Feets = 8,
+        Helmet = 9,
+        Front = 10,
+        Pants = 11,
+        Boots = 12,
+        Gloves = 13,
+        Pendant = 14,
+        Ring = 15,
+        Weapon = 16,
+        Consumable = 17,
     }
 }

@@ -19,7 +19,6 @@ public class CharacterData
         {ItemBaseSO.TypeObject.Pendant, null},
         {ItemBaseSO.TypeObject.Ring, null},
         {ItemBaseSO.TypeObject.Weapon, null},
-        {ItemBaseSO.TypeObject.Utility, null},
     };
     public SerializedDictionary<int, CharacterItem> consumables = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
@@ -125,7 +124,14 @@ public class CharacterData
             itemStatistics.Clear();
             amount = 0;
         }
-        public CharacterItem() { }
+        public CharacterItem()
+        {
+            itemId = 0;
+            typeObject = default;
+            itemBaseSO = null;
+            itemStatistics.Clear();
+            amount = 0;
+        }
         public CharacterItem(CharacterItem characterItem)
         {
             itemId = characterItem.itemId;

@@ -17,7 +17,6 @@ public class CharacterPlayer : CharacterBase
     public bool isInventoryOpen;
     public CharacterBase otherCharacterToMakeSkill;
     public CharacterPlayerCamera characterPlayerCamera;
-    public bool hideWeaponsInHand;
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
@@ -40,7 +39,21 @@ public class CharacterPlayer : CharacterBase
                 charactersDataList.Add(characterData.Value);
             }
             charactersData = charactersDataList.ToArray();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters data: {ex.Message}");
+        }
+        try
+        {
             await InitializeItems();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters items: {ex.Message}");
+        }
+        try
+        {
             for (int i = 0; i < 4; i++)
             {
                 if (i <= charactersData.Length - 1)
@@ -54,17 +67,45 @@ public class CharacterPlayer : CharacterBase
                 }
             }
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
-            await characterPlayerHud.InitializeInventory();
-            await InitializeModels();
-            characterMovement.HandleInitialize();
-            dissolvePlayer.ObtainCharacterModels();
-            dissolvePlayer.NeedAppear();
-            isInitialize = true;
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Error initializing character: {ex.Message}");
+            Debug.LogError($"Error initializing characters portraits: {ex.Message}");
         }
+        try
+        {
+            await characterPlayerHud.InitializeInventory();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters inventory: {ex.Message}");
+        }
+        try
+        {
+            await InitializeModels();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters models: {ex.Message}");
+        }
+        try
+        {
+            characterMovement.HandleInitialize();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters movement: {ex.Message}");
+        }
+        try
+        {
+            dissolvePlayer.ObtainCharacterModels();
+            dissolvePlayer.NeedAppear();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters dissolve: {ex.Message}");
+        }
+        isInitialize = true;
     }
     async Awaitable InitializeItems()
     {
@@ -75,7 +116,7 @@ public class CharacterPlayer : CharacterBase
     }
     void OnHandleChangeCharacter(InputAction.CallbackContext context)
     {
-        if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>())
+        if (!isChangingCharacter && charactersData.Length - 1 >= context.ReadValue<float>() && characterIndex != (int)context.ReadValue<float>() && !isInCanalization)
         {
             isChangingCharacter = true;
             dissolvePlayer.NeedAppear();
@@ -83,20 +124,20 @@ public class CharacterPlayer : CharacterBase
             characterIndex = (int)context.ReadValue<float>();
             characterPlayerHud.characterUI.characterPortraits[characterIndex].characterBg.color = Color.yellow;
             _ = InitializeModels();
-            _ = ChangeCharacterAction();
+            _ = ChangeCharacterPortraits();
             _ = characterPlayerHud.RefreshCharacterInventory();
             characterPlayerHud.RefreshStatusEffects();
         }
+    }
+    async Awaitable ChangeCharacterPortraits()
+    {
+        await characterPlayerHud.ChangeCharacterPortrait();
+        isChangingCharacter = false;
     }
     public void MoveCamera(InputAction.CallbackContext context)
     {
         if (isInventoryOpen) return;
         characterPlayerCamera.MoveCamera(context);
-    }
-    async Awaitable ChangeCharacterAction()
-    {
-        await characterPlayerHud.ChangeCharacterPortrait();
-        isChangingCharacter = false;
     }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {
@@ -105,11 +146,22 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleUseFastItem(InputAction.CallbackContext context)
     {
-        if (!isInventoryOpen) UseItem();
+        if (!isInventoryOpen && !isInCanalization) UseItem();
+    }
+    public override void UseItem()
+    {
+        if (isInventoryOpen) return;
+        if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
+            charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].consumables[currentFastItemIndex]);
+    }
+    public override void UseItem(int bagSlotIndex)
+    {
+        if (isInventoryOpen) return;
+        if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].bag[bagSlotIndex]);
     }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
     {
-        if (!isInventoryOpen) _ = UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
+        if (!isInventoryOpen && !isInCanalization) _ = UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
     }
     public override async Awaitable UseSkill(int skillIndex)
     {
@@ -140,17 +192,6 @@ public class CharacterPlayer : CharacterBase
                 handleUseSkillCoroutine = StartCoroutine(HandleUseSkill());
             }
         }
-    }
-    public override void UseItem()
-    {
-        if (isInventoryOpen) return;
-        if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO) 
-                charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].consumables[currentFastItemIndex]);
-    }
-    public override void UseItem(int bagSlotIndex)
-    {
-        if (isInventoryOpen) return;
-        if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].bag[bagSlotIndex]);
     }
     public void OnHandleShowItemsToPickUp()
     {
@@ -291,11 +332,6 @@ public class CharacterPlayer : CharacterBase
             if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp);
             if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp);
             characterPlayerHud.RefreshCharacterStatistics();
-            if ((equipmentItemTemp.itemBaseSO && equipmentItemTemp.itemBaseSO.typeObject == ItemBaseSO.TypeObject.Utility) || 
-                bagItemTemp.itemBaseSO && bagItemTemp.itemBaseSO.typeObject == ItemBaseSO.TypeObject.Utility)
-            {
-                characterPlayerHud.RefreshSkills();
-            }
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
             characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
         }
