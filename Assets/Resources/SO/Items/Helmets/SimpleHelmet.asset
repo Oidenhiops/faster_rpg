@@ -14,6 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
   id: 1
   idText: 7
+  modelInfo:
+    meshId: 1
+    colors:
+    - {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
+    occlude: 0
+    typeModel: 9
+    occludedModels: 01000000
   icon: {fileID: -1417439036, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   generalTypeObject: 1
   typeObject: 1

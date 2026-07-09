@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EquipableItem", menuName = "ScriptableObjects/Items/EquipableItem", order = 1)]
 public class EquipableItemSO : ItemBaseSO
 {
-    public override async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem)
+    public override async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterItem.itemStatistics)
         {
@@ -14,8 +14,9 @@ public class EquipableItemSO : ItemBaseSO
                 character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
+        EquipModelItem(character, characterItem, true);
     }
-    public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem)
+    public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterItem.itemStatistics)
         {
@@ -25,10 +26,6 @@ public class EquipableItemSO : ItemBaseSO
                 character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
-    }
-
-    public void UseEquipableItem(CharacterBase character, CharacterData.CharacterItem characterItem)
-    {
-        throw new System.NotImplementedException();
+        DesEquipModelItem(character, characterItem, true);
     }
 }

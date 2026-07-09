@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
@@ -6,7 +7,7 @@ public class ItemBaseSO : ScriptableObject
 {
     public int id;
     public string idText;
-    public CharacterData.CharacterSkinInfo modelInfo;
+    public ItemModelInfo modelInfo;
     public Sprite icon;
     public GeneralTypeObject generalTypeObject;
     public TypeObject typeObject;
@@ -14,9 +15,41 @@ public class ItemBaseSO : ScriptableObject
     public string animationName;
     public int maxStack;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
-    public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("EquipItem not implemented"); }
-    public virtual async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("DesEquipItem not implemented"); }
-    public virtual void EquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
+    public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false) { Debug.LogError("EquipItem not implemented"); }
+    public virtual void EquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)
+    {
+        if (modelInfo.meshId != 0)
+        {
+            character.charactersData[character.characterIndex].models[modelInfo.typeModel].meshId = modelInfo.meshId;
+            character.charactersData[character.characterIndex].models[modelInfo.typeModel].colors = new List<Color>(modelInfo.colors);
+            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
+            {
+                character.charactersData[character.characterIndex].models[occludedModel].occlude = true;
+            }
+            if (refreshModel)
+            {
+                character.RefreshCharacterModel(characterItem, true);
+            }
+        }
+    }
+    public virtual async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false) { Debug.LogError("DesEquipItem not implemented"); }
+    public void DesEquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)
+    {
+        if (modelInfo.meshId != 0)
+        {
+            character.charactersData[character.characterIndex].models[modelInfo.typeModel].meshId = 0;
+            character.charactersData[character.characterIndex].models[modelInfo.typeModel].colors = new List<Color>();
+            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
+            {
+                character.charactersData[character.characterIndex].models[occludedModel].occlude = false;
+            }
+            if (refreshModel)
+            {
+                character.RefreshCharacterModel(characterItem, false);
+            }
+        }
+    }
+    public void EquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
         {
@@ -26,8 +59,21 @@ public class ItemBaseSO : ScriptableObject
                 characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
+        EquipModelItem(characterData, characterItem);
     }
-    public virtual void DesEquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
+    public void EquipModelItem(CharacterData characterData, CharacterData.CharacterItem characterItem, bool refreshModel = false)
+    {
+        if (modelInfo.meshId != 0)
+        {
+            characterData.models[modelInfo.typeModel].meshId = modelInfo.meshId;
+            characterData.models[modelInfo.typeModel].colors = new List<Color>(modelInfo.colors);
+            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
+            {
+                characterData.models[occludedModel].occlude = true;
+            }
+        }
+    }
+    public void DesEquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
         {
@@ -35,6 +81,19 @@ public class ItemBaseSO : ScriptableObject
             {
                 characterData.statistics[statistic.Key].itemValue -= statistic.Value.baseValue;
                 characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
+            }
+        }
+        DesEquipModelItem(characterData, characterItem);
+    }
+    public virtual void DesEquipModelItem(CharacterData characterData, CharacterData.CharacterItem characterItem, bool refreshModel = false)
+    {
+        if (modelInfo.meshId != 0)
+        {
+            characterData.models[modelInfo.typeModel].meshId = 0;
+            characterData.models[modelInfo.typeModel].colors = new List<Color>();
+            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
+            {
+                characterData.models[occludedModel].occlude = false;
             }
         }
     }
@@ -87,5 +146,11 @@ public class ItemBaseSO : ScriptableObject
         Axe = 5,
         Staff = 6,
         Monster = 7
+    }
+    [Serializable]
+    public class ItemModelInfo: CharacterData.CharacterSkinInfo
+    {
+        public CharactersModelDBSO.TypeModel typeModel;
+        public List<CharactersModelDBSO.TypeModel> occludedModels = new List<CharactersModelDBSO.TypeModel>();
     }
 }

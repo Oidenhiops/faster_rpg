@@ -10,11 +10,10 @@ public class CharactersModelDBSO : ScriptableObject
     {
         SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo> model = new SerializedDictionary<TypeModel, CharacterData.CharacterSkinInfo>();
         int hairIndex = Random.Range(1, data[TypeModel.Hair].Count + 1);
-        Color hairColor = RandomColor();
         model.Add(TypeModel.Hair, new CharacterData.CharacterSkinInfo
         {
             meshId = hairIndex,
-            colors = new List<Color> { hairColor },
+            colors = new List<Color> { RandomColor(), RandomColor(), RandomColor(), RandomColor(), RandomColor() },
         });
         int headIndex = Random.Range(1, data[TypeModel.Head].Count + 1);
         Color skinColor = RandomColor();
@@ -58,6 +57,51 @@ public class CharactersModelDBSO : ScriptableObject
         {
             meshId = feetIndex,
             colors = new List<Color> { skinColor },
+        });
+        model.Add(TypeModel.Helmet, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Front, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Pants, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Boots, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Gloves, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Pendant, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Ring, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Weapon, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
+        });
+        model.Add(TypeModel.Consumable, new CharacterData.CharacterSkinInfo
+        {
+            meshId = 0,
+            colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
         });
         return model;
     }

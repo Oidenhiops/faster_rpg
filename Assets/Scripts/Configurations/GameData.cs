@@ -356,7 +356,7 @@ public class GameData : MonoBehaviour
                             { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 1) },
                             { ItemBaseSO.TypeObject.Front, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Front, 1) },
                             { ItemBaseSO.TypeObject.Gloves, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Gloves, 1) },
-                            { ItemBaseSO.TypeObject.Helmet, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Helmet, 1) },
+                            { ItemBaseSO.TypeObject.Helmet, new CharacterData.CharacterItem() },
                             { ItemBaseSO.TypeObject.Pants, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pants, 1) },
                             { ItemBaseSO.TypeObject.Pendant, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pendant, 1) },
                             { ItemBaseSO.TypeObject.Ring, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Ring, 1) },
@@ -459,6 +459,7 @@ public class GameData : MonoBehaviour
         bags[0][1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
         bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
         bags[0][3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
+        bags[0][4] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Helmet, 1);
         return newSlotData;
     }
     public void SetStartingItems()

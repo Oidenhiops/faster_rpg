@@ -40,6 +40,15 @@ public class CharacterData
         {CharactersModelDBSO.TypeModel.Body, new CharacterSkinInfo()},
         {CharactersModelDBSO.TypeModel.Hands, new CharacterSkinInfo()},
         {CharactersModelDBSO.TypeModel.Feets, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Helmet, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Front, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Pants, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Boots, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Gloves, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Pendant, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Ring, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Weapon, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.Consumable, new CharacterSkinInfo()},
     };
     public void InitializeStatistics()
     {
@@ -162,6 +171,7 @@ public class CharacterData
     {
         public int meshId;
         public List<Color> colors;
+        public bool occlude;
     }
     public enum MasteryRange
     {

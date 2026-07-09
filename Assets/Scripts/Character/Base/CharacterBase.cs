@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
@@ -84,7 +83,7 @@ public class CharacterBase : MonoBehaviour
                             materials[j].SetColor("_Color", skinInfo.colors[j]);
                         }
                         model.Value[i].meshRenderer.materials = materials;
-                        model.Value[i].meshFilter.gameObject.SetActive(true);
+                        model.Value[i].meshFilter.gameObject.SetActive(!skinInfo.occlude);
                     }
                 }
                 else
@@ -127,6 +126,51 @@ public class CharacterBase : MonoBehaviour
             charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue = spare;
             charactersData[characterIndex].LevelUp();
             level++;
+        }
+    }
+    public void RefreshCharacterModel(CharacterData.CharacterItem characterItem, bool isEquip)
+    {
+        if (characterItem.itemBaseSO != null)
+        {
+            for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
+            {
+                characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(isEquip);
+            }
+            if (isEquip)
+            {
+                for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
+                {
+                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.mesh = 
+                        GameData.Instance.charactersModelDBSO.data[characterItem.itemBaseSO.modelInfo.typeModel][characterItem.itemBaseSO.modelInfo.meshId][i];
+                    Material[] materials = characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials;
+                    int colorCount = Mathf.Min(materials.Length, characterItem.itemBaseSO.modelInfo.colors.Count);
+                    for (int j = 0; j < colorCount; j++)
+                    {
+                        materials[j].SetColor("_Color", characterItem.itemBaseSO.modelInfo.colors[j]);
+                    }
+                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials = materials;
+                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(true);
+                }
+                for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
+                {
+                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = true;
+                    foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
+                    {
+                        modelData.meshFilter.gameObject.SetActive(false);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
+                {
+                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = false;
+                    foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
+                    {
+                        modelData.meshFilter.gameObject.SetActive(true);
+                    }
+                }
+            }
         }
     }
     public string GenerateFantasyName()

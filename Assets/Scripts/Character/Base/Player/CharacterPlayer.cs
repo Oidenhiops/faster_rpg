@@ -329,8 +329,8 @@ public class CharacterPlayer : CharacterBase
             charactersData[characterIndex].equipments[equipmentIndex] = bagItemTemp;
             charactersData[characterIndex].bag[bagSlotIndex] = equipmentItemTemp;
 
-            if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp);
-            if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp);
+            if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true);
+            if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp, true);
             characterPlayerHud.RefreshCharacterStatistics();
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
             characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
