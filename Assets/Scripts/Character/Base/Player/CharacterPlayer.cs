@@ -215,6 +215,17 @@ public class CharacterPlayer : CharacterBase
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
         characterPlayerHud.SelectFastItem();
+        if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
+        {
+            RefreshCharacterModel(charactersData[characterIndex].consumables[currentFastItemIndex], true);
+        }
+        else
+        {
+            RefreshCharacterModel(new CharacterData.CharacterItem
+            {
+                typeObject = ItemBaseSO.TypeObject.Consumable,
+            }, false);
+        }
     }
     public void ChangeObjectPosition()
     {
