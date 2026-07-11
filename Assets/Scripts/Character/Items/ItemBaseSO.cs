@@ -28,7 +28,7 @@ public class ItemBaseSO : ScriptableObject
             }
             if (refreshModel)
             {
-                character.RefreshCharacterModel(characterItem, true);
+                character.RefreshCharacterItemModel(characterItem, true);
             }
         }
     }
@@ -45,7 +45,7 @@ public class ItemBaseSO : ScriptableObject
             }
             if (refreshModel)
             {
-                character.RefreshCharacterModel(characterItem, false);
+                character.RefreshCharacterItemModel(characterItem, false);
             }
         }
     }

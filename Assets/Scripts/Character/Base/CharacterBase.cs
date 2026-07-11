@@ -77,10 +77,24 @@ public class CharacterBase : MonoBehaviour
                     {
                         model.Value[i].meshFilter.mesh = GameData.Instance.charactersModelDBSO.data[model.Key][skinInfo.meshId][i];
                         Material[] materials = model.Value[i].meshRenderer.materials;
-                        int colorCount = Mathf.Min(materials.Length, skinInfo.colors.Count);
-                        for (int j = 0; j < colorCount; j++)
+                        if (!skinInfo.useTexture)
                         {
-                            materials[j].SetColor("_Color", skinInfo.colors[j]);
+                            for (int j = 0; j < skinInfo.colors.Count; j++)
+                            {
+                                materials[j].SetColor("_Color", skinInfo.colors[j]);
+                            }
+                        }
+                        else
+                        {
+                            for (int j = 0; j < skinInfo.textures.Count; j++)
+                            {
+                                materials[j].SetTexture("_MainTex", skinInfo.textures[j].texture);
+                                SetTextureFromAtlas(
+                                    skinInfo.textures[j],
+                                    characterModel.meshesData[model.Key][i].meshRenderer,
+                                    skinInfo.originalMesh[j]
+                                );
+                            }
                         }
                         model.Value[i].meshRenderer.materials = materials;
                         model.Value[i].meshFilter.gameObject.SetActive(!skinInfo.occlude);
@@ -95,6 +109,102 @@ public class CharacterBase : MonoBehaviour
                 }
             }
         }
+        if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
+        {
+            RefreshCharacterItemModel(charactersData[characterIndex].consumables[currentFastItemIndex], true);
+        }
+        else
+        {
+            RefreshCharacterItemModel(new CharacterData.CharacterItem
+            {
+                typeObject = ItemBaseSO.TypeObject.Consumable,
+            }, false);
+        }
+    }
+    public void RefreshCharacterItemModel(CharacterData.CharacterItem characterItem, bool isEquip)
+    {
+        if (characterItem.itemBaseSO != null)
+        {
+            for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
+            {
+                characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(isEquip);
+            }
+            if (isEquip)
+            {
+                for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
+                {
+                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.mesh =
+                        GameData.Instance.charactersModelDBSO.data[characterItem.itemBaseSO.modelInfo.typeModel][characterItem.itemBaseSO.modelInfo.meshId][i];
+                    Material[] materials = characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials;
+                    if (!characterItem.itemBaseSO.modelInfo.useTexture)
+                    {
+                        for (int j = 0; j < characterItem.itemBaseSO.modelInfo.colors.Count; j++)
+                        {
+                            materials[j].SetFloat("_UseTexture", 0f);
+                            materials[j].SetColor("_Color", characterItem.itemBaseSO.modelInfo.colors[j]);
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < characterItem.itemBaseSO.modelInfo.textures.Count; j++)
+                        {
+                            materials[j].SetFloat("_UseTexture", 1f);
+                            materials[j].SetTexture("_MainTex", characterItem.itemBaseSO.modelInfo.textures[j].texture);
+                            SetTextureFromAtlas(
+                                characterItem.itemBaseSO.modelInfo.textures[j],
+                                characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer,
+                                characterItem.itemBaseSO.modelInfo.originalMesh[j]
+                            );
+                        }
+                    }
+                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials = materials;
+                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(true);
+                }
+                for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
+                {
+                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = true;
+                    foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
+                    {
+                        modelData.meshFilter.gameObject.SetActive(false);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
+                {
+                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = false;
+                    foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
+                    {
+                        modelData.meshFilter.gameObject.SetActive(true);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < characterModel.meshesData[GetTypeObjectFromModel(characterItem.typeObject)].Count; i++)
+            {
+                characterModel.meshesData[GetTypeObjectFromModel(characterItem.typeObject)][i].meshFilter.gameObject.SetActive(false);
+            }
+        }
+    }
+    public CharactersModelDBSO.TypeModel GetTypeObjectFromModel(ItemBaseSO.TypeObject typeModel)
+    {
+        return Enum.Parse<CharactersModelDBSO.TypeModel>(typeModel.ToString());
+    }
+    void SetTextureFromAtlas(Sprite spriteFromAtlas, MeshRenderer meshRenderer, Mesh originalMesh)
+    {
+        Vector2[] uvs = originalMesh.uv;
+        Texture2D texture = spriteFromAtlas.texture;
+        meshRenderer.material.mainTexture = texture;
+        Rect spriteRect = spriteFromAtlas.rect;
+        for (int i = 0; i < uvs.Length; i++)
+        {
+            uvs[i].x = Mathf.Lerp(spriteRect.x / texture.width, (spriteRect.x + spriteRect.width) / texture.width, uvs[i].x);
+            uvs[i].y = Mathf.Lerp(spriteRect.y / texture.height, (spriteRect.y + spriteRect.height) / texture.height, uvs[i].y);
+        }
+        meshRenderer.GetComponent<MeshFilter>().mesh.uv = uvs;
     }
     public void MoveCharacter()
     {
@@ -126,51 +236,6 @@ public class CharacterBase : MonoBehaviour
             charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue = spare;
             charactersData[characterIndex].LevelUp();
             level++;
-        }
-    }
-    public void RefreshCharacterModel(CharacterData.CharacterItem characterItem, bool isEquip)
-    {
-        if (characterItem.itemBaseSO != null)
-        {
-            for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
-            {
-                characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(isEquip);
-            }
-            if (isEquip)
-            {
-                for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
-                {
-                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.mesh = 
-                        GameData.Instance.charactersModelDBSO.data[characterItem.itemBaseSO.modelInfo.typeModel][characterItem.itemBaseSO.modelInfo.meshId][i];
-                    Material[] materials = characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials;
-                    int colorCount = Mathf.Min(materials.Length, characterItem.itemBaseSO.modelInfo.colors.Count);
-                    for (int j = 0; j < colorCount; j++)
-                    {
-                        materials[j].SetColor("_Color", characterItem.itemBaseSO.modelInfo.colors[j]);
-                    }
-                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials = materials;
-                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(true);
-                }
-                for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
-                {
-                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = true;
-                    foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
-                    {
-                        modelData.meshFilter.gameObject.SetActive(false);
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
-                {
-                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = false;
-                    foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
-                    {
-                        modelData.meshFilter.gameObject.SetActive(true);
-                    }
-                }
-            }
         }
     }
     public string GenerateFantasyName()

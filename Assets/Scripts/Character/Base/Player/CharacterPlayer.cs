@@ -215,13 +215,17 @@ public class CharacterPlayer : CharacterBase
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
         characterPlayerHud.SelectFastItem();
+        UpdateFastItemModel();
+    }
+    void UpdateFastItemModel()
+    {
         if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterModel(charactersData[characterIndex].consumables[currentFastItemIndex], true);
+            RefreshCharacterItemModel(charactersData[characterIndex].consumables[currentFastItemIndex], true);
         }
         else
         {
-            RefreshCharacterModel(new CharacterData.CharacterItem
+            RefreshCharacterItemModel(new CharacterData.CharacterItem
             {
                 typeObject = ItemBaseSO.TypeObject.Consumable,
             }, false);
@@ -328,6 +332,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[draggedConsumableSlotIndex]);
         }
         characterPlayerHud.UpdateFastItems();
+        UpdateFastItemModel();
     }
     async Awaitable ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
     {
@@ -392,6 +397,7 @@ public class CharacterPlayer : CharacterBase
             }
         }
         characterPlayerHud.UpdateFastItems();
+        UpdateFastItemModel();
     }
     void DiferentBagAndConsumable(int bagSlotIndex, int consumableSlotIndex)
     {
@@ -542,6 +548,8 @@ public class CharacterPlayer : CharacterBase
             LaunchDropItem(itemDropped);
             charactersData[characterIndex].consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
+            characterPlayerHud.UpdateFastItems();
+            UpdateFastItemModel();
         }
     }
     void LaunchDropItem(ItemDropped itemDropped)

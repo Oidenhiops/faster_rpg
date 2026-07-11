@@ -39,7 +39,7 @@ public class ItemDropped : InteractableBase
     public void InitializeDropItem(CharacterData.CharacterItem itemData, bool startCountToPickUp = false)
     {
         this.itemData = itemData;
-        itemMeshRenderer.material.SetTexture("_BaseTexture", itemData.itemBaseSO.icon.texture);
+        itemMeshRenderer.material.SetTexture("_MainTex", itemData.itemBaseSO.icon.texture);
         SetTextureFromAtlas(itemData.itemBaseSO.icon, itemMeshRenderer);
         if (startCountToPickUp) _ = StartCountToPickUp();
     }

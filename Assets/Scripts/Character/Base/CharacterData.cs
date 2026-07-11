@@ -171,6 +171,9 @@ public class CharacterData
     {
         public int meshId;
         public List<Color> colors;
+        public bool useTexture;
+        public List<Sprite> textures;
+        public List<Mesh> originalMesh;
         public bool occlude;
     }
     public enum MasteryRange

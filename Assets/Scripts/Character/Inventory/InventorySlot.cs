@@ -67,7 +67,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         }
         else
         {
-            characterPlayerHud.characterPlayer.DropItem();
+            _ = characterPlayerHud.characterPlayer.DropItem();
         }
         characterPlayerHud.lastSelectedSlot = null;
         Destroy(characterPlayerHud.inventoryDraggedSlot.gameObject);

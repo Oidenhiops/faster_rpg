@@ -15,8 +15,13 @@ MonoBehaviour:
   id: 3
   idText: 3
   modelInfo:
-    meshId: 0
+    meshId: 1
     colors: []
+    useTexture: 1
+    textures:
+    - {fileID: 1062106936, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
+    originalMesh:
+    - {fileID: -6126938873385421277, guid: 3dd05c39b71a3b544873a5f386c01a68, type: 3}
     occlude: 0
     typeModel: 17
     occludedModels: 
