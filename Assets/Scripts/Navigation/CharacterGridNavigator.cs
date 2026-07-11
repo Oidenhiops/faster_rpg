@@ -208,14 +208,14 @@ public class CharacterGridNavigator : CharacterMovementBase
 
     int ResolveJumpDistance()
     {
-        return characterBase.charactersData[characterBase.characterIndex]
+        return (int)characterBase.charactersData[characterBase.characterIndex]
                             .statistics[CharacterData.TypeStatistic.JumpDistance]
                             .currentValue;
     }
 
     int ResolveDropDistance()
     {
-        return characterBase.charactersData[characterBase.characterIndex]
+        return (int)characterBase.charactersData[characterBase.characterIndex]
                             .statistics[CharacterData.TypeStatistic.DropDistance]
                             .currentValue;
     }

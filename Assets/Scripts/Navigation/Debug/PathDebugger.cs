@@ -87,7 +87,7 @@ public class PathDebugger : MonoBehaviour
         var data = c.charactersData[c.characterIndex];
         if (data == null || data.statistics == null) return 0;
         if (!data.statistics.TryGetValue(type, out var stat)) return 0;
-        return stat.currentValue;
+        return (int)stat.currentValue;
     }
 
 #if UNITY_EDITOR

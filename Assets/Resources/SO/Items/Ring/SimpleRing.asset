@@ -14,6 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
   id: 1
   idText: 10
+  modelInfo:
+    meshId: 0
+    colors: []
+    useTexture: 0
+    textures: []
+    originalMesh: []
+    occlude: 0
+    typeModel: 0
+    occludedModels: 
   icon: {fileID: 505844233, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   generalTypeObject: 1
   typeObject: 7
@@ -34,6 +43,15 @@ MonoBehaviour:
     - Key: 5
       Value:
         baseValue: 5
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 0
+    - Key: 16
+      Value:
+        baseValue: 10
         aptitudeValue: 0
         itemValue: 0
         buffValue:

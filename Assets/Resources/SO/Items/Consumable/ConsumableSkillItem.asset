@@ -31,6 +31,7 @@ MonoBehaviour:
   typeWeapon: 0
   animationName: 
   maxStack: 1
+  useEnergy: 1
   itemStatistics:
     _serializedList:
     - Key: 5
@@ -43,6 +44,15 @@ MonoBehaviour:
         currentValue: 0
         maxValue: 0
     - Key: 13
+      Value:
+        baseValue: 10
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 0
+    - Key: 16
       Value:
         baseValue: 10
         aptitudeValue: 0

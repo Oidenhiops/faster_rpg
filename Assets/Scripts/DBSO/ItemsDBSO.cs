@@ -31,14 +31,20 @@ public class ItemsDBSO : ScriptableObject
     {
         if (data.ContainsKey(typeObject) && data[typeObject].ContainsKey(id))
         {
-            return new CharacterData.CharacterItem
+            CharacterData.CharacterItem newItem = new CharacterData.CharacterItem
             {
                 itemId = data[typeObject][id].id,
                 typeObject = typeObject,
                 itemBaseSO = data[typeObject][id],
                 itemStatistics = data[typeObject][id].CloneStatistics(),
-                amount = amountItems
+                amount = amountItems,
             };
+            if (newItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+            {
+                newItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue = newItem.itemStatistics[CharacterData.TypeStatistic.Durability].baseValue;
+                newItem.itemStatistics[CharacterData.TypeStatistic.Durability].maxValue = newItem.itemStatistics[CharacterData.TypeStatistic.Durability].baseValue;
+            }
+            return newItem;
         }
         Debug.LogError($"Item with TypeObject: {typeObject} and ID: {id} not found in ItemsDBSO.");
         return null;

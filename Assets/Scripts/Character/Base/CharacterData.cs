@@ -74,7 +74,7 @@ public class CharacterData
 
         foreach (KeyValuePair<TypeStatistic, Statistic> statistic in statistics)
         {
-            if (statistic.Key != TypeStatistic.Exp && statistic.Key != TypeStatistic.Crtv && statistic.Key != TypeStatistic.Crtd)
+            if (statistic.Key != TypeStatistic.Exp && statistic.Key != TypeStatistic.Crtv && statistic.Key != TypeStatistic.Crtd && statistic.Key != TypeStatistic.Durability)
             {
                 statistic.Value.baseValue = Mathf.CeilToInt(statistic.Value.baseValue * (1.25f * statistic.Value.aptitudeValue / 100));
                 statistic.Value.RefreshValue((int)statistic.Key);
@@ -94,20 +94,20 @@ public class CharacterData
     [Serializable]
     public class Statistic
     {
-        public int baseValue = 0;
-        public int aptitudeValue = 0;
-        public int itemValue = 0;
-        public SerializedDictionary<StatusEffectBaseSO, int> buffValue = new SerializedDictionary<StatusEffectBaseSO, int>();
-        public int currentValue = 0;
-        public int maxValue = 0;
+        public float baseValue = 0;
+        public float aptitudeValue = 0;
+        public float itemValue = 0;
+        public SerializedDictionary<StatusEffectBaseSO, float> buffValue = new SerializedDictionary<StatusEffectBaseSO, float>();
+        public float currentValue = 0;
+        public float maxValue = 0;
         public void RefreshValue(int typeStatistic = 0)
         {
-            int baseWhitItem = baseValue + itemValue;
-            int totalBuffValue = 0;
-            foreach (KeyValuePair<StatusEffectBaseSO, int> buff in buffValue) totalBuffValue += buff.Value;
-            int baseWhitBuff = Mathf.CeilToInt(baseValue * totalBuffValue / 100);
-            int finalValue = Mathf.CeilToInt(baseWhitItem + baseWhitBuff);
-            int whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
+            float baseWhitItem = baseValue + itemValue;
+            float totalBuffValue = 0;
+            foreach (KeyValuePair<StatusEffectBaseSO, float> buff in buffValue) totalBuffValue += buff.Value;
+            float baseWhitBuff = Mathf.CeilToInt(baseValue * totalBuffValue / 100);
+            float finalValue = Mathf.CeilToInt(baseWhitItem + baseWhitBuff);
+            float whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
             maxValue = Mathf.Clamp(whitAptitude, 1, 99999);
             if (currentValue > maxValue) currentValue = maxValue;
             else if (typeStatistic != 0 && typeStatistic != 1 && typeStatistic != 2) currentValue = maxValue;
@@ -205,5 +205,6 @@ public class CharacterData
         Cd = 13,
         JumpDistance = 14,
         DropDistance = 15,
+        Durability = 16,
     }
 }

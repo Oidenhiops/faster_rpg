@@ -9,12 +9,14 @@ public class GameData : MonoBehaviour
     public static GameData Instance { get; private set; }
     public GameDataInfo gameDataInfo = new GameDataInfo();
     public SystemDataInfo systemDataInfo = new SystemDataInfo();
+    public Utils utils = new Utils();
     public List<ResolutionsInfo> allResolutions = new List<ResolutionsInfo>();
     public Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>> locs = new Dictionary<TypeLOCS, Dictionary<TypeLanguage, Dictionary<string, DialogData>>>();
     public CharactersDBSO charactersDBSO;
     public CharactersModelDBSO charactersModelDBSO;
     public ItemsDBSO itemsDBSO;
     public SkillsDBSO skillsDBSO;
+    public 
     void Awake()
     {
         if (Instance == null)
@@ -629,6 +631,11 @@ public class GameData : MonoBehaviour
     {
         public string dialog;
         public string description;
+    }
+    [Serializable]
+    public class Utils
+    {
+        public SerializedDictionary<string, Color> systemColors = new SerializedDictionary<string, Color>();
     }
     public enum TypeLanguage
     {

@@ -27,6 +27,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
         inputActions.Player.UseSkill.performed += OnHandleUseSkill;
         inputActions.Player.MoveCamera.performed += MoveCamera;
+        inputActions.Player.SetCameraRadius.performed += SetCameraRadius;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -139,6 +140,11 @@ public class CharacterPlayer : CharacterBase
         if (isInventoryOpen) return;
         characterPlayerCamera.MoveCamera(context);
     }
+    public void SetCameraRadius(InputAction.CallbackContext context)
+    {
+        if (isInventoryOpen) return;
+        characterPlayerCamera.SetCameraRadius(context);
+    }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {
         isInventoryOpen = !isInventoryOpen;
@@ -150,13 +156,20 @@ public class CharacterPlayer : CharacterBase
     }
     public override void UseItem()
     {
-        if (isInventoryOpen) return;
+        if (isInventoryOpen || isInCanalization) return;
         if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
-            charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].consumables[currentFastItemIndex]);
+        {
+            if (!charactersData[characterIndex].consumables[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) || 
+                charactersData[characterIndex].consumables[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) &&
+                charactersData[characterIndex].consumables[currentFastItemIndex].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0)
+            {
+                charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].consumables[currentFastItemIndex]);
+            }
+        }
     }
     public override void UseItem(int bagSlotIndex)
     {
-        if (isInventoryOpen) return;
+        if (isInventoryOpen || isInCanalization) return;
         if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].bag[bagSlotIndex]);
     }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
@@ -210,7 +223,7 @@ public class CharacterPlayer : CharacterBase
     }
     void OnHandleChangeFastItem(InputAction.CallbackContext context)
     {
-        if (isInventoryOpen) return;
+        if (isInventoryOpen || isInCanalization) return;
         currentFastItemIndex += (int)context.ReadValue<float>();
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
@@ -335,7 +348,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
             characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[draggedConsumableSlotIndex]);
         }
-        characterPlayerHud.UpdateFastItems();
+        characterPlayerHud.RefreshConsumables();
         if (consumableSlotIndex == currentFastItemIndex || draggedConsumableSlotIndex == currentFastItemIndex) UpdateFastItemModel();
     }
     async Awaitable ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
@@ -400,7 +413,7 @@ public class CharacterPlayer : CharacterBase
                 DiferentBagAndConsumable(bagSlotIndex, consumableSlotIndex);
             }
         }
-        characterPlayerHud.UpdateFastItems();
+        characterPlayerHud.RefreshConsumables();
         if (consumableSlotIndex == currentFastItemIndex) UpdateFastItemModel();
     }
     void DiferentBagAndConsumable(int bagSlotIndex, int consumableSlotIndex)
@@ -412,7 +425,7 @@ public class CharacterPlayer : CharacterBase
         charactersData[characterIndex].consumables[consumableSlotIndex] = bagSlotTemp;
         characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
         characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
-        characterPlayerHud.UpdateFastItems();
+        characterPlayerHud.RefreshConsumables();
     }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
@@ -520,7 +533,7 @@ public class CharacterPlayer : CharacterBase
             {
                 ChangeBagAndConsumable(slotIndex, consumableIndex, true);
             }
-            characterPlayerHud.UpdateFastItems();
+            characterPlayerHud.RefreshConsumables();
         }
         _ = characterPlayerHud.ResetInventoryTarget();
     }
@@ -552,7 +565,7 @@ public class CharacterPlayer : CharacterBase
             LaunchDropItem(itemDropped);
             charactersData[characterIndex].consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
-            characterPlayerHud.UpdateFastItems();
+            characterPlayerHud.RefreshConsumables();
             if (characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex == currentFastItemIndex) UpdateFastItemModel();
         }
     }

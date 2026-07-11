@@ -8,6 +8,10 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
     {
         float elapsedTime = 0f;
         bool cancelSkill = false;
+        if (characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+        {
+            characterItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue -= 1;
+        }
         if (canalizationEffect != null)
         {
             character.characterAnimator.Play(canalizationEffect.canalizationAnimationName, -1, 0f);
@@ -18,7 +22,6 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
                 elapsedTime += Time.deltaTime;
                 if (character.cancelCanalization)
                 {
-                    //character.statusEffects[character.characterIndex][canalizationEffect].cd = 0;
                     character.AddStatusEffectToRemove(character.characterIndex, canalizationEffect);
                     cancelSkill = true;
                     break;
@@ -27,6 +30,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
             }
             character.isInCanalization = false;
         }
+        character.characterPlayerHud.RefreshConsumables();
         if (!cancelSkill)
         {
             statusEffectBaseSO.ApplyEffect(character);

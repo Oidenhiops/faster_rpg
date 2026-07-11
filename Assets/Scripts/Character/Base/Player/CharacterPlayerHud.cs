@@ -112,32 +112,10 @@ public class CharacterPlayerHud : MonoBehaviour
         {
             characterUI.panelToResetSelect.gameObject.SetActive(true);
             ResetDescription();
-            foreach (Transform child in characterUI.characterBag.bagContainer)
-            {
-                Destroy(child.gameObject);
-            }
-            int index = 0;
-            characterUI.characterBag.inventorySlots.Clear();
-            foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.charactersData[characterPlayer.characterIndex].bag)
-            {
-                InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
-                bagSlotPrefab.characterPlayerHud = this;
-                bagSlotPrefab.slotIndex = bagSlot.Key;
-                bagSlotPrefab.InitializeSlot(bagSlot.Value);
-                characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
-                index++;
-            }
-            foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.equipments)
-            {
-                characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
-            }
-            foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
-            {
-                characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
-                characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].consumables[consumable.Key]);
-            }
+            RefreshBag();
+            RefreshEquipments();
             RefreshCharacterStatistics();
-            UpdateFastItems();
+            RefreshConsumables();
             RefreshSkills();
             await Awaitable.NextFrameAsync();
             if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
@@ -167,7 +145,7 @@ public class CharacterPlayerHud : MonoBehaviour
                 }
                 else
                 {
-                    int otherStatsValue = stat.currentValue;
+                    float otherStatsValue = stat.currentValue;
                     statistic.Value.text = stat.baseValue.ToString() + (otherStatsValue - stat.baseValue != 0 ? $" (+{otherStatsValue - stat.baseValue})" : "");
                 }
             }
@@ -222,8 +200,14 @@ public class CharacterPlayerHud : MonoBehaviour
             characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.statusEffectBaseSO, statusEffectBanner);
         }
     }
-    public void UpdateFastItems()
+    public void RefreshConsumables()
     {
+        foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
+        {
+            characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
+            characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].consumables[consumable.Key]);
+        }
+
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {
             if (characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO != null)
@@ -233,6 +217,20 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO.icon;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].amount.ToString() : "";
+                if (characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+                {
+                    characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = true;
+                    characterUI.fastItems[fastItem.Key].fastItemDurability.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
+                    characterUI.fastItems[fastItem.Key].fastItemDurability.color = 
+                        GameData.Instance.utils.systemColors.TryGetValue(
+                            characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
+                            characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
+                }
+                else
+                {
+                    characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = false;
+                    characterUI.fastItems[fastItem.Key].fastItemDurability.text = "";
+                }
             }
             else
             {
@@ -240,7 +238,34 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 0.5f;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = false;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.text = "";
+                characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = false;
+                characterUI.fastItems[fastItem.Key].fastItemDurability.text = "";
             }
+        }
+    }
+    public void RefreshEquipments()
+    {
+        foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.equipments)
+        {
+            characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
+        }
+    }
+    public void RefreshBag()
+    {
+        foreach (Transform child in characterUI.characterBag.bagContainer)
+        {
+            Destroy(child.gameObject);
+        }
+        int index = 0;
+        characterUI.characterBag.inventorySlots.Clear();
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.charactersData[characterPlayer.characterIndex].bag)
+        {
+            InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
+            bagSlotPrefab.characterPlayerHud = this;
+            bagSlotPrefab.slotIndex = bagSlot.Key;
+            bagSlotPrefab.InitializeSlot(bagSlot.Value);
+            characterUI.characterBag.inventorySlots.Add(index, bagSlotPrefab);
+            index++;
         }
     }
     public InventorySlot GetBagSlotByIndex(int index)
@@ -372,6 +397,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public Image fastItemBg;
         public Image fastItemIcon;
         public TMP_Text fastItemAmount;
+        public TMP_Text fastItemDurability;
     }
     [Serializable]
     public class ItemDescription

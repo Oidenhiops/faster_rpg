@@ -14,6 +14,7 @@ public class ItemBaseSO : ScriptableObject
     public TypeWeapon typeWeapon;
     public string animationName;
     public int maxStack;
+    public bool useEnergy;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false) { Debug.LogError("EquipItem not implemented"); }
     public virtual void EquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)

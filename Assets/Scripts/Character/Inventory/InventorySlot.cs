@@ -9,6 +9,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public CharacterPlayerHud characterPlayerHud;
     public Image itemImage;
     public TMP_Text itemAmount;
+    public TMP_Text itemDurability;
     public TypeInventorySlot typeInventorySlot;
     public CharacterData.CharacterItem characterItem;
     public int slotIndex;
@@ -20,6 +21,20 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             itemImage.enabled = true;
             itemAmount.enabled = true;
             itemAmount.text = item.amount > 1 ? item.amount.ToString() : "";
+            if (item.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+            {
+                itemDurability.enabled = true;
+            itemDurability.text = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
+            itemDurability.color =
+                GameData.Instance.utils.systemColors.TryGetValue(
+                    item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
+                    item.itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
+            }
+            else
+            {
+                itemDurability.enabled = false;
+                itemDurability.text = "";
+            }
             characterItem = item;
         }
         else
@@ -28,6 +43,8 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             itemImage.enabled = false;
             itemAmount.enabled = false;
             itemAmount.text = "";
+            itemDurability.enabled = false;
+            itemDurability.text = "";
             characterItem = new CharacterData.CharacterItem();
         }
     }
