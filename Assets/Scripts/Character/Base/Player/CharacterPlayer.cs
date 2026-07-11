@@ -222,6 +222,10 @@ public class CharacterPlayer : CharacterBase
         if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
         {
             RefreshCharacterItemModel(charactersData[characterIndex].consumables[currentFastItemIndex], true);
+            for (int i = 0; i < characterModel.meshesData[CharactersModelDBSO.TypeModel.Consumable].Count; i++)
+            {
+                dissolvePlayer.NeedAppearSpecificObj(characterModel.meshesData[CharactersModelDBSO.TypeModel.Consumable][i].meshRenderer);
+            }
         }
         else
         {
@@ -332,7 +336,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.GetConsumableSlotByIndex(draggedConsumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[draggedConsumableSlotIndex]);
         }
         characterPlayerHud.UpdateFastItems();
-        UpdateFastItemModel();
+        if (consumableSlotIndex == currentFastItemIndex || draggedConsumableSlotIndex == currentFastItemIndex) UpdateFastItemModel();
     }
     async Awaitable ChangeEquipmentAndBag(ItemBaseSO.TypeObject equipmentIndex, int bagSlotIndex)
     {
@@ -397,7 +401,7 @@ public class CharacterPlayer : CharacterBase
             }
         }
         characterPlayerHud.UpdateFastItems();
-        UpdateFastItemModel();
+        if (consumableSlotIndex == currentFastItemIndex) UpdateFastItemModel();
     }
     void DiferentBagAndConsumable(int bagSlotIndex, int consumableSlotIndex)
     {
@@ -549,7 +553,7 @@ public class CharacterPlayer : CharacterBase
             charactersData[characterIndex].consumables[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
             characterPlayerHud.UpdateFastItems();
-            UpdateFastItemModel();
+            if (characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex == currentFastItemIndex) UpdateFastItemModel();
         }
     }
     void LaunchDropItem(ItemDropped itemDropped)
