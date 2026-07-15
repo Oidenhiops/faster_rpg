@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b23430bf251ff0419dcdac3f70e037e, type: 3}
+  m_Name: ActivableItem
+  m_EditorClassIdentifier: Assembly-CSharp::ActivableItemSO
+  id: 5
+  idText: 14
+  modelInfo:
+    meshId: 3
+    colors:
+    - {r: 0.45490196, g: 0.38039216, b: 0.29411766, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    useTexture: 0
+    textures: []
+    originalMesh:
+    - {fileID: -4086548920162585460, guid: 15b63b4dab1acfa42af982ed9c609d6e, type: 3}
+    occlude: 0
+    typeModel: 17
+    occludedModels: 
+  icon: {fileID: -1239926245, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
+  generalTypeObject: 2
+  typeObject: 9
+  typeWeapon: 0
+  animationName: 
+  maxStack: 1
+  useEnergy: 1
+  itemStatistics:
+    _serializedList:
+    - Key: 16
+      Value:
+        baseValue: 240
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 0
