@@ -9,16 +9,16 @@ public class CharacterData
     public int level;
     public string name;
     public SerializedDictionary<TypeStatistic, Statistic> statistics = new SerializedDictionary<TypeStatistic, Statistic>();
-    public SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem> equipments = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterItem>
+    public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterItem> equipments = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterItem>
     {
-        {ItemBaseSO.TypeObject.Helmet, null},
-        {ItemBaseSO.TypeObject.Front, null},
-        {ItemBaseSO.TypeObject.Pants, null},
-        {ItemBaseSO.TypeObject.Boots, null},
-        {ItemBaseSO.TypeObject.Gloves, null},
-        {ItemBaseSO.TypeObject.Pendant, null},
-        {ItemBaseSO.TypeObject.Ring, null},
-        {ItemBaseSO.TypeObject.Weapon, null},
+        {CharactersModelDBSO.TypeModel.Helmet, null},
+        {CharactersModelDBSO.TypeModel.Front, null},
+        {CharactersModelDBSO.TypeModel.Pants, null},
+        {CharactersModelDBSO.TypeModel.Boots, null},
+        {CharactersModelDBSO.TypeModel.Gloves, null},
+        {CharactersModelDBSO.TypeModel.Pendant, null},
+        {CharactersModelDBSO.TypeModel.Ring, null},
+        {CharactersModelDBSO.TypeModel.Weapon, null},
     };
     public SerializedDictionary<int, CharacterItem> consumables = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
@@ -60,7 +60,7 @@ public class CharacterData
     }
     public void InitializeItems()
     {
-        foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterItem> item in equipments)
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterItem> item in equipments)
         {
             if (item.Value.itemId != 0)
             {
@@ -83,7 +83,7 @@ public class CharacterData
     }
     public bool GetCurrentWeapon(out CharacterItem weapon)
     {
-        if (equipments.TryGetValue(ItemBaseSO.TypeObject.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
+        if (equipments.TryGetValue(CharactersModelDBSO.TypeModel.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
         {
             weapon = currentWeapon;
             return true;
@@ -116,12 +116,24 @@ public class CharacterData
         {
             currentValue = maxValue;
         }
+        public bool IsValidStatCharacter(TypeStatistic typeStatistic)
+        {
+            return typeStatistic == TypeStatistic.Hp ||
+                   typeStatistic == TypeStatistic.Sp ||
+                   typeStatistic == TypeStatistic.Atk ||
+                   typeStatistic == TypeStatistic.Hit ||
+                   typeStatistic == TypeStatistic.Int ||
+                   typeStatistic == TypeStatistic.Def ||
+                   typeStatistic == TypeStatistic.Res ||
+                   typeStatistic == TypeStatistic.Spd ||
+                   typeStatistic == TypeStatistic.Crtv;
+        }
     }
     [Serializable]
     public class CharacterItem
     {
         public int itemId;
-        public ItemBaseSO.TypeObject typeObject;
+        public CharactersModelDBSO.TypeModel typeObject;
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
         public void ResetItem()

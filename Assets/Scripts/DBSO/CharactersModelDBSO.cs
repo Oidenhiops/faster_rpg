@@ -129,5 +129,6 @@ public class CharactersModelDBSO : ScriptableObject
         Ring = 15,
         Weapon = 16,
         Consumable = 17,
+        Bag = 18
     }
 }

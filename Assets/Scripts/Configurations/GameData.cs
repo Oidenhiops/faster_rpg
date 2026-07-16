@@ -98,7 +98,7 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
-                foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> item in characterData.Value.equipments)
+                foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterData.CharacterItem> item in characterData.Value.equipments)
                 {
                     if (item.Value.itemId != 0)
                     {
@@ -353,23 +353,23 @@ public class GameData : MonoBehaviour
                         level = 1,
                         name = randomNames[0],
                         statistics = characterStatistics[0],
-                        equipments = new SerializedDictionary<ItemBaseSO.TypeObject, CharacterData.CharacterItem>()
+                        equipments = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterData.CharacterItem>()
                         {
-                            { ItemBaseSO.TypeObject.Boots, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Boots, 1) },
-                            { ItemBaseSO.TypeObject.Front, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Front, 1) },
-                            { ItemBaseSO.TypeObject.Gloves, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Gloves, 1) },
-                            { ItemBaseSO.TypeObject.Helmet, new CharacterData.CharacterItem() },
-                            { ItemBaseSO.TypeObject.Pants, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pants, 1) },
-                            { ItemBaseSO.TypeObject.Pendant, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Pendant, 1) },
-                            { ItemBaseSO.TypeObject.Ring, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Ring, 1) },
-                            { ItemBaseSO.TypeObject.Weapon, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 1) },
+                            { CharactersModelDBSO.TypeModel.Boots, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Boots, 1) },
+                            { CharactersModelDBSO.TypeModel.Front, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Front, 1) },
+                            { CharactersModelDBSO.TypeModel.Gloves, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Gloves, 1) },
+                            { CharactersModelDBSO.TypeModel.Helmet, new CharacterData.CharacterItem() },
+                            { CharactersModelDBSO.TypeModel.Pants, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Pants, 1) },
+                            { CharactersModelDBSO.TypeModel.Pendant, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Pendant, 1) },
+                            { CharactersModelDBSO.TypeModel.Ring, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Ring, 1) },
+                            { CharactersModelDBSO.TypeModel.Weapon, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Weapon, 1) },
                         },
                         consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
-                            { 0, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3) },
-                            { 1, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2) },
-                            { 2, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1) },
-                            { 3, itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 4, 1) }
+                            { 0, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 1, 3) },
+                            { 1, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 2, 2) },
+                            { 2, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 3, 1) },
+                            { 3, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 4, 1) }
                         },
                         bag = bags[0],
                         models = charactersModelDBSO.GenerateRandomModel()
@@ -428,7 +428,7 @@ public class GameData : MonoBehaviour
 
         foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
         {
-            foreach (KeyValuePair<ItemBaseSO.TypeObject, CharacterData.CharacterItem> equipment in characterData.Value.equipments)
+            foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterData.CharacterItem> equipment in characterData.Value.equipments)
             {
                 if (equipment.Value != null && equipment.Value?.itemId != 0)
                 {
@@ -457,12 +457,12 @@ public class GameData : MonoBehaviour
                 characterData.Value.bag.Add(i, new CharacterData.CharacterItem());
             }
         }
-        bags[0][0] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 1, 3);
-        bags[0][1] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 2, 2);
-        bags[0][2] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 3, 1);
-        bags[0][3] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Weapon, 2, 1);
-        bags[0][4] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Helmet, 1);
-        bags[0][5] = itemsDBSO.GenerateItem(ItemBaseSO.TypeObject.Consumable, 5);
+        bags[0][0] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 1, 3);
+        bags[0][1] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 2, 2);
+        bags[0][2] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 3, 1);
+        bags[0][3] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Weapon, 2, 1);
+        bags[0][4] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Helmet, 1);
+        bags[0][5] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 5);
         return newSlotData;
     }
     public void SetStartingItems()

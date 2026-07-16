@@ -9,8 +9,7 @@ public class ItemBaseSO : ScriptableObject
     public string idText;
     public ItemModelInfo modelInfo;
     public Sprite icon;
-    public GeneralTypeObject generalTypeObject;
-    public TypeObject typeObject;
+    public CharactersModelDBSO.TypeModel typeObject;
     public TypeWeapon typeWeapon;
     public string animationName;
     public bool useEnergy;
@@ -20,8 +19,8 @@ public class ItemBaseSO : ScriptableObject
     {
         if (modelInfo.meshId != 0)
         {
-            character.charactersData[character.characterIndex].models[modelInfo.typeModel].meshId = modelInfo.meshId;
-            character.charactersData[character.characterIndex].models[modelInfo.typeModel].colors = new List<Color>(modelInfo.colors);
+            character.charactersData[character.characterIndex].models[typeObject].meshId = modelInfo.meshId;
+            character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>(modelInfo.colors);
             foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
             {
                 character.charactersData[character.characterIndex].models[occludedModel].occlude = true;
@@ -37,8 +36,8 @@ public class ItemBaseSO : ScriptableObject
     {
         if (modelInfo.meshId != 0)
         {
-            character.charactersData[character.characterIndex].models[modelInfo.typeModel].meshId = 0;
-            character.charactersData[character.characterIndex].models[modelInfo.typeModel].colors = new List<Color>();
+            character.charactersData[character.characterIndex].models[typeObject].meshId = 0;
+            character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>();
             foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
             {
                 character.charactersData[character.characterIndex].models[occludedModel].occlude = false;
@@ -65,8 +64,8 @@ public class ItemBaseSO : ScriptableObject
     {
         if (modelInfo.meshId != 0)
         {
-            characterData.models[modelInfo.typeModel].meshId = modelInfo.meshId;
-            characterData.models[modelInfo.typeModel].colors = new List<Color>(modelInfo.colors);
+            characterData.models[typeObject].meshId = modelInfo.meshId;
+            characterData.models[typeObject].colors = new List<Color>(modelInfo.colors);
             foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
             {
                 characterData.models[occludedModel].occlude = true;
@@ -89,8 +88,8 @@ public class ItemBaseSO : ScriptableObject
     {
         if (modelInfo.meshId != 0)
         {
-            characterData.models[modelInfo.typeModel].meshId = 0;
-            characterData.models[modelInfo.typeModel].colors = new List<Color>();
+            characterData.models[typeObject].meshId = 0;
+            characterData.models[typeObject].colors = new List<Color>();
             foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
             {
                 characterData.models[occludedModel].occlude = false;
@@ -117,25 +116,6 @@ public class ItemBaseSO : ScriptableObject
 
         return clone;
     }
-    public enum GeneralTypeObject
-    {
-        None = 0,
-        Equipment = 1,
-        Consumables = 2
-    }
-    public enum TypeObject
-    {
-        None = 0,
-        Helmet = 1,
-        Front = 2,
-        Pants = 3,
-        Boots = 4,
-        Gloves = 5,
-        Pendant = 6,
-        Ring = 7,
-        Weapon = 8,
-        Consumable = 9,
-    }
     public enum TypeWeapon
     {
         None = 0,
@@ -150,7 +130,6 @@ public class ItemBaseSO : ScriptableObject
     [Serializable]
     public class ItemModelInfo: CharacterData.CharacterSkinInfo
     {
-        public CharactersModelDBSO.TypeModel typeModel;
         public List<CharactersModelDBSO.TypeModel> occludedModels = new List<CharactersModelDBSO.TypeModel>();
     }
 }

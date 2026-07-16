@@ -21,14 +21,12 @@ MonoBehaviour:
     textures: []
     originalMesh: []
     occlude: 0
-    typeModel: 0
     occludedModels: 
   icon: {fileID: 478415271, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
-  generalTypeObject: 1
-  typeObject: 8
+  typeObject: 16
   typeWeapon: 2
   animationName: 
-  maxStack: 1
+  useEnergy: 0
   itemStatistics:
     _serializedList:
     - Key: 3
@@ -58,3 +56,12 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
+    - Key: 17
+      Value:
+        baseValue: 0
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue:
+          _serializedList: []
+        currentValue: 0
+        maxValue: 1

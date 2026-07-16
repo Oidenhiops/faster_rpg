@@ -117,7 +117,7 @@ public class CharacterBase : MonoBehaviour
         {
             RefreshCharacterItemModel(new CharacterData.CharacterItem
             {
-                typeObject = ItemBaseSO.TypeObject.Consumable,
+                typeObject = CharactersModelDBSO.TypeModel.Consumable,
             }, false);
         }
     }
@@ -125,17 +125,17 @@ public class CharacterBase : MonoBehaviour
     {
         if (characterItem.itemBaseSO != null)
         {
-            for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
+            for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.typeObject].Count; i++)
             {
-                characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(isEquip);
+                characterModel.meshesData[characterItem.itemBaseSO.typeObject][i].meshFilter.gameObject.SetActive(isEquip);
             }
             if (isEquip)
             {
-                for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel].Count; i++)
+                for (int i = 0; i < characterModel.meshesData[characterItem.itemBaseSO.typeObject].Count; i++)
                 {
-                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.mesh =
-                        GameData.Instance.charactersModelDBSO.data[characterItem.itemBaseSO.modelInfo.typeModel][characterItem.itemBaseSO.modelInfo.meshId][i];
-                    Material[] materials = characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials;
+                    characterModel.meshesData[characterItem.itemBaseSO.typeObject][i].meshFilter.mesh =
+                        GameData.Instance.charactersModelDBSO.data[characterItem.itemBaseSO.typeObject][characterItem.itemBaseSO.modelInfo.meshId][i];
+                    Material[] materials = characterModel.meshesData[characterItem.itemBaseSO.typeObject][i].meshRenderer.materials;
                     if (!characterItem.itemBaseSO.modelInfo.useTexture)
                     {
                         for (int j = 0; j < characterItem.itemBaseSO.modelInfo.colors.Count; j++)
@@ -152,13 +152,13 @@ public class CharacterBase : MonoBehaviour
                             materials[j].SetTexture("_MainTex", characterItem.itemBaseSO.modelInfo.textures[j].texture);
                             SetTextureFromAtlas(
                                 characterItem.itemBaseSO.modelInfo.textures[j],
-                                characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer,
+                                characterModel.meshesData[characterItem.itemBaseSO.typeObject][i].meshRenderer,
                                 characterItem.itemBaseSO.modelInfo.originalMesh[j]
                             );
                         }
                     }
-                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshRenderer.materials = materials;
-                    characterModel.meshesData[characterItem.itemBaseSO.modelInfo.typeModel][i].meshFilter.gameObject.SetActive(true);
+                    characterModel.meshesData[characterItem.itemBaseSO.typeObject][i].meshRenderer.materials = materials;
+                    characterModel.meshesData[characterItem.itemBaseSO.typeObject][i].meshFilter.gameObject.SetActive(true);
                 }
                 for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
                 {
@@ -189,7 +189,7 @@ public class CharacterBase : MonoBehaviour
             }
         }
     }
-    public CharactersModelDBSO.TypeModel GetTypeObjectFromModel(ItemBaseSO.TypeObject typeModel)
+    public CharactersModelDBSO.TypeModel GetTypeObjectFromModel(CharactersModelDBSO.TypeModel typeModel)
     {
         return Enum.Parse<CharactersModelDBSO.TypeModel>(typeModel.ToString());
     }

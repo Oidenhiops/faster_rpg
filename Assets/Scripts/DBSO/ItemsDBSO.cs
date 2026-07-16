@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ItemsDataDB", menuName = "ScriptableObjects/DB/ItemsDataDB", order = 1)]
 public class ItemsDBSO : ScriptableObject
 {
-    public SerializedDictionary<ItemBaseSO.TypeObject, SerializedDictionary<int, ItemBaseSO>> data = new SerializedDictionary<ItemBaseSO.TypeObject, SerializedDictionary<int, ItemBaseSO>>();
+    public SerializedDictionary<CharactersModelDBSO.TypeModel, SerializedDictionary<int, ItemBaseSO>> data = new SerializedDictionary<CharactersModelDBSO.TypeModel, SerializedDictionary<int, ItemBaseSO>>();
     public ItemBaseSO[] itemsToAdd;
     [NaughtyAttributes.Button]
     public void AddNewItems()
@@ -27,21 +27,18 @@ public class ItemsDBSO : ScriptableObject
             );
         }
     }
-    public CharacterData.CharacterItem GenerateItem(ItemBaseSO.TypeObject typeObject, int id, int amountItems = 1)
+    public CharacterData.CharacterItem GenerateItem(CharactersModelDBSO.TypeModel typeObject, int id, int amountItems = 1)
     {
         if (data.ContainsKey(typeObject) && data[typeObject].ContainsKey(id))
         {
+            SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> newStatistics = data[typeObject][id].CloneStatistics();
+            newStatistics[CharacterData.TypeStatistic.Amount].currentValue = amountItems;
             CharacterData.CharacterItem newItem = new CharacterData.CharacterItem
             {
                 itemId = data[typeObject][id].id,
                 typeObject = typeObject,
                 itemBaseSO = data[typeObject][id],
-                itemStatistics = () =>
-                {
-                    SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> newStatistics = data[typeObject][id].CloneStatistics();
-                    newStatistics[CharacterData.TypeStatistic.Amount].currentValue = amountItems;
-                    return newStatistics;
-                },
+                itemStatistics = newStatistics,
             };
             if (newItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {

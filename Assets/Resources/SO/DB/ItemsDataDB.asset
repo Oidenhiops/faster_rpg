@@ -14,49 +14,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemsDBSO
   data:
     _serializedList:
-    - Key: 1
+    - Key: 9
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: 1c9e59ed573ff624aa85269b9fe76a88, type: 2}
-    - Key: 2
+    - Key: 10
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: 99949dac959f56c4b8d65db1cf7eb8f4, type: 2}
-    - Key: 3
+    - Key: 11
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: 138887797a717e84fa9d3fb29a367323, type: 2}
-    - Key: 4
+    - Key: 12
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: 351f4dd1a6707e8469352f6866727939, type: 2}
-    - Key: 5
+    - Key: 13
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: e8fbf84e4c1858448aae21813a2c79cc, type: 2}
-    - Key: 6
+    - Key: 14
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: 8df7251d560e4ca448836abcffb6a267, type: 2}
-    - Key: 7
+    - Key: 15
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: a6054177be09c024cb7f304d8431d9d3, type: 2}
-    - Key: 8
+    - Key: 16
       Value:
         _serializedList:
         - Key: 1
           Value: {fileID: 11400000, guid: f70cace27b6db4848850d8592cdea39a, type: 2}
         - Key: 2
           Value: {fileID: 11400000, guid: 425f6d8d5de322f4aba80e069acad6ac, type: 2}
-    - Key: 9
+    - Key: 17
       Value:
         _serializedList:
         - Key: 1

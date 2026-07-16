@@ -245,7 +245,7 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     public void RefreshEquipments()
     {
-        foreach (KeyValuePair<ItemBaseSO.TypeObject, InventorySlot> item in characterUI.equipments)
+        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, InventorySlot> item in characterUI.equipments)
         {
             characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
         }
@@ -284,7 +284,7 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         return null;
     }
-    public InventorySlot GetEquipmentSlotByIndex(ItemBaseSO.TypeObject index)
+    public InventorySlot GetEquipmentSlotByIndex(CharactersModelDBSO.TypeModel index)
     {
         if (characterUI.equipments.TryGetValue(index, out InventorySlot equipmentSlot))
         {
@@ -380,7 +380,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public CharacterPortrait[] characterPortraits;
         public CharacterBag characterBag;
-        public SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot> equipments = new SerializedDictionary<ItemBaseSO.TypeObject, InventorySlot>();
+        public SerializedDictionary<CharactersModelDBSO.TypeModel, InventorySlot> equipments = new SerializedDictionary<CharactersModelDBSO.TypeModel, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
