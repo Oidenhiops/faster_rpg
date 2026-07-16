@@ -216,7 +216,7 @@ public class CharacterPlayerHud : MonoBehaviour
                 characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = true;
                 characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO.icon;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].amount > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].amount.ToString() : "";
+                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
                 if (characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
                 {
                     characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = true;

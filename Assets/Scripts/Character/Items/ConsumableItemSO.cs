@@ -17,8 +17,8 @@ public class ConsumableItemSO : ItemBaseSO
         GameObject effect = Instantiate(useEffectPrefab, character.transform.position + Vector3.up * 0.5f, Quaternion.identity);
         effect.transform.SetParent(character.transform);
         Destroy(effect, 2f);
-        characterItem.amount--;
-        if (characterItem.amount <= 0)
+        characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue--;
+        if (characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
         {
             characterItem.ResetItem();
         }

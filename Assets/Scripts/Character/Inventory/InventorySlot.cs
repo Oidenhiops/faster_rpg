@@ -20,7 +20,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             itemImage.sprite = item.itemBaseSO.icon;
             itemImage.enabled = true;
             itemAmount.enabled = true;
-            itemAmount.text = item.amount > 1 ? item.amount.ToString() : "";
+            itemAmount.text = item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
             if (item.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {
                 itemDurability.enabled = true;

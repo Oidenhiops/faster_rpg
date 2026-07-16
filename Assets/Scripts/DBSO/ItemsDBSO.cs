@@ -36,8 +36,12 @@ public class ItemsDBSO : ScriptableObject
                 itemId = data[typeObject][id].id,
                 typeObject = typeObject,
                 itemBaseSO = data[typeObject][id],
-                itemStatistics = data[typeObject][id].CloneStatistics(),
-                amount = amountItems,
+                itemStatistics = () =>
+                {
+                    SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> newStatistics = data[typeObject][id].CloneStatistics();
+                    newStatistics[CharacterData.TypeStatistic.Amount].currentValue = amountItems;
+                    return newStatistics;
+                },
             };
             if (newItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {

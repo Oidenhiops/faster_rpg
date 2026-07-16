@@ -124,14 +124,12 @@ public class CharacterData
         public ItemBaseSO.TypeObject typeObject;
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
-        public int amount;
         public void ResetItem()
         {
             itemId = 0;
             typeObject = default;
             itemBaseSO = null;
             itemStatistics.Clear();
-            amount = 0;
         }
         public CharacterItem()
         {
@@ -139,7 +137,6 @@ public class CharacterData
             typeObject = default;
             itemBaseSO = null;
             itemStatistics.Clear();
-            amount = 0;
         }
         public CharacterItem(CharacterItem characterItem)
         {
@@ -147,7 +144,6 @@ public class CharacterData
             typeObject = characterItem.typeObject;
             itemBaseSO = characterItem.itemBaseSO;
             itemStatistics = characterItem.itemStatistics;
-            amount = characterItem.amount;
         }
     }
     [Serializable]
@@ -206,5 +202,6 @@ public class CharacterData
         JumpDistance = 14,
         DropDistance = 15,
         Durability = 16,
+        Amount = 17,
     }
 }

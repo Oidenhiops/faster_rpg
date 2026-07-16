@@ -15,7 +15,6 @@ public class CharacterPlayer : CharacterBase
     public Action OnShowItemsToPickUp;
     public bool isChangingCharacter;
     public bool isInventoryOpen;
-    public CharacterBase otherCharacterToMakeSkill;
     public CharacterPlayerCamera characterPlayerCamera;
     public override void OnEnableHandle()
     {
@@ -183,7 +182,7 @@ public class CharacterPlayer : CharacterBase
             !(skillsCd.ContainsKey(characterIndex) && skillsCd[characterIndex].ContainsKey(skillIndex)) &&
             charactersData[characterIndex].skills[skillIndex].skillsBaseSO.ValidateCanUseSkill(new SkillsBaseSO.CharacterMakeSkillData(this, characterIndex), charactersData[characterIndex].skills[skillIndex].level))
         {
-            await charactersData[characterIndex].skills[skillIndex].skillsBaseSO.UseSkill(new SkillsBaseSO.CharacterMakeSkillData(this, characterIndex), otherCharacterToMakeSkill ? otherCharacterToMakeSkill : this, charactersData[characterIndex].skills[skillIndex].level);
+            await charactersData[characterIndex].skills[skillIndex].skillsBaseSO.UseSkill(new SkillsBaseSO.CharacterMakeSkillData(this, characterIndex), charactersData[characterIndex].skills[skillIndex].level);
             if (skillsCd.ContainsKey(characterIndex))
             {
                 skillsCd[characterIndex].Add(0, new SkillCd
@@ -299,13 +298,13 @@ public class CharacterPlayer : CharacterBase
     {
         if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO != null &&
             charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO == charactersData[characterIndex].bag[draggedBagSlotIndex].itemBaseSO &&
-            charactersData[characterIndex].bag[bagSlotIndex].amount < charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.maxStack)
+            charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue < charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].maxValue)
         {
             FindAmountToAppend(charactersData[characterIndex].bag[draggedBagSlotIndex], charactersData[characterIndex].bag[bagSlotIndex], out int amountToAppend);
-            charactersData[characterIndex].bag[bagSlotIndex].amount += amountToAppend;
-            charactersData[characterIndex].bag[draggedBagSlotIndex].amount -= amountToAppend;
+            charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue += amountToAppend;
+            charactersData[characterIndex].bag[draggedBagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue -= amountToAppend;
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
-            if (charactersData[characterIndex].bag[draggedBagSlotIndex].amount <= 0)
+            if (charactersData[characterIndex].bag[draggedBagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
             {
                 charactersData[characterIndex].bag[draggedBagSlotIndex] = new CharacterData.CharacterItem();
             }
@@ -326,13 +325,13 @@ public class CharacterPlayer : CharacterBase
     {
         if (charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO != null &&
             charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].consumables[draggedConsumableSlotIndex].itemBaseSO &&
-            charactersData[characterIndex].consumables[consumableSlotIndex].amount < charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO.maxStack)
+            charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue < charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].maxValue)
         {
             FindAmountToAppend(charactersData[characterIndex].consumables[draggedConsumableSlotIndex], charactersData[characterIndex].consumables[consumableSlotIndex], out int amountToAppend);
-            charactersData[characterIndex].consumables[consumableSlotIndex].amount += amountToAppend;
-            charactersData[characterIndex].consumables[draggedConsumableSlotIndex].amount -= amountToAppend;
+            charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue += amountToAppend;
+            charactersData[characterIndex].consumables[draggedConsumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue -= amountToAppend;
             characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
-            if (charactersData[characterIndex].consumables[draggedConsumableSlotIndex].amount <= 0)
+            if (charactersData[characterIndex].consumables[draggedConsumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
             {
                 charactersData[characterIndex].consumables[draggedConsumableSlotIndex] = new CharacterData.CharacterItem();
             }
@@ -375,13 +374,13 @@ public class CharacterPlayer : CharacterBase
         {
             if (charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO != null &&
                 charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO == charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO &&
-                charactersData[characterIndex].consumables[consumableSlotIndex].amount < charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO.maxStack)
+                charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue < charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].maxValue)
             {
                 FindAmountToAppend(charactersData[characterIndex].bag[bagSlotIndex], charactersData[characterIndex].consumables[consumableSlotIndex], out int amountToAppend);
-                charactersData[characterIndex].consumables[consumableSlotIndex].amount += amountToAppend;
-                charactersData[characterIndex].bag[bagSlotIndex].amount -= amountToAppend;
+                charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue += amountToAppend;
+                charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue -= amountToAppend;
                 characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].consumables[consumableSlotIndex]);
-                if (charactersData[characterIndex].bag[bagSlotIndex].amount <= 0)
+                if (charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
                 {
                     charactersData[characterIndex].bag[bagSlotIndex] = new CharacterData.CharacterItem();
                 }
@@ -396,13 +395,13 @@ public class CharacterPlayer : CharacterBase
         {
             if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO != null &&
                 charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO == charactersData[characterIndex].consumables[consumableSlotIndex].itemBaseSO &&
-                charactersData[characterIndex].bag[bagSlotIndex].amount < charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.maxStack)
+                charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue < charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].maxValue)
             {
                 FindAmountToAppend(charactersData[characterIndex].consumables[consumableSlotIndex], charactersData[characterIndex].bag[bagSlotIndex], out int amountToAppend);
-                charactersData[characterIndex].bag[bagSlotIndex].amount += amountToAppend;
-                charactersData[characterIndex].consumables[consumableSlotIndex].amount -= amountToAppend;
+                charactersData[characterIndex].bag[bagSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue += amountToAppend;
+                charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue -= amountToAppend;
                 characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
-                if (charactersData[characterIndex].consumables[consumableSlotIndex].amount <= 0)
+                if (charactersData[characterIndex].consumables[consumableSlotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
                 {
                     charactersData[characterIndex].consumables[consumableSlotIndex] = new CharacterData.CharacterItem();
                 }
@@ -457,7 +456,7 @@ public class CharacterPlayer : CharacterBase
     {
         foreach (KeyValuePair<int, CharacterData.CharacterItem> consumableSlot in charactersData[characterIndex].consumables)
         {
-            if (consumableSlot.Value.itemBaseSO != null && consumableSlot.Value.itemBaseSO.id == charactersData[characterIndex].bag[bagIndex].itemBaseSO.id && consumableSlot.Value.amount < consumableSlot.Value.itemBaseSO.maxStack)
+            if (consumableSlot.Value.itemBaseSO != null && consumableSlot.Value.itemBaseSO.id == charactersData[characterIndex].bag[bagIndex].itemBaseSO.id && consumableSlot.Value.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue < consumableSlot.Value.itemStatistics[CharacterData.TypeStatistic.Amount].maxValue)
             {
                 consumableIndex = consumableSlot.Key;
                 return true;
@@ -468,13 +467,13 @@ public class CharacterPlayer : CharacterBase
     }
     public void FindAmountToAppend(CharacterData.CharacterItem fromAppend, CharacterData.CharacterItem toAppend, out int amountToAppend)
     {
-        if (fromAppend.amount + toAppend.amount <= toAppend.itemBaseSO.maxStack)
+        if (fromAppend.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue + toAppend.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= toAppend.itemStatistics[CharacterData.TypeStatistic.Amount].maxValue)
         {
-            amountToAppend = fromAppend.amount;
+            amountToAppend = (int)fromAppend.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue;
         }
         else
         {
-            amountToAppend = toAppend.itemBaseSO.maxStack - toAppend.amount;
+            amountToAppend = (int)(toAppend.itemStatistics[CharacterData.TypeStatistic.Amount].maxValue - toAppend.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue);
         }
     }
     public CharacterData.CharacterItem GetBagItemByIndex(int index)
@@ -520,10 +519,10 @@ public class CharacterPlayer : CharacterBase
             if (FindSimilarConsumableSlot(slotIndex, out int similarConsumableIndex))
             {
                 FindAmountToAppend(charactersData[characterIndex].bag[slotIndex], charactersData[characterIndex].consumables[similarConsumableIndex], out int amountToAppend);
-                charactersData[characterIndex].bag[slotIndex].amount -= amountToAppend;
-                charactersData[characterIndex].consumables[similarConsumableIndex].amount += amountToAppend;
+                charactersData[characterIndex].bag[slotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue -= amountToAppend;
+                charactersData[characterIndex].consumables[similarConsumableIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue += amountToAppend;
                 characterPlayerHud.GetConsumableSlotByIndex(similarConsumableIndex).InitializeSlot(charactersData[characterIndex].consumables[similarConsumableIndex]);
-                if (charactersData[characterIndex].bag[slotIndex].amount <= 0)
+                if (charactersData[characterIndex].bag[slotIndex].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
                 {
                     charactersData[characterIndex].bag[slotIndex] = new CharacterData.CharacterItem();
                 }
