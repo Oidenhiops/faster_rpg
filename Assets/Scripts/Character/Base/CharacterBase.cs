@@ -109,15 +109,15 @@ public class CharacterBase : MonoBehaviour
                 }
             }
         }
-        if (charactersData[characterIndex].consumables[currentFastItemIndex].itemBaseSO)
+        if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterItemModel(charactersData[characterIndex].consumables[currentFastItemIndex], true);
+            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true);
         }
         else
         {
             RefreshCharacterItemModel(new CharacterData.CharacterItem
             {
-                typeObject = CharactersModelDBSO.TypeModel.Consumable,
+                typeObject = CharactersModelDBSO.TypeModel.FastItems,
             }, false);
         }
     }

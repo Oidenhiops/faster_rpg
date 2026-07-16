@@ -152,14 +152,13 @@ MonoBehaviour:
   itemImage: {fileID: 5866423273924199184}
   itemAmount: {fileID: 3212399250952459714}
   itemDurability: {fileID: 8875641304349780639}
-  typeInventorySlot: 11
+  typeInventorySlot: 18
   characterItem:
     itemId: 0
     typeObject: 0
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
-    amount: 0
   slotIndex: 0
 --- !u!1 &4036682313856178474
 GameObject:

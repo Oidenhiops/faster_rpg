@@ -30,7 +30,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
             }
             character.isInCanalization = false;
         }
-        character.characterPlayerHud.RefreshConsumables();
+        character.characterPlayerHud.RefreshFastItems();
         if (!cancelSkill)
         {
             statusEffectBaseSO.ApplyEffect(character);

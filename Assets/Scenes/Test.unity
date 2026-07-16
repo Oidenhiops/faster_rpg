@@ -487,7 +487,7 @@ MonoBehaviour:
   itemImage: {fileID: 1566902571}
   itemAmount: {fileID: 1237524389}
   itemDurability: {fileID: 1326698510}
-  typeInventorySlot: 5
+  typeInventorySlot: 13
   characterItem:
     itemId: 0
     typeObject: 0
@@ -2206,7 +2206,7 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
-    consumables:
+    fastItems:
       _serializedList: []
     bag:
       _serializedList: []
@@ -2395,7 +2395,7 @@ MonoBehaviour:
         Value: {fileID: 1365449649}
       - Key: 16
         Value: {fileID: 1387120163}
-    consumables:
+    fastItemsInventory:
       _serializedList:
       - Key: 0
         Value: {fileID: 1177914138}
@@ -6126,7 +6126,7 @@ MonoBehaviour:
   itemImage: {fileID: 1865548621}
   itemAmount: {fileID: 469363916}
   itemDurability: {fileID: 33222270}
-  typeInventorySlot: 10
+  typeInventorySlot: 17
   characterItem:
     itemId: 0
     typeObject: 0
@@ -6274,7 +6274,7 @@ MonoBehaviour:
   itemImage: {fileID: 1756201655}
   itemAmount: {fileID: 1044520045}
   itemDurability: {fileID: 1989014613}
-  typeInventorySlot: 2
+  typeInventorySlot: 10
   characterItem:
     itemId: 0
     typeObject: 0
@@ -7623,7 +7623,7 @@ MonoBehaviour:
   itemImage: {fileID: 667200900}
   itemAmount: {fileID: 519715966}
   itemDurability: {fileID: 226419081}
-  typeInventorySlot: 10
+  typeInventorySlot: 17
   characterItem:
     itemId: 0
     typeObject: 0
@@ -9162,7 +9162,7 @@ MonoBehaviour:
   itemImage: {fileID: 158510640}
   itemAmount: {fileID: 635429705}
   itemDurability: {fileID: 89634441}
-  typeInventorySlot: 4
+  typeInventorySlot: 12
   characterItem:
     itemId: 0
     typeObject: 0
@@ -11869,7 +11869,7 @@ MonoBehaviour:
   itemImage: {fileID: 953202268}
   itemAmount: {fileID: 1653096513}
   itemDurability: {fileID: 2026691058}
-  typeInventorySlot: 10
+  typeInventorySlot: 17
   characterItem:
     itemId: 0
     typeObject: 0
@@ -12718,7 +12718,7 @@ MonoBehaviour:
   itemImage: {fileID: 1050949856}
   itemAmount: {fileID: 682731824}
   itemDurability: {fileID: 2012452802}
-  typeInventorySlot: 10
+  typeInventorySlot: 17
   characterItem:
     itemId: 0
     typeObject: 0
@@ -13924,7 +13924,7 @@ MonoBehaviour:
   itemImage: {fileID: 1499037855}
   itemAmount: {fileID: 1733097063}
   itemDurability: {fileID: 971530479}
-  typeInventorySlot: 7
+  typeInventorySlot: 15
   characterItem:
     itemId: 0
     typeObject: 0
@@ -14423,7 +14423,7 @@ MonoBehaviour:
   itemImage: {fileID: 1414554294}
   itemAmount: {fileID: 1156855655}
   itemDurability: {fileID: 1648477802}
-  typeInventorySlot: 8
+  typeInventorySlot: 16
   characterItem:
     itemId: 0
     typeObject: 0
@@ -16069,7 +16069,7 @@ MonoBehaviour:
   itemImage: {fileID: 1756176664}
   itemAmount: {fileID: 238986935}
   itemDurability: {fileID: 1339053626}
-  typeInventorySlot: 6
+  typeInventorySlot: 14
   characterItem:
     itemId: 0
     typeObject: 0
@@ -19166,7 +19166,7 @@ MonoBehaviour:
   itemImage: {fileID: 488772817}
   itemAmount: {fileID: 1778983518}
   itemDurability: {fileID: 2145328501}
-  typeInventorySlot: 3
+  typeInventorySlot: 11
   characterItem:
     itemId: 0
     typeObject: 0
@@ -20863,7 +20863,7 @@ MonoBehaviour:
   itemImage: {fileID: 1213183567}
   itemAmount: {fileID: 518728230}
   itemDurability: {fileID: 1289159130}
-  typeInventorySlot: 1
+  typeInventorySlot: 9
   characterItem:
     itemId: 0
     typeObject: 0

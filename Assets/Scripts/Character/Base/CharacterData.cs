@@ -20,7 +20,7 @@ public class CharacterData
         {CharactersModelDBSO.TypeModel.Ring, null},
         {CharactersModelDBSO.TypeModel.Weapon, null},
     };
-    public SerializedDictionary<int, CharacterItem> consumables = new SerializedDictionary<int, CharacterItem>();
+    public SerializedDictionary<int, CharacterItem> fastItems = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterSkillInfo> skills = new SerializedDictionary<int, CharacterSkillInfo>
     {
@@ -48,7 +48,7 @@ public class CharacterData
         {CharactersModelDBSO.TypeModel.Pendant, new CharacterSkinInfo()},
         {CharactersModelDBSO.TypeModel.Ring, new CharacterSkinInfo()},
         {CharactersModelDBSO.TypeModel.Weapon, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Consumable, new CharacterSkinInfo()},
+        {CharactersModelDBSO.TypeModel.FastItems, new CharacterSkinInfo()},
     };
     public void InitializeStatistics()
     {

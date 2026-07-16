@@ -62,7 +62,7 @@ public class CharacterPlayerHud : MonoBehaviour
         {
             item.Value.characterPlayerHud = this;
         }
-        foreach (var consumable in characterUI.consumables)
+        foreach (var consumable in characterUI.fastItemsInventory)
         {
             consumable.Value.characterPlayerHud = this;
         }
@@ -115,7 +115,7 @@ public class CharacterPlayerHud : MonoBehaviour
             RefreshBag();
             RefreshEquipments();
             RefreshCharacterStatistics();
-            RefreshConsumables();
+            RefreshFastItems();
             RefreshSkills();
             await Awaitable.NextFrameAsync();
             if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
@@ -200,31 +200,31 @@ public class CharacterPlayerHud : MonoBehaviour
             characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.statusEffectBaseSO, statusEffectBanner);
         }
     }
-    public void RefreshConsumables()
+    public void RefreshFastItems()
     {
-        foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.consumables)
+        foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.fastItemsInventory)
         {
-            characterUI.consumables[consumable.Key].slotIndex = consumable.Key;
-            characterUI.consumables[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].consumables[consumable.Key]);
+            characterUI.fastItemsInventory[consumable.Key].slotIndex = consumable.Key;
+            characterUI.fastItemsInventory[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[consumable.Key]);
         }
 
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO != null)
+            if (characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO != null)
             {
                 characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 1;
                 characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO.icon;
+                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.icon;
                 characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
-                if (characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
+                if (characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
                 {
                     characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = true;
-                    characterUI.fastItems[fastItem.Key].fastItemDurability.text = characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
+                    characterUI.fastItems[fastItem.Key].fastItemDurability.text = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
                     characterUI.fastItems[fastItem.Key].fastItemDurability.color = 
                         GameData.Instance.utils.systemColors.TryGetValue(
-                            characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
-                            characterPlayer.charactersData[characterPlayer.characterIndex].consumables[fastItem.Key].itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
+                            characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
+                            characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
                 }
                 else
                 {
@@ -278,7 +278,7 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     public InventorySlot GetConsumableSlotByIndex(int index)
     {
-        if (characterUI.consumables.TryGetValue(index, out InventorySlot consumableSlot))
+        if (characterUI.fastItemsInventory.TryGetValue(index, out InventorySlot consumableSlot))
         {
             return consumableSlot;
         }
@@ -381,7 +381,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public CharacterPortrait[] characterPortraits;
         public CharacterBag characterBag;
         public SerializedDictionary<CharactersModelDBSO.TypeModel, InventorySlot> equipments = new SerializedDictionary<CharactersModelDBSO.TypeModel, InventorySlot>();
-        public SerializedDictionary<int, InventorySlot> consumables = new SerializedDictionary<int, InventorySlot>();
+        public SerializedDictionary<int, InventorySlot> fastItemsInventory = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
         public SerializedDictionary<int, SkillUi> skills = new SerializedDictionary<int, SkillUi>();

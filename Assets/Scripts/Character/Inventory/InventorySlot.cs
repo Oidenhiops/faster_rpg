@@ -10,7 +10,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public Image itemImage;
     public TMP_Text itemAmount;
     public TMP_Text itemDurability;
-    public TypeInventorySlot typeInventorySlot;
+    public CharactersModelDBSO.TypeModel typeInventorySlot;
     public CharacterData.CharacterItem characterItem;
     public int slotIndex;
     public void InitializeSlot(CharacterData.CharacterItem item)
@@ -95,20 +95,5 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         {
             characterPlayerHud.characterPlayer.FastEquipItem(slotIndex);
         }
-    }
-    public enum TypeInventorySlot
-    {
-        None = 0,
-        Helmet = 1,
-        Front = 2,
-        Pants = 3,
-        Boots = 4,
-        Gloves = 5,
-        Pendant = 6,
-        Ring = 7,
-        Weapon = 8,
-        Utility = 9,
-        Consumables = 10,
-        Bag = 11
     }
 }

@@ -98,7 +98,7 @@ public class CharactersModelDBSO : ScriptableObject
             meshId = 0,
             colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
         });
-        model.Add(TypeModel.Consumable, new CharacterData.CharacterSkinInfo
+        model.Add(TypeModel.FastItems, new CharacterData.CharacterSkinInfo
         {
             meshId = 0,
             colors = new List<Color> { Color.white, Color.white, Color.white, Color.white, Color.white },
@@ -128,7 +128,7 @@ public class CharactersModelDBSO : ScriptableObject
         Pendant = 14,
         Ring = 15,
         Weapon = 16,
-        Consumable = 17,
+        FastItems = 17,
         Bag = 18
     }
 }

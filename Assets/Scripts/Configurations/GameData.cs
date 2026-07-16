@@ -114,7 +114,7 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
-                foreach (KeyValuePair<int, CharacterData.CharacterItem> consumable in characterData.Value.consumables)
+                foreach (KeyValuePair<int, CharacterData.CharacterItem> consumable in characterData.Value.fastItems)
                 {
                     if (consumable.Value.itemId != 0)
                     {
@@ -364,12 +364,12 @@ public class GameData : MonoBehaviour
                             { CharactersModelDBSO.TypeModel.Ring, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Ring, 1) },
                             { CharactersModelDBSO.TypeModel.Weapon, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Weapon, 1) },
                         },
-                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
-                            { 0, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 1, 3) },
-                            { 1, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 2, 2) },
-                            { 2, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 3, 1) },
-                            { 3, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 4, 1) }
+                            { 0, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 1, 3) },
+                            { 1, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 2, 2) },
+                            { 2, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 3, 1) },
+                            { 3, itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 4, 1) }
                         },
                         bag = bags[0],
                         models = charactersModelDBSO.GenerateRandomModel()
@@ -380,7 +380,7 @@ public class GameData : MonoBehaviour
                         level = 1,
                         name = randomNames[1],
                         statistics = characterStatistics[1],
-                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
@@ -396,7 +396,7 @@ public class GameData : MonoBehaviour
                         level = 1,
                         name = randomNames[2],
                         statistics = characterStatistics[2],
-                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
@@ -412,7 +412,7 @@ public class GameData : MonoBehaviour
                         level = 1,
                         name = randomNames[3],
                         statistics = characterStatistics[3],
-                        consumables = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, new CharacterData.CharacterItem() },
                             { 1, new CharacterData.CharacterItem() },
@@ -457,12 +457,12 @@ public class GameData : MonoBehaviour
                 characterData.Value.bag.Add(i, new CharacterData.CharacterItem());
             }
         }
-        bags[0][0] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 1, 3);
-        bags[0][1] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 2, 2);
-        bags[0][2] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 3, 1);
+        bags[0][0] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 1, 3);
+        bags[0][1] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 2, 2);
+        bags[0][2] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 3, 1);
         bags[0][3] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Weapon, 2, 1);
         bags[0][4] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Helmet, 1);
-        bags[0][5] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.Consumable, 5);
+        bags[0][5] = itemsDBSO.GenerateItem(CharactersModelDBSO.TypeModel.FastItems, 5);
         return newSlotData;
     }
     public void SetStartingItems()
