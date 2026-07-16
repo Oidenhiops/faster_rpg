@@ -279,7 +279,7 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot != CharactersModelDBSO.TypeModel.Bag &&
             characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag)
         {
-            if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != CharactersModelDBSO.TypeModel.FastItems && IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.typeObject))
+            if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != CharactersModelDBSO.TypeModel.FastItems && IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.typeObject) && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot != CharactersModelDBSO.TypeModel.FastItems)
             {
                 _ = ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, lastSelectedSlotIndex);
             }
@@ -292,18 +292,20 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems && 
             IsEquipableItem(characterPlayerHud.lastSelectedSlot.typeInventorySlot))
         {
-            if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject == characterPlayerHud.lastSelectedSlot.characterItem.typeObject)
+            if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject == characterPlayerHud.lastSelectedSlot.typeInventorySlot || 
+                !characterPlayerHud.lastSelectedSlot.characterItem.itemBaseSO)
             {
-                FastItemToEquipment(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex, characterPlayerHud.lastSelectedSlot.characterItem.typeObject);
+                FastItemToEquipment(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex, characterPlayerHud.lastSelectedSlot.typeInventorySlot);
             }
         }
         else if (
             characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems && 
             IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot))
         {
-            if (characterPlayerHud.lastSelectedSlot.characterItem.typeObject == characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject)
+            if (characterPlayerHud.lastSelectedSlot.characterItem.typeObject == characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject ||
+                !characterPlayerHud.lastSelectedSlot.characterItem.itemBaseSO)
             {
-                FastItemToEquipment(characterPlayerHud.lastSelectedSlot.slotIndex, characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject);
+                FastItemToEquipment(characterPlayerHud.lastSelectedSlot.slotIndex, characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot);
             }
         }
         _ = characterPlayerHud.ResetInventoryTarget();
@@ -442,23 +444,24 @@ public class CharacterPlayer : CharacterBase
     }
     void FastItemToEquipment(int fastItemSlotIndex, CharactersModelDBSO.TypeModel equipmentIndex)
     {
-        if (charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO?.typeObject == equipmentIndex ||
-            charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO == null)
-        {
-            CharacterData.CharacterItem fastItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(fastItemSlotIndex));
-            CharacterData.CharacterItem equipmentItemTemp = new CharacterData.CharacterItem(GetEquipmentItemByIndex(equipmentIndex));
+        CharacterData.CharacterItem fastItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(fastItemSlotIndex));
+        CharacterData.CharacterItem equipmentItemTemp = new CharacterData.CharacterItem(GetEquipmentItemByIndex(equipmentIndex));
 
-            charactersData[characterIndex].equipments[equipmentIndex] = fastItemTemp;
-            charactersData[characterIndex].fastItems[fastItemSlotIndex] = equipmentItemTemp;
+        if (fastItemTemp.typeObject == CharactersModelDBSO.TypeModel.None) fastItemTemp.typeObject = equipmentIndex;
+        if (equipmentItemTemp.typeObject == CharactersModelDBSO.TypeModel.None) equipmentItemTemp.typeObject = CharactersModelDBSO.TypeModel.FastItems;
 
-            if (equipmentItemTemp.itemBaseSO) _ = equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true);
-            if (fastItemTemp.itemBaseSO) _ = fastItemTemp.itemBaseSO.EquipItem(this, fastItemTemp, true);
-            characterPlayerHud.RefreshCharacterStatistics();
-            characterPlayerHud.GetConsumableSlotByIndex(fastItemSlotIndex).InitializeSlot(charactersData[characterIndex].fastItems[fastItemSlotIndex]);
-            characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
-            characterPlayerHud.RefreshFastItems();
-            if (fastItemSlotIndex == currentFastItemIndex) UpdateFastItemModel();
-        }
+        charactersData[characterIndex].equipments[equipmentIndex] = fastItemTemp;
+        charactersData[characterIndex].fastItems[fastItemSlotIndex] = equipmentItemTemp;
+
+        if (equipmentItemTemp.itemBaseSO) _ = equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true);
+        if (fastItemTemp.itemBaseSO) _ = fastItemTemp.itemBaseSO.EquipItem(this, fastItemTemp, true);
+        characterPlayerHud.RefreshCharacterStatistics();
+        characterPlayerHud.GetConsumableSlotByIndex(fastItemSlotIndex).InitializeSlot(charactersData[characterIndex].fastItems[fastItemSlotIndex]);
+        characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
+        characterPlayerHud.RefreshFastItems();
+        if (fastItemSlotIndex == currentFastItemIndex) UpdateFastItemModel();
+        else if (IsEquipableItem(equipmentIndex)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentIndex], true);
+        else if (IsEquipableItem(equipmentItemTemp.typeObject)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentItemTemp.typeObject], false);
     }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
