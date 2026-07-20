@@ -96,7 +96,7 @@ public class ItemBaseSO : ScriptableObject
             }
         }
     }
-    public virtual void UseItem(CharacterBase character, CharacterData.CharacterItem characterItem) { Debug.LogError("UseItem not implemented"); }
+    public virtual void UseItem(UseItemInfo useItemInfo) { Debug.LogError("UseItem not implemented"); }
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> CloneStatistics()
     {
         var clone = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
@@ -116,6 +116,26 @@ public class ItemBaseSO : ScriptableObject
 
         return clone;
     }
+    [Serializable]
+    public class ItemModelInfo: CharacterData.CharacterSkinInfo
+    {
+        public List<CharactersModelDBSO.TypeModel> occludedModels = new List<CharactersModelDBSO.TypeModel>();
+    }
+    [Serializable]
+    public class UseItemInfo
+    {
+        public CharacterBase character;
+        public CharacterData.CharacterItem characterItem;
+        public bool isFastItem;
+        public RaycastHit hit;
+        public UseItemInfo(CharacterBase character, CharacterData.CharacterItem characterItem, bool isFastItem = false, RaycastHit hit = new RaycastHit())
+        {
+            this.character = character;
+            this.characterItem = characterItem;
+            this.isFastItem = isFastItem;
+            this.hit = hit;
+        }
+    }
     public enum TypeWeapon
     {
         None = 0,
@@ -126,10 +146,5 @@ public class ItemBaseSO : ScriptableObject
         Axe = 5,
         Staff = 6,
         Monster = 7
-    }
-    [Serializable]
-    public class ItemModelInfo: CharacterData.CharacterSkinInfo
-    {
-        public List<CharactersModelDBSO.TypeModel> occludedModels = new List<CharactersModelDBSO.TypeModel>();
     }
 }

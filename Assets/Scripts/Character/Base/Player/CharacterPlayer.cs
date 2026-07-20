@@ -151,9 +151,9 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleUseFastItem(InputAction.CallbackContext context)
     {
-        if (!isInventoryOpen && !isInCanalization) UseItem();
+        if (!isInventoryOpen && !isInCanalization) UseFastItem();
     }
-    public override void UseItem()
+    public override void UseFastItem()
     {
         if (isInventoryOpen || isInCanalization) return;
         if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
@@ -162,14 +162,13 @@ public class CharacterPlayer : CharacterBase
                 charactersData[characterIndex].fastItems[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) &&
                 charactersData[characterIndex].fastItems[currentFastItemIndex].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0)
             {
-                charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].fastItems[currentFastItemIndex]);
+                charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(
+                    character: this,
+                    characterItem: charactersData[characterIndex].fastItems[currentFastItemIndex],
+                    isFastItem: true
+                ));
             }
         }
-    }
-    public override void UseItem(int bagSlotIndex)
-    {
-        if (isInventoryOpen || isInCanalization) return;
-        if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.UseItem(this, charactersData[characterIndex].bag[bagSlotIndex]);
     }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
     {

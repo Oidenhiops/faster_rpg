@@ -4,11 +4,11 @@ using UnityEngine;
 public class ConsumableSkillSO : ItemBaseSO
 {
     public SkillsBaseSO skillsBaseSO;
-        public override void UseItem(CharacterBase character, CharacterData.CharacterItem characterItem)
+        public override void UseItem(UseItemInfo useItemInfo)
     {
         if (skillsBaseSO)
         {
-            _ = skillsBaseSO.UseSkill(character, characterItem);
+            _ = skillsBaseSO.UseSkill(useItemInfo.character, useItemInfo.characterItem);
         }
     }
 }

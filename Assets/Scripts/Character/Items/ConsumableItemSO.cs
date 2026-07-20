@@ -4,25 +4,25 @@ using UnityEngine;
 public class ConsumableItemSO : ItemBaseSO
 {
     public GameObject useEffectPrefab;
-    public override void UseItem(CharacterBase character, CharacterData.CharacterItem characterItem)
+    public override void UseItem(UseItemInfo useItemInfo)
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
         {
-            if (character.charactersData[character.characterIndex].statistics.ContainsKey(statistic.Key))
+            if (useItemInfo.character.charactersData[useItemInfo.character.characterIndex].statistics.ContainsKey(statistic.Key))
             {
-                character.charactersData[character.characterIndex].statistics[statistic.Key].currentValue += statistic.Value.baseValue;
-                character.charactersData[character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                useItemInfo.character.charactersData[useItemInfo.character.characterIndex].statistics[statistic.Key].currentValue += statistic.Value.baseValue;
+                useItemInfo.character.charactersData[useItemInfo.character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
-        GameObject effect = Instantiate(useEffectPrefab, character.transform.position + Vector3.up * 0.5f, Quaternion.identity);
-        effect.transform.SetParent(character.transform);
+        GameObject effect = Instantiate(useEffectPrefab, useItemInfo.character.transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        effect.transform.SetParent(useItemInfo.character.transform);
         Destroy(effect, 2f);
-        characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue--;
-        if (characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
+        useItemInfo.characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue--;
+        if (useItemInfo.characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
         {
-            characterItem.ResetItem();
-            character.UpdateFastItemModel();
+            useItemInfo.characterItem.ResetItem();
+            useItemInfo.character.UpdateFastItemModel();
         }
-        _ = character.characterPlayerHud?.RefreshCharacterInventory();
+        _ = useItemInfo.character.characterPlayerHud?.RefreshCharacterInventory();
     }
 }

@@ -233,8 +233,7 @@ public class CharacterBase : MonoBehaviour
         characterAnimations.HandleAnimation();
     }
     public virtual void OnHandlePickUpItem(ItemDropped itemDropped) { }
-    public virtual void UseItem() { }
-    public virtual void UseItem(int bagSlotIndex) { }
+    public virtual void UseFastItem() { }
     public virtual async Awaitable UseSkill(int skillIndex) { }
     protected bool SetGrounded()
     {        
