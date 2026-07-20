@@ -233,7 +233,7 @@ public class CharacterPlayer : CharacterBase
     {
         if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true);
+            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, CharactersModelDBSO.TypeModel.FastItems);
             for (int i = 0; i < characterModel.meshesData[CharactersModelDBSO.TypeModel.FastItems].Count; i++)
             {
                 dissolvePlayer.NeedAppearSpecificObj(characterModel.meshesData[CharactersModelDBSO.TypeModel.FastItems][i].meshRenderer);
@@ -460,8 +460,8 @@ public class CharacterPlayer : CharacterBase
         characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
         characterPlayerHud.RefreshFastItems();
         if (fastItemSlotIndex == currentFastItemIndex) UpdateFastItemModel();
-        else if (IsEquipableItem(equipmentIndex)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentIndex], true);
-        else if (IsEquipableItem(equipmentItemTemp.typeObject)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentItemTemp.typeObject], false);
+        else if (IsEquipableItem(equipmentIndex)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentIndex], true, CharactersModelDBSO.TypeModel.FastItems);
+        else if (IsEquipableItem(equipmentItemTemp.typeObject)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentItemTemp.typeObject], false, CharactersModelDBSO.TypeModel.FastItems);
     }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
