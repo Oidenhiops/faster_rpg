@@ -193,6 +193,24 @@ public class CharacterBase : MonoBehaviour
             }
         }
     }
+    public void UpdateFastItemModel()
+    {
+        if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
+        {
+            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, CharactersModelDBSO.TypeModel.FastItems);
+            for (int i = 0; i < characterModel.meshesData[CharactersModelDBSO.TypeModel.FastItems].Count; i++)
+            {
+                dissolvePlayer.NeedAppearSpecificObj(characterModel.meshesData[CharactersModelDBSO.TypeModel.FastItems][i].meshRenderer);
+            }
+        }
+        else
+        {
+            RefreshCharacterItemModel(new CharacterData.CharacterItem
+            {
+                typeObject = CharactersModelDBSO.TypeModel.FastItems,
+            }, false);
+        }
+    }
     void SetTextureFromAtlas(Sprite spriteFromAtlas, MeshRenderer meshRenderer, Mesh originalMesh)
     {
         Vector2[] uvs = originalMesh.uv;

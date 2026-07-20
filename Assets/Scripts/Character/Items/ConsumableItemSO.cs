@@ -21,6 +21,7 @@ public class ConsumableItemSO : ItemBaseSO
         if (characterItem.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue <= 0)
         {
             characterItem.ResetItem();
+            character.UpdateFastItemModel();
         }
         _ = character.characterPlayerHud?.RefreshCharacterInventory();
     }
