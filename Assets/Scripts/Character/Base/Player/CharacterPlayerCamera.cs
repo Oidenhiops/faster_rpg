@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,19 +15,18 @@ public class CharacterPlayerCamera : MonoBehaviour
     [Header("Límites de inclinación (pitch)")]
     [SerializeField] float minPitch = -40f;
     [SerializeField] float maxPitch = 70f;
-
     [Header("Jugador")]
-    [Tooltip("Raíz del personaje que se orienta según la cámara (estilo Palworld).")]
+    [Tooltip("Raíz del personaje que se orienta según la cámara.")]
     [SerializeField] Transform player;
-    [SerializeField] bool rotatePlayerWithCamera = true;
+    [SerializeField] public bool rotatePlayerWithCamera = true;
     [SerializeField] float playerRotationSpeed = 12f;
     [Header("Cursor")]
     [SerializeField] bool lockCursor = true;
-    public bool isRotatingCamera = false;
-
     private float yaw;
     private float pitch;
-
+    public bool isRotatingCamera = false;
+    public float awaitForFreeRotate;
+    public Coroutine awaitForFreeRotateCoroutine;
     public void Awake()
     {
         if (pivot != null)
@@ -60,11 +60,15 @@ public class CharacterPlayerCamera : MonoBehaviour
         player.rotation = Quaternion.Slerp(
             player.rotation, target, playerRotationSpeed * Time.deltaTime);
     }
-
-    public void MoveCamera(InputAction.CallbackContext context)
+    public void OnHandleSetFreeCamera(InputAction.CallbackContext context)
+    {
+        rotatePlayerWithCamera = !rotatePlayerWithCamera;
+    }
+    public void OnHandleMoveCamera(InputAction.CallbackContext context)
     {
         if (context.performed || context.started)
         {
+            if (awaitForFreeRotateCoroutine != null) StopCoroutine(awaitForFreeRotateCoroutine);
             isRotatingCamera = true;
             if (pivot == null)
                 return;
@@ -78,7 +82,21 @@ public class CharacterPlayerCamera : MonoBehaviour
         }
         else
         {
-            isRotatingCamera = false;
+            ResetAwaitForFreeRotate();
         }
+    }
+    public void ResetAwaitForFreeRotate()
+    {
+        if (awaitForFreeRotateCoroutine == null) awaitForFreeRotateCoroutine = StartCoroutine(AwaitForFreeRotate());
+        else
+        {
+            StopCoroutine(awaitForFreeRotateCoroutine);
+            awaitForFreeRotateCoroutine = StartCoroutine(AwaitForFreeRotate());
+        }
+    }
+    public IEnumerator AwaitForFreeRotate()
+    {
+        yield return new WaitForSeconds(awaitForFreeRotate);
+        isRotatingCamera = false;
     }
 }

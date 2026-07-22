@@ -25,8 +25,9 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.ChangeFastItem.performed += OnHandleChangeFastItem;
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
         inputActions.Player.UseSkill.performed += OnHandleUseSkill;
-        inputActions.Player.MoveCamera.performed += MoveCamera;
-        inputActions.Player.MoveCamera.canceled += MoveCamera;
+        inputActions.Player.MoveCamera.performed += OnHandleMoveCamera;
+        inputActions.Player.MoveCamera.canceled += OnHandleMoveCamera;
+        inputActions.Player.SetFreeCamera.performed += OnHandleSetFreeCamera;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -134,10 +135,14 @@ public class CharacterPlayer : CharacterBase
         await characterPlayerHud.ChangeCharacterPortrait();
         isChangingCharacter = false;
     }
-    public void MoveCamera(InputAction.CallbackContext context)
+    public void OnHandleMoveCamera(InputAction.CallbackContext context)
     {
         if (isInventoryOpen) return;
-        characterPlayerCamera.MoveCamera(context);
+        characterPlayerCamera.OnHandleMoveCamera(context);
+    }
+    public void OnHandleSetFreeCamera(InputAction.CallbackContext context)
+    {
+        characterPlayerCamera.OnHandleSetFreeCamera(context);
     }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {

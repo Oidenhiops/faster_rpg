@@ -111,10 +111,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""SetCameraRadius"",
-                    ""type"": ""Value"",
+                    ""name"": ""SetFreeCamera"",
+                    ""type"": ""Button"",
                     ""id"": ""c3472019-1f7b-45ce-9af5-e6e93cce0135"",
-                    ""expectedControlType"": ""Vector2"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -696,11 +696,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""65245852-f1f6-4538-8997-9a736f88c1e0"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Keyboard>/alt"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SetCameraRadius"",
+                    ""action"": ""SetFreeCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1290,7 +1290,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_MoveCamera = m_Player.FindAction("MoveCamera", throwIfNotFound: true);
-        m_Player_SetCameraRadius = m_Player.FindAction("SetCameraRadius", throwIfNotFound: true);
+        m_Player_SetFreeCamera = m_Player.FindAction("SetFreeCamera", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Run = m_Player.FindAction("Run", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
@@ -1397,7 +1397,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_MoveCamera;
-    private readonly InputAction m_Player_SetCameraRadius;
+    private readonly InputAction m_Player_SetFreeCamera;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Run;
     private readonly InputAction m_Player_Jump;
@@ -1429,9 +1429,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @MoveCamera => m_Wrapper.m_Player_MoveCamera;
         /// <summary>
-        /// Provides access to the underlying input action "Player/SetCameraRadius".
+        /// Provides access to the underlying input action "Player/SetFreeCamera".
         /// </summary>
-        public InputAction @SetCameraRadius => m_Wrapper.m_Player_SetCameraRadius;
+        public InputAction @SetFreeCamera => m_Wrapper.m_Player_SetFreeCamera;
         /// <summary>
         /// Provides access to the underlying input action "Player/Look".
         /// </summary>
@@ -1508,9 +1508,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MoveCamera.started += instance.OnMoveCamera;
             @MoveCamera.performed += instance.OnMoveCamera;
             @MoveCamera.canceled += instance.OnMoveCamera;
-            @SetCameraRadius.started += instance.OnSetCameraRadius;
-            @SetCameraRadius.performed += instance.OnSetCameraRadius;
-            @SetCameraRadius.canceled += instance.OnSetCameraRadius;
+            @SetFreeCamera.started += instance.OnSetFreeCamera;
+            @SetFreeCamera.performed += instance.OnSetFreeCamera;
+            @SetFreeCamera.canceled += instance.OnSetFreeCamera;
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
@@ -1561,9 +1561,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MoveCamera.started -= instance.OnMoveCamera;
             @MoveCamera.performed -= instance.OnMoveCamera;
             @MoveCamera.canceled -= instance.OnMoveCamera;
-            @SetCameraRadius.started -= instance.OnSetCameraRadius;
-            @SetCameraRadius.performed -= instance.OnSetCameraRadius;
-            @SetCameraRadius.canceled -= instance.OnSetCameraRadius;
+            @SetFreeCamera.started -= instance.OnSetFreeCamera;
+            @SetFreeCamera.performed -= instance.OnSetFreeCamera;
+            @SetFreeCamera.canceled -= instance.OnSetFreeCamera;
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
@@ -1912,12 +1912,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMoveCamera(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "SetCameraRadius" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SetFreeCamera" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSetCameraRadius(InputAction.CallbackContext context);
+        void OnSetFreeCamera(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Look" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

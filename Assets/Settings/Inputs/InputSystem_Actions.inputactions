@@ -25,10 +25,10 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "SetCameraRadius",
-                    "type": "Value",
+                    "name": "SetFreeCamera",
+                    "type": "Button",
                     "id": "c3472019-1f7b-45ce-9af5-e6e93cce0135",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -610,11 +610,11 @@
                 {
                     "name": "",
                     "id": "65245852-f1f6-4538-8997-9a736f88c1e0",
-                    "path": "<Mouse>/scroll",
+                    "path": "<Keyboard>/alt",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SetCameraRadius",
+                    "action": "SetFreeCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

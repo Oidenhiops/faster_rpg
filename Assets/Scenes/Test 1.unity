@@ -2067,6 +2067,7 @@ MonoBehaviour:
   playerRotationSpeed: 12
   lockCursor: 1
   isRotatingCamera: 0
+  awaitForFreeRotate: 1
 --- !u!114 &211714510
 MonoBehaviour:
   m_ObjectHideFlags: 0

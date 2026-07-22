@@ -45,7 +45,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
             directionFromCamera.x = 0;
             directionFromCamera.z = 0;
         }
-        if (!characterPlayer.characterPlayerCamera.isRotatingCamera) characterBase.characterDirection.ChangeDirection();
+        if (!characterPlayer.characterPlayerCamera.rotatePlayerWithCamera || !characterPlayer.characterPlayerCamera.isRotatingCamera) characterBase.characterDirection.ChangeDirection();
         rb.linearVelocity = directionFromCamera;
     }
     void OnHandleJump(InputAction.CallbackContext context)
