@@ -6,7 +6,6 @@ public class CharacterDirection : MonoBehaviour
     [SerializeField] Transform cameraTransform;
     [SerializeField] float rotationSpeed = 10f;
     [SerializeField] Vector3 direction;
-
     public void ChangeDirection()
     {
         if (characterBase.directionMovement != Vector2.zero)

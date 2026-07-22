@@ -26,7 +26,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
         inputActions.Player.UseSkill.performed += OnHandleUseSkill;
         inputActions.Player.MoveCamera.performed += MoveCamera;
-        inputActions.Player.SetCameraRadius.performed += SetCameraRadius;
+        inputActions.Player.MoveCamera.canceled += MoveCamera;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -138,11 +138,6 @@ public class CharacterPlayer : CharacterBase
     {
         if (isInventoryOpen) return;
         characterPlayerCamera.MoveCamera(context);
-    }
-    public void SetCameraRadius(InputAction.CallbackContext context)
-    {
-        if (isInventoryOpen) return;
-        characterPlayerCamera.SetCameraRadius(context);
     }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {

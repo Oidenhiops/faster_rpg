@@ -5,23 +5,80 @@ using UnityEngine.InputSystem;
 public class CharacterPlayerCamera : MonoBehaviour
 {
     [SerializeField] CinemachineCamera vcam;
-    [SerializeField] float speed = 0.01f;
+
+    [Header("Pivote de cámara")]
+    [Tooltip("Transform que rota con el mouse. Debe ser el Tracking Target de la cámara (Third Person Follow). Mantenlo FUERA de la jerarquía del jugador para evitar acoplamiento.")]
+    [SerializeField] Transform pivot;
+    [SerializeField] float speed = 0.1f;
     public bool flipYAxis = false;
-    public Vector2 radiusRange = new Vector2(2, 8);
-    private CinemachineOrbitalFollow orbital;
+    [Header("Límites de inclinación (pitch)")]
+    [SerializeField] float minPitch = -40f;
+    [SerializeField] float maxPitch = 70f;
+
+    [Header("Jugador")]
+    [Tooltip("Raíz del personaje que se orienta según la cámara (estilo Palworld).")]
+    [SerializeField] Transform player;
+    [SerializeField] bool rotatePlayerWithCamera = true;
+    [SerializeField] float playerRotationSpeed = 12f;
+    [Header("Cursor")]
+    [SerializeField] bool lockCursor = true;
+    public bool isRotatingCamera = false;
+
+    private float yaw;
+    private float pitch;
+
     public void Awake()
     {
-        orbital = vcam.GetComponent<CinemachineOrbitalFollow>();
+        if (pivot != null)
+        {
+            Vector3 e = pivot.eulerAngles;
+            yaw = e.y;
+            pitch = e.x;
+        }
     }
+
+    private void Start()
+    {
+        if (lockCursor)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        HandlePlayerRotation();
+    }
+
+    private void HandlePlayerRotation()
+    {
+        if (!rotatePlayerWithCamera || player == null || pivot == null || !isRotatingCamera)
+            return;
+
+        Quaternion target = Quaternion.Euler(0f, pivot.eulerAngles.y, 0f);
+        player.rotation = Quaternion.Slerp(
+            player.rotation, target, playerRotationSpeed * Time.deltaTime);
+    }
+
     public void MoveCamera(InputAction.CallbackContext context)
     {
-        orbital.HorizontalAxis.Value += context.ReadValue<Vector2>().x * speed * Time.deltaTime;
-        orbital.VerticalAxis.Value += context.ReadValue<Vector2>().y * (flipYAxis ? -1 : 1) * speed * Time.deltaTime;
-        orbital.VerticalAxis.Value = Mathf.Clamp(orbital.VerticalAxis.Value, orbital.VerticalAxis.Range.x, orbital.VerticalAxis.Range.y);
-    }
-    public void SetCameraRadius(InputAction.CallbackContext context)
-    {
-        // float newRadius = orbital.Radius + context.ReadValue<Vector2>().y * Time.deltaTime;
-        // orbital.Radius = Mathf.Clamp(newRadius, radiusRange.x, radiusRange.y);
+        if (context.performed || context.started)
+        {
+            isRotatingCamera = true;
+            if (pivot == null)
+                return;
+
+            Vector2 look = context.ReadValue<Vector2>();
+            yaw += look.x * speed;
+            pitch += look.y * (flipYAxis ? 1 : -1) * speed;
+            pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+
+            pivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
+        else
+        {
+            isRotatingCamera = false;
+        }
     }
 }
