@@ -222,11 +222,14 @@ public class CharacterPlayer : CharacterBase
     void OnHandleChangeFastItem(InputAction.CallbackContext context)
     {
         if (isInventoryOpen || isInCanalization) return;
+        if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO) _ = charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[currentFastItemIndex], false, true);
         currentFastItemIndex += (int)context.ReadValue<float>();
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
+        if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO) _ = charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].fastItems[currentFastItemIndex], true, true);
         characterPlayerHud.SelectFastItem();
         UpdateFastItemModel();
+        characterPlayerHud.RefreshCharacterStatistics();
     }
     public void ChangeObjectPosition()
     {
@@ -235,42 +238,42 @@ public class CharacterPlayer : CharacterBase
 
         if (characterPlayerHud.lastSelectedSlot == characterPlayerHud.inventoryDraggedSlot.itemDraged) return;
 
-        if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag)
+        if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.Bag && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == ItemsDBSO.TypeModel.Bag)
         {
             ChangeBagToBag(lastSelectedSlotIndex, draggedSlotIndex);
         }
-        else if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems)
+        else if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.FastItems && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == ItemsDBSO.TypeModel.FastItems)
         {
             ChangeFasItemToFastItem(lastSelectedSlotIndex, draggedSlotIndex);
         }
         else if (
-            characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag &&
-            characterPlayerHud.lastSelectedSlot.typeInventorySlot != CharactersModelDBSO.TypeModel.Bag)
+            characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == ItemsDBSO.TypeModel.Bag &&
+            characterPlayerHud.lastSelectedSlot.typeInventorySlot != ItemsDBSO.TypeModel.Bag)
         {
-            if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != CharactersModelDBSO.TypeModel.FastItems && IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.typeObject))
+            if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != ItemsDBSO.TypeModel.FastItems && IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.typeObject))
             {
                 _ = ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, draggedSlotIndex);
             }
-            else if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems || characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag)
+            else if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.FastItems || characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.Bag)
             {
                 ChangeBagAndConsumable(draggedSlotIndex, lastSelectedSlotIndex, false);
             }
         }
         else if (
-            characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot != CharactersModelDBSO.TypeModel.Bag &&
-            characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag)
+            characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot != ItemsDBSO.TypeModel.Bag &&
+            characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.Bag)
         {
-            if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != CharactersModelDBSO.TypeModel.FastItems && IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.typeObject) && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot != CharactersModelDBSO.TypeModel.FastItems)
+            if (characterPlayerHud.lastSelectedSlot.typeInventorySlot != ItemsDBSO.TypeModel.FastItems && IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.typeObject) && characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot != ItemsDBSO.TypeModel.FastItems)
             {
                 _ = ChangeEquipmentAndBag(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject, lastSelectedSlotIndex);
             }
-            else if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems || characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag)
+            else if (characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.FastItems || characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.Bag)
             {
                 ChangeBagAndConsumable(lastSelectedSlotIndex, draggedSlotIndex, true);
             }
         }
         else if (
-            characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems && 
+            characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == ItemsDBSO.TypeModel.FastItems && 
             IsEquipableItem(characterPlayerHud.lastSelectedSlot.typeInventorySlot))
         {
             if (characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject == characterPlayerHud.lastSelectedSlot.typeInventorySlot || 
@@ -280,7 +283,7 @@ public class CharacterPlayer : CharacterBase
             }
         }
         else if (
-            characterPlayerHud.lastSelectedSlot.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems && 
+            characterPlayerHud.lastSelectedSlot.typeInventorySlot == ItemsDBSO.TypeModel.FastItems && 
             IsEquipableItem(characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot))
         {
             if (characterPlayerHud.lastSelectedSlot.characterItem.typeObject == characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject ||
@@ -306,6 +309,7 @@ public class CharacterPlayer : CharacterBase
                 charactersData[characterIndex].bag[draggedBagSlotIndex] = new CharacterData.CharacterItem();
             }
             characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[draggedBagSlotIndex]);
+            characterPlayerHud.RefreshCharacterStatistics();
         }
         else
         {
@@ -316,6 +320,7 @@ public class CharacterPlayer : CharacterBase
             charactersData[characterIndex].bag[bagSlotIndex] = draggedItemTemp;
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
             characterPlayerHud.GetBagSlotByIndex(draggedBagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[draggedBagSlotIndex]);
+            characterPlayerHud.RefreshCharacterStatistics();
         }
     }
     void ChangeFasItemToFastItem(int fastItemSlotIndex, int draggedFastItemSlotIndex)
@@ -345,9 +350,21 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.GetConsumableSlotByIndex(draggedFastItemSlotIndex).InitializeSlot(charactersData[characterIndex].fastItems[draggedFastItemSlotIndex]);
         }
         characterPlayerHud.RefreshFastItems();
-        if (fastItemSlotIndex == currentFastItemIndex || draggedFastItemSlotIndex == currentFastItemIndex) UpdateFastItemModel();
+        if (fastItemSlotIndex == currentFastItemIndex)
+        {
+            _ = charactersData[characterIndex].fastItems[draggedFastItemSlotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[draggedFastItemSlotIndex], false, true);
+            _ = charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].fastItems[fastItemSlotIndex], false, true);
+            UpdateFastItemModel();
+        }
+        else if (draggedFastItemSlotIndex == currentFastItemIndex)
+        {
+            _ = charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[fastItemSlotIndex], false, true);
+            _ = charactersData[characterIndex].fastItems[draggedFastItemSlotIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].fastItems[draggedFastItemSlotIndex], false, true);
+            UpdateFastItemModel();
+        }
+        characterPlayerHud.RefreshCharacterStatistics();
     }
-    async Awaitable ChangeEquipmentAndBag(CharactersModelDBSO.TypeModel equipmentIndex, int bagSlotIndex)
+    async Awaitable ChangeEquipmentAndBag(ItemsDBSO.TypeModel equipmentIndex, int bagSlotIndex)
     {
         if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO?.typeObject == equipmentIndex ||
             charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO == null)
@@ -358,8 +375,8 @@ public class CharacterPlayer : CharacterBase
             charactersData[characterIndex].equipments[equipmentIndex] = bagItemTemp;
             charactersData[characterIndex].bag[bagSlotIndex] = equipmentItemTemp;
 
-            if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true);
-            if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp, true);
+            if (equipmentItemTemp.itemBaseSO) await equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true, false);
+            if (bagItemTemp.itemBaseSO) await bagItemTemp.itemBaseSO.EquipItem(this, bagItemTemp, true, false);
             characterPlayerHud.RefreshCharacterStatistics();
             characterPlayerHud.GetBagSlotByIndex(bagSlotIndex).InitializeSlot(charactersData[characterIndex].bag[bagSlotIndex]);
             characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
@@ -423,26 +440,26 @@ public class CharacterPlayer : CharacterBase
         characterPlayerHud.GetConsumableSlotByIndex(consumableSlotIndex).InitializeSlot(charactersData[characterIndex].fastItems[consumableSlotIndex]);
         characterPlayerHud.RefreshFastItems();
     }
-    void FastItemToEquipment(int fastItemSlotIndex, CharactersModelDBSO.TypeModel equipmentIndex)
+    void FastItemToEquipment(int fastItemSlotIndex, ItemsDBSO.TypeModel equipmentIndex)
     {
         CharacterData.CharacterItem fastItemTemp = new CharacterData.CharacterItem(GetConsumableItemByIndex(fastItemSlotIndex));
         CharacterData.CharacterItem equipmentItemTemp = new CharacterData.CharacterItem(GetEquipmentItemByIndex(equipmentIndex));
 
-        if (fastItemTemp.typeObject == CharactersModelDBSO.TypeModel.None) fastItemTemp.typeObject = equipmentIndex;
-        if (equipmentItemTemp.typeObject == CharactersModelDBSO.TypeModel.None) equipmentItemTemp.typeObject = CharactersModelDBSO.TypeModel.FastItems;
+        if (fastItemTemp.typeObject == ItemsDBSO.TypeModel.None) fastItemTemp.typeObject = equipmentIndex;
+        if (equipmentItemTemp.typeObject == ItemsDBSO.TypeModel.None) equipmentItemTemp.typeObject = ItemsDBSO.TypeModel.FastItems;
 
         charactersData[characterIndex].equipments[equipmentIndex] = fastItemTemp;
         charactersData[characterIndex].fastItems[fastItemSlotIndex] = equipmentItemTemp;
 
-        if (equipmentItemTemp.itemBaseSO) _ = equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true);
-        if (fastItemTemp.itemBaseSO) _ = fastItemTemp.itemBaseSO.EquipItem(this, fastItemTemp, true);
+        if (equipmentItemTemp.itemBaseSO) _ = equipmentItemTemp.itemBaseSO.DesEquipItem(this, equipmentItemTemp, true, false);
+        if (fastItemTemp.itemBaseSO) _ = fastItemTemp.itemBaseSO.EquipItem(this, fastItemTemp, true, false);
         characterPlayerHud.RefreshCharacterStatistics();
         characterPlayerHud.GetConsumableSlotByIndex(fastItemSlotIndex).InitializeSlot(charactersData[characterIndex].fastItems[fastItemSlotIndex]);
         characterPlayerHud.GetEquipmentSlotByIndex(equipmentIndex).InitializeSlot(charactersData[characterIndex].equipments[equipmentIndex]);
         characterPlayerHud.RefreshFastItems();
         if (fastItemSlotIndex == currentFastItemIndex) UpdateFastItemModel();
-        else if (IsEquipableItem(equipmentIndex)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentIndex], true, CharactersModelDBSO.TypeModel.FastItems);
-        else if (IsEquipableItem(equipmentItemTemp.typeObject)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentItemTemp.typeObject], false, CharactersModelDBSO.TypeModel.FastItems);
+        else if (IsEquipableItem(equipmentIndex)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentIndex], true, ItemsDBSO.TypeModel.FastItems);
+        else if (IsEquipableItem(equipmentItemTemp.typeObject)) RefreshCharacterItemModel(charactersData[characterIndex].equipments[equipmentItemTemp.typeObject], false, ItemsDBSO.TypeModel.FastItems);
     }
     public bool FindEmptyBagSlot(out int bagIndex)
     {
@@ -494,16 +511,16 @@ public class CharacterPlayer : CharacterBase
             amountToAppend = (int)(toAppend.itemStatistics[CharacterData.TypeStatistic.Amount].maxValue - toAppend.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue);
         }
     }
-    public bool IsEquipableItem(CharactersModelDBSO.TypeModel typeModel)
+    public bool IsEquipableItem(ItemsDBSO.TypeModel typeModel)
     {
-        return typeModel == CharactersModelDBSO.TypeModel.Helmet ||
-               typeModel == CharactersModelDBSO.TypeModel.Front ||
-               typeModel == CharactersModelDBSO.TypeModel.Pants ||
-               typeModel == CharactersModelDBSO.TypeModel.Boots ||
-               typeModel == CharactersModelDBSO.TypeModel.Gloves ||
-               typeModel == CharactersModelDBSO.TypeModel.Pendant ||
-               typeModel == CharactersModelDBSO.TypeModel.Ring ||
-               typeModel == CharactersModelDBSO.TypeModel.Weapon;
+        return typeModel == ItemsDBSO.TypeModel.Helmet ||
+               typeModel == ItemsDBSO.TypeModel.Front ||
+               typeModel == ItemsDBSO.TypeModel.Pants ||
+               typeModel == ItemsDBSO.TypeModel.Boots ||
+               typeModel == ItemsDBSO.TypeModel.Gloves ||
+               typeModel == ItemsDBSO.TypeModel.Pendant ||
+               typeModel == ItemsDBSO.TypeModel.Ring ||
+               typeModel == ItemsDBSO.TypeModel.Weapon;
     }
     public CharacterData.CharacterItem GetBagItemByIndex(int index)
     {
@@ -521,7 +538,7 @@ public class CharacterPlayer : CharacterBase
         }
         return new CharacterData.CharacterItem();
     }
-    public CharacterData.CharacterItem GetEquipmentItemByIndex(CharactersModelDBSO.TypeModel index)
+    public CharacterData.CharacterItem GetEquipmentItemByIndex(ItemsDBSO.TypeModel index)
     {
         if (charactersData[characterIndex].equipments.TryGetValue(index, out CharacterData.CharacterItem equipmentItem))
         {
@@ -532,7 +549,7 @@ public class CharacterPlayer : CharacterBase
     public void FastEquipItem(int slotIndex)
     {
         if (characterPlayerHud.isDraggingItem) return;
-        if (charactersData[characterIndex].bag[slotIndex].itemBaseSO?.typeObject != CharactersModelDBSO.TypeModel.FastItems)
+        if (charactersData[characterIndex].bag[slotIndex].itemBaseSO?.typeObject != ItemsDBSO.TypeModel.FastItems)
         {
             if (GetEquipmentItemByIndex(charactersData[characterIndex].bag[slotIndex].itemBaseSO.typeObject).itemBaseSO != null)
             {
@@ -568,7 +585,7 @@ public class CharacterPlayer : CharacterBase
     public async Task DropItem()
     {
         int draggedSlotIndex = characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex;
-        if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.Bag)
+        if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == ItemsDBSO.TypeModel.Bag)
         {
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetBagItemByIndex(draggedSlotIndex), true);
@@ -576,11 +593,12 @@ public class CharacterPlayer : CharacterBase
             charactersData[characterIndex].bag[draggedSlotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetBagSlotByIndex(draggedSlotIndex).InitializeSlot(new CharacterData.CharacterItem());
         }
-        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == CharactersModelDBSO.TypeModel.FastItems)
+        else if (characterPlayerHud.inventoryDraggedSlot.itemDraged.typeInventorySlot == ItemsDBSO.TypeModel.FastItems)
         {
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetConsumableItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex), true);
             LaunchDropItem(itemDropped);
+            _ = charactersData[characterIndex].fastItems[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex], true, true);
             charactersData[characterIndex].fastItems[characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex] = new CharacterData.CharacterItem();
             characterPlayerHud.GetConsumableSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.slotIndex).InitializeSlot(new CharacterData.CharacterItem());
             characterPlayerHud.RefreshFastItems();
@@ -591,7 +609,7 @@ public class CharacterPlayer : CharacterBase
             ItemDropped itemDropped = Instantiate(itempDroppedPrefab, transform.position + Vector3.up / 2, Quaternion.identity).GetComponent<ItemDropped>();
             itemDropped.InitializeDropItem(GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), true);
             LaunchDropItem(itemDropped);
-            if (charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO) await charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO.DesEquipItem(this, GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject));
+            if (charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO) await charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject].itemBaseSO.DesEquipItem(this, GetEquipmentItemByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject), false, false);
             charactersData[characterIndex].equipments[characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject] = new CharacterData.CharacterItem();
             characterPlayerHud.GetEquipmentSlotByIndex(characterPlayerHud.inventoryDraggedSlot.itemDraged.characterItem.itemBaseSO.typeObject).InitializeSlot(new CharacterData.CharacterItem());
             characterPlayerHud.RefreshCharacterStatistics();

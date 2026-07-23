@@ -14,6 +14,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemsDBSO
   data:
     _serializedList:
+    - Key: 1
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: 41352d90bc56c714e959dd05d7a72a42, type: 2}
+        - Key: 2
+          Value: {fileID: 11400000, guid: 2bbd5c69f3678f445b7273d16fff5a62, type: 2}
+    - Key: 2
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: a4e1c879b30260d4b9d2db964c1c8a2c, type: 2}
+    - Key: 3
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: 3bfd7ea76af9a7140b8cad60861a7717, type: 2}
+    - Key: 4
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: cb008235ed9500843bfc993d56f89ea9, type: 2}
+    - Key: 5
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: dc3d97b195f03014ca832942ed8d315a, type: 2}
+        - Key: 2
+          Value: {fileID: 11400000, guid: 566cae79b9483e74ba6fc71c673030ba, type: 2}
+    - Key: 6
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: 0bc37dad038461744abf5fb131914bc2, type: 2}
+    - Key: 7
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: 783375a893600aa4d9a40f20cdf82b14, type: 2}
+    - Key: 8
+      Value:
+        _serializedList:
+        - Key: 1
+          Value: {fileID: 11400000, guid: cd3f342ac16388843a58fb4db88933cb, type: 2}
     - Key: 9
       Value:
         _serializedList:
@@ -69,4 +113,7 @@ MonoBehaviour:
           Value: {fileID: 11400000, guid: e12b663c2c20dc9429cf9eb46940e7b1, type: 2}
         - Key: 5
           Value: {fileID: 11400000, guid: 28b676280ecc951428fe703207085029, type: 2}
+    - Key: 18
+      Value:
+        _serializedList: []
   itemsToAdd: []

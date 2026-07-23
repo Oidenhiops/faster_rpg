@@ -67,20 +67,21 @@ public class CharacterBase : MonoBehaviour
     public async virtual Awaitable InitializeCharacter() { }
     protected async Awaitable InitializeModels()
     {
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterModelData>> model in characterModel.meshesData)
+        foreach (KeyValuePair<ItemsDBSO.TypeModel, List<CharacterModelData>> model in characterModel.meshesData)
         {
             if (charactersData[characterIndex].models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo))
             {
-                if (skinInfo.meshId != 0)
+                if (skinInfo.itemId != 0)
                 {
                     for (int i = 0; i < model.Value.Count; i++)
                     {
-                        model.Value[i].meshFilter.mesh = GameData.Instance.charactersModelDBSO.data[model.Key][skinInfo.meshId][i];
+                        model.Value[i].meshFilter.mesh = skinInfo.itemBaseSO.modelInfo.originalMesh[i];
                         Material[] materials = model.Value[i].meshRenderer.materials;
                         if (!skinInfo.useTexture)
                         {
                             for (int j = 0; j < skinInfo.colors.Count; j++)
                             {
+                                materials[j].SetFloat("_UseTexture", 0f);
                                 materials[j].SetColor("_Color", skinInfo.colors[j]);
                             }
                         }
@@ -88,6 +89,7 @@ public class CharacterBase : MonoBehaviour
                         {
                             for (int j = 0; j < skinInfo.textures.Count; j++)
                             {
+                                materials[j].SetFloat("_UseTexture", 1f);
                                 materials[j].SetTexture("_MainTex", skinInfo.textures[j].texture);
                                 SetTextureFromAtlas(
                                     skinInfo.textures[j],
@@ -111,19 +113,19 @@ public class CharacterBase : MonoBehaviour
         }
         if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, CharactersModelDBSO.TypeModel.FastItems);
+            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, ItemsDBSO.TypeModel.FastItems);
         }
         else
         {
             RefreshCharacterItemModel(new CharacterData.CharacterItem
             {
-                typeObject = CharactersModelDBSO.TypeModel.FastItems,
+                typeObject = ItemsDBSO.TypeModel.FastItems,
             }, false);
         }
     }
-    public void RefreshCharacterItemModel(CharacterData.CharacterItem characterItem, bool isEquip, CharactersModelDBSO.TypeModel typeObject = CharactersModelDBSO.TypeModel.None)
+    public void RefreshCharacterItemModel(CharacterData.CharacterItem characterItem, bool isEquip, ItemsDBSO.TypeModel typeObject = ItemsDBSO.TypeModel.None)
     {
-        CharactersModelDBSO.TypeModel typeModel = typeObject == CharactersModelDBSO.TypeModel.None ? characterItem.typeObject : typeObject;
+        ItemsDBSO.TypeModel typeModel = typeObject == ItemsDBSO.TypeModel.None ? characterItem.typeObject : typeObject;
         if (characterItem.itemBaseSO != null)
         {
             for (int i = 0; i < characterModel.meshesData[typeModel].Count; i++)
@@ -134,8 +136,7 @@ public class CharacterBase : MonoBehaviour
             {
                 for (int i = 0; i < characterModel.meshesData[typeModel].Count; i++)
                 {
-                    characterModel.meshesData[typeModel][i].meshFilter.mesh =
-                        GameData.Instance.charactersModelDBSO.data[characterItem.itemBaseSO.typeObject][characterItem.itemBaseSO.modelInfo.meshId][i];
+                    characterModel.meshesData[typeModel][i].meshFilter.mesh = characterItem.itemBaseSO.modelInfo.originalMesh[i];
                     Material[] materials = characterModel.meshesData[typeModel][i].meshRenderer.materials;
                     if (!characterItem.itemBaseSO.modelInfo.useTexture)
                     {
@@ -161,7 +162,7 @@ public class CharacterBase : MonoBehaviour
                     characterModel.meshesData[typeModel][i].meshRenderer.materials = materials;
                     characterModel.meshesData[typeModel][i].meshFilter.gameObject.SetActive(true);
                 }
-                if (typeModel != CharactersModelDBSO.TypeModel.FastItems)
+                if (typeModel != ItemsDBSO.TypeModel.FastItems)
                 {
                     for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
                     {
@@ -173,7 +174,7 @@ public class CharacterBase : MonoBehaviour
                     }
                 }
             }
-            else if (typeModel != CharactersModelDBSO.TypeModel.FastItems)
+            else if (typeModel != ItemsDBSO.TypeModel.FastItems)
             {
                 for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
                 {
@@ -197,17 +198,17 @@ public class CharacterBase : MonoBehaviour
     {
         if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, CharactersModelDBSO.TypeModel.FastItems);
-            for (int i = 0; i < characterModel.meshesData[CharactersModelDBSO.TypeModel.FastItems].Count; i++)
+            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, ItemsDBSO.TypeModel.FastItems);
+            for (int i = 0; i < characterModel.meshesData[ItemsDBSO.TypeModel.FastItems].Count; i++)
             {
-                dissolvePlayer.NeedAppearSpecificObj(characterModel.meshesData[CharactersModelDBSO.TypeModel.FastItems][i].meshRenderer);
+                dissolvePlayer.NeedAppearSpecificObj(characterModel.meshesData[ItemsDBSO.TypeModel.FastItems][i].meshRenderer);
             }
         }
         else
         {
             RefreshCharacterItemModel(new CharacterData.CharacterItem
             {
-                typeObject = CharactersModelDBSO.TypeModel.FastItems,
+                typeObject = ItemsDBSO.TypeModel.FastItems,
             }, false);
         }
     }
@@ -505,7 +506,7 @@ public class CharacterBase : MonoBehaviour
     [Serializable]
     public class CharacterModel
     {
-        public SerializedDictionary<CharactersModelDBSO.TypeModel, List<CharacterModelData>> meshesData = new SerializedDictionary<CharactersModelDBSO.TypeModel, List<CharacterModelData>>();
+        public SerializedDictionary<ItemsDBSO.TypeModel, List<CharacterModelData>> meshesData = new SerializedDictionary<ItemsDBSO.TypeModel, List<CharacterModelData>>();
         public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;

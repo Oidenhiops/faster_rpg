@@ -72,6 +72,16 @@ public class CharacterPlayerHud : MonoBehaviour
     public async Awaitable ToggleCharacterInventory()
     {
         characterInventoryAnim.SetBool("isOpen", characterPlayer.isInventoryOpen);
+        if (!characterPlayer.isInventoryOpen)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
     public async Awaitable ChangeCharacterPortrait()
     {
@@ -245,7 +255,7 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     public void RefreshEquipments()
     {
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, InventorySlot> item in characterUI.equipments)
+        foreach (KeyValuePair<ItemsDBSO.TypeModel, InventorySlot> item in characterUI.equipments)
         {
             characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
         }
@@ -284,7 +294,7 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         return null;
     }
-    public InventorySlot GetEquipmentSlotByIndex(CharactersModelDBSO.TypeModel index)
+    public InventorySlot GetEquipmentSlotByIndex(ItemsDBSO.TypeModel index)
     {
         if (characterUI.equipments.TryGetValue(index, out InventorySlot equipmentSlot))
         {
@@ -380,7 +390,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         public CharacterPortrait[] characterPortraits;
         public CharacterBag characterBag;
-        public SerializedDictionary<CharactersModelDBSO.TypeModel, InventorySlot> equipments = new SerializedDictionary<CharactersModelDBSO.TypeModel, InventorySlot>();
+        public SerializedDictionary<ItemsDBSO.TypeModel, InventorySlot> equipments = new SerializedDictionary<ItemsDBSO.TypeModel, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> fastItemsInventory = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();

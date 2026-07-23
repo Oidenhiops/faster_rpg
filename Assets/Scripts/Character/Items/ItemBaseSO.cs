@@ -2,50 +2,47 @@ using System;
 using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
-
+[CreateAssetMenu(fileName = "BaseItem", menuName = "ScriptableObjects/Items/BaseItem", order = 1)]
 public class ItemBaseSO : ScriptableObject
 {
     public int id;
     public string idText;
     public ItemModelInfo modelInfo;
     public Sprite icon;
-    public CharactersModelDBSO.TypeModel typeObject;
+    public ItemsDBSO.TypeModel typeObject;
     public TypeWeapon typeWeapon;
     public string animationName;
     public bool useEnergy;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
-    public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false) { Debug.LogError("EquipItem not implemented"); }
-    public virtual void EquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)
+    public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem) { Debug.LogError("EquipItem not implemented"); }
+    public virtual void EquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem)
     {
-        if (modelInfo.meshId != 0)
+        character.charactersData[character.characterIndex].models[typeObject].itemId = id;
+        character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>(modelInfo.colors);
+        character.charactersData[character.characterIndex].models[typeObject].useTexture = characterItem.itemBaseSO.modelInfo.useTexture;
+        character.charactersData[character.characterIndex].models[typeObject].textures = characterItem.itemBaseSO.modelInfo.textures;
+        character.charactersData[character.characterIndex].models[typeObject].originalMesh = characterItem.itemBaseSO.modelInfo.originalMesh;
+        foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
-            character.charactersData[character.characterIndex].models[typeObject].meshId = modelInfo.meshId;
-            character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>(modelInfo.colors);
-            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
-            {
-                character.charactersData[character.characterIndex].models[occludedModel].occlude = true;
-            }
-            if (refreshModel)
-            {
-                character.RefreshCharacterItemModel(characterItem, true);
-            }
+            character.charactersData[character.characterIndex].models[occludedModel].occlude = true;
+        }
+        if (refreshModel)
+        {
+            character.RefreshCharacterItemModel(characterItem, true, !isFastItem ? ItemsDBSO.TypeModel.None : ItemsDBSO.TypeModel.FastItems);
         }
     }
-    public virtual async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false) { Debug.LogError("DesEquipItem not implemented"); }
-    public void DesEquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel = false)
+    public virtual async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem) { Debug.LogError("DesEquipItem not implemented"); }
+    public void DesEquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem)
     {
-        if (modelInfo.meshId != 0)
+        character.charactersData[character.characterIndex].models[typeObject].itemId = 0;
+        character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>();
+        foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
-            character.charactersData[character.characterIndex].models[typeObject].meshId = 0;
-            character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>();
-            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
-            {
-                character.charactersData[character.characterIndex].models[occludedModel].occlude = false;
-            }
-            if (refreshModel)
-            {
-                character.RefreshCharacterItemModel(characterItem, false);
-            }
+            character.charactersData[character.characterIndex].models[occludedModel].occlude = false;
+        }
+        if (refreshModel)
+        {
+            character.RefreshCharacterItemModel(characterItem, false, !isFastItem ? ItemsDBSO.TypeModel.None : ItemsDBSO.TypeModel.FastItems);
         }
     }
     public void EquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
@@ -62,14 +59,14 @@ public class ItemBaseSO : ScriptableObject
     }
     public void EquipModelItem(CharacterData characterData, CharacterData.CharacterItem characterItem, bool refreshModel = false)
     {
-        if (modelInfo.meshId != 0)
+        characterData.models[typeObject].itemId = id;
+        characterData.models[typeObject].colors = new List<Color>(modelInfo.colors);
+        characterData.models[typeObject].useTexture = characterItem.itemBaseSO.modelInfo.useTexture;
+        characterData.models[typeObject].textures = characterItem.itemBaseSO.modelInfo.textures;
+        characterData.models[typeObject].originalMesh = characterItem.itemBaseSO.modelInfo.originalMesh;
+        foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
-            characterData.models[typeObject].meshId = modelInfo.meshId;
-            characterData.models[typeObject].colors = new List<Color>(modelInfo.colors);
-            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
-            {
-                characterData.models[occludedModel].occlude = true;
-            }
+            characterData.models[occludedModel].occlude = true;
         }
     }
     public void DesEquipItem(CharacterData characterData, CharacterData.CharacterItem characterItem)
@@ -86,14 +83,11 @@ public class ItemBaseSO : ScriptableObject
     }
     public virtual void DesEquipModelItem(CharacterData characterData, CharacterData.CharacterItem characterItem, bool refreshModel = false)
     {
-        if (modelInfo.meshId != 0)
+        characterData.models[typeObject].itemId = 0;
+        characterData.models[typeObject].colors = new List<Color>();
+        foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
-            characterData.models[typeObject].meshId = 0;
-            characterData.models[typeObject].colors = new List<Color>();
-            foreach (CharactersModelDBSO.TypeModel occludedModel in modelInfo.occludedModels)
-            {
-                characterData.models[occludedModel].occlude = false;
-            }
+            characterData.models[occludedModel].occlude = false;
         }
     }
     public virtual void UseItem(UseItemInfo useItemInfo) { Debug.LogError("UseItem not implemented"); }
@@ -117,9 +111,14 @@ public class ItemBaseSO : ScriptableObject
         return clone;
     }
     [Serializable]
-    public class ItemModelInfo: CharacterData.CharacterSkinInfo
+    public class ItemModelInfo
     {
-        public List<CharactersModelDBSO.TypeModel> occludedModels = new List<CharactersModelDBSO.TypeModel>();
+        public List<Color> colors;
+        public bool useTexture;
+        public List<Sprite> textures;
+        public List<Mesh> originalMesh;
+        public bool occlude;
+        public List<ItemsDBSO.TypeModel> occludedModels = new List<ItemsDBSO.TypeModel>();
     }
     [Serializable]
     public class UseItemInfo

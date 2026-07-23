@@ -71,7 +71,7 @@ public class CharacterAnimator : MonoBehaviour
 
     void ApplyBlinkColor(Color color)
     {
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
+        foreach (KeyValuePair<ItemsDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
         {
             if (model.Value == null) continue;
             foreach (CharacterBase.CharacterModelData modelData in model.Value)
@@ -91,7 +91,7 @@ public class CharacterAnimator : MonoBehaviour
     void RestoreOriginalColors()
     {
         CharacterData data = characterBase.charactersData[characterBase.characterIndex];
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
+        foreach (KeyValuePair<ItemsDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
         {
             if (model.Value == null) continue;
             bool hasSkin = data.models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo);

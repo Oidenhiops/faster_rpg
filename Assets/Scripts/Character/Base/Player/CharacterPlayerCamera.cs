@@ -5,8 +5,6 @@ using UnityEngine.InputSystem;
 
 public class CharacterPlayerCamera : MonoBehaviour
 {
-    [SerializeField] CinemachineCamera vcam;
-
     [Header("Pivote de cámara")]
     [Tooltip("Transform que rota con el mouse. Debe ser el Tracking Target de la cámara (Third Person Follow). Mantenlo FUERA de la jerarquía del jugador para evitar acoplamiento.")]
     [SerializeField] Transform pivot;
@@ -20,10 +18,8 @@ public class CharacterPlayerCamera : MonoBehaviour
     [SerializeField] Transform player;
     [SerializeField] public bool rotatePlayerWithCamera = true;
     [SerializeField] float playerRotationSpeed = 12f;
-    [Header("Cursor")]
-    [SerializeField] bool lockCursor = true;
-    private float yaw;
-    private float pitch;
+    float yaw;
+    float pitch;
     public bool isRotatingCamera = false;
     public float awaitForFreeRotate;
     public Coroutine awaitForFreeRotateCoroutine;
@@ -35,17 +31,9 @@ public class CharacterPlayerCamera : MonoBehaviour
             yaw = e.y;
             pitch = e.x;
         }
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
-
-    private void Start()
-    {
-        if (lockCursor)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-    }
-
     private void LateUpdate()
     {
         HandlePlayerRotation();

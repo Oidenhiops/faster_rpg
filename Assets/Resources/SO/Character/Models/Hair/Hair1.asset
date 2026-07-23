@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81edf96d02f2628419795b0a5eadb1ef, type: 3}
+  m_Name: Hair1
+  m_EditorClassIdentifier: Assembly-CSharp::ItemBaseSO
+  id: 1
+  idText: 
+  modelInfo:
+    colors: []
+    useTexture: 0
+    textures: []
+    originalMesh:
+    - {fileID: -8261066796910302577, guid: 4d0eb4703e3c6f44bb547c031f481e85, type: 3}
+    occlude: 0
+    occludedModels: 
+  icon: {fileID: 0}
+  typeObject: 1
+  typeWeapon: 0
+  animationName: 
+  useEnergy: 0
+  itemStatistics:
+    _serializedList: []

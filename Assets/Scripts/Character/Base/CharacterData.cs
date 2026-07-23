@@ -9,16 +9,16 @@ public class CharacterData
     public int level;
     public string name;
     public SerializedDictionary<TypeStatistic, Statistic> statistics = new SerializedDictionary<TypeStatistic, Statistic>();
-    public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterItem> equipments = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterItem>
+    public SerializedDictionary<ItemsDBSO.TypeModel, CharacterItem> equipments = new SerializedDictionary<ItemsDBSO.TypeModel, CharacterItem>
     {
-        {CharactersModelDBSO.TypeModel.Helmet, null},
-        {CharactersModelDBSO.TypeModel.Front, null},
-        {CharactersModelDBSO.TypeModel.Pants, null},
-        {CharactersModelDBSO.TypeModel.Boots, null},
-        {CharactersModelDBSO.TypeModel.Gloves, null},
-        {CharactersModelDBSO.TypeModel.Pendant, null},
-        {CharactersModelDBSO.TypeModel.Ring, null},
-        {CharactersModelDBSO.TypeModel.Weapon, null},
+        {ItemsDBSO.TypeModel.Helmet, null},
+        {ItemsDBSO.TypeModel.Front, null},
+        {ItemsDBSO.TypeModel.Pants, null},
+        {ItemsDBSO.TypeModel.Boots, null},
+        {ItemsDBSO.TypeModel.Gloves, null},
+        {ItemsDBSO.TypeModel.Pendant, null},
+        {ItemsDBSO.TypeModel.Ring, null},
+        {ItemsDBSO.TypeModel.Weapon, null},
     };
     public SerializedDictionary<int, CharacterItem> fastItems = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
@@ -30,25 +30,25 @@ public class CharacterData
         {3, new CharacterSkillInfo()},
         {4, new CharacterSkillInfo()},
     };
-    public SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo> models = new SerializedDictionary<CharactersModelDBSO.TypeModel, CharacterSkinInfo>
+    public SerializedDictionary<ItemsDBSO.TypeModel, CharacterSkinInfo> models = new SerializedDictionary<ItemsDBSO.TypeModel, CharacterSkinInfo>
     {
-        {CharactersModelDBSO.TypeModel.Hair, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Head, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Eyes, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Eyebrows, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Ears, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Body, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Hands, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Feets, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Helmet, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Front, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Pants, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Boots, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Gloves, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Pendant, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Ring, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.Weapon, new CharacterSkinInfo()},
-        {CharactersModelDBSO.TypeModel.FastItems, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Hair, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Head, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Eyes, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Eyebrows, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Ears, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Body, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Hands, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Feets, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Helmet, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Front, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Pants, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Boots, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Gloves, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Pendant, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Ring, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.Weapon, new CharacterSkinInfo()},
+        {ItemsDBSO.TypeModel.FastItems, new CharacterSkinInfo()},
     };
     public void InitializeStatistics()
     {
@@ -60,7 +60,7 @@ public class CharacterData
     }
     public void InitializeItems()
     {
-        foreach (KeyValuePair<CharactersModelDBSO.TypeModel, CharacterItem> item in equipments)
+        foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterItem> item in equipments)
         {
             if (item.Value.itemId != 0)
             {
@@ -83,7 +83,7 @@ public class CharacterData
     }
     public bool GetCurrentWeapon(out CharacterItem weapon)
     {
-        if (equipments.TryGetValue(CharactersModelDBSO.TypeModel.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
+        if (equipments.TryGetValue(ItemsDBSO.TypeModel.Weapon, out CharacterItem currentWeapon) && currentWeapon != null)
         {
             weapon = currentWeapon;
             return true;
@@ -133,7 +133,7 @@ public class CharacterData
     public class CharacterItem
     {
         public int itemId;
-        public CharactersModelDBSO.TypeModel typeObject;
+        public ItemsDBSO.TypeModel typeObject;
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
         public void ResetItem()
@@ -175,14 +175,11 @@ public class CharacterData
         public int cd;
     }
     [Serializable]
-    public class CharacterSkinInfo
+    public class CharacterSkinInfo: ItemBaseSO.ItemModelInfo
     {
-        public int meshId;
-        public List<Color> colors;
-        public bool useTexture;
-        public List<Sprite> textures;
-        public List<Mesh> originalMesh;
-        public bool occlude;
+        public int itemId;
+        public ItemsDBSO.TypeModel typeObject;
+        public ItemBaseSO itemBaseSO;
     }
     public enum MasteryRange
     {

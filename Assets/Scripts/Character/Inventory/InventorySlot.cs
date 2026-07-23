@@ -10,7 +10,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public Image itemImage;
     public TMP_Text itemAmount;
     public TMP_Text itemDurability;
-    public CharactersModelDBSO.TypeModel typeInventorySlot;
+    public ItemsDBSO.TypeModel typeInventorySlot;
     public CharacterData.CharacterItem characterItem;
     public int slotIndex;
     public void InitializeSlot(CharacterData.CharacterItem item)
