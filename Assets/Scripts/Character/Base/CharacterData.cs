@@ -175,11 +175,13 @@ public class CharacterData
         public int cd;
     }
     [Serializable]
-    public class CharacterSkinInfo: ItemBaseSO.ItemModelInfo
+    public class CharacterSkinInfo
     {
         public int itemId;
         public ItemsDBSO.TypeModel typeObject;
         public ItemBaseSO itemBaseSO;
+        public bool occlude;
+        public List<Color> colors;
     }
     public enum MasteryRange
     {

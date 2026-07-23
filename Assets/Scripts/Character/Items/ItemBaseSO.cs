@@ -19,9 +19,6 @@ public class ItemBaseSO : ScriptableObject
     {
         character.charactersData[character.characterIndex].models[typeObject].itemId = id;
         character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>(modelInfo.colors);
-        character.charactersData[character.characterIndex].models[typeObject].useTexture = characterItem.itemBaseSO.modelInfo.useTexture;
-        character.charactersData[character.characterIndex].models[typeObject].textures = characterItem.itemBaseSO.modelInfo.textures;
-        character.charactersData[character.characterIndex].models[typeObject].originalMesh = characterItem.itemBaseSO.modelInfo.originalMesh;
         foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
             character.charactersData[character.characterIndex].models[occludedModel].occlude = true;
@@ -61,9 +58,6 @@ public class ItemBaseSO : ScriptableObject
     {
         characterData.models[typeObject].itemId = id;
         characterData.models[typeObject].colors = new List<Color>(modelInfo.colors);
-        characterData.models[typeObject].useTexture = characterItem.itemBaseSO.modelInfo.useTexture;
-        characterData.models[typeObject].textures = characterItem.itemBaseSO.modelInfo.textures;
-        characterData.models[typeObject].originalMesh = characterItem.itemBaseSO.modelInfo.originalMesh;
         foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
             characterData.models[occludedModel].occlude = true;
@@ -84,7 +78,6 @@ public class ItemBaseSO : ScriptableObject
     public virtual void DesEquipModelItem(CharacterData characterData, CharacterData.CharacterItem characterItem, bool refreshModel = false)
     {
         characterData.models[typeObject].itemId = 0;
-        characterData.models[typeObject].colors = new List<Color>();
         foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
             characterData.models[occludedModel].occlude = false;
@@ -117,7 +110,6 @@ public class ItemBaseSO : ScriptableObject
         public bool useTexture;
         public List<Sprite> textures;
         public List<Mesh> originalMesh;
-        public bool occlude;
         public List<ItemsDBSO.TypeModel> occludedModels = new List<ItemsDBSO.TypeModel>();
     }
     [Serializable]

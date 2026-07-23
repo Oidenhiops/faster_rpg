@@ -62,9 +62,9 @@ public class CharacterPlayerHud : MonoBehaviour
         {
             item.Value.characterPlayerHud = this;
         }
-        foreach (var consumable in characterUI.fastItemsInventory)
+        foreach (var fastItem in characterUI.fastItemsInventory)
         {
-            consumable.Value.characterPlayerHud = this;
+            fastItem.Value.characterPlayerHud = this;
         }
         SelectFastItem();
         await RefreshCharacterInventory();
@@ -212,10 +212,10 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     public void RefreshFastItems()
     {
-        foreach (KeyValuePair<int, InventorySlot> consumable in characterUI.fastItemsInventory)
+        foreach (KeyValuePair<int, InventorySlot> fastItem in characterUI.fastItemsInventory)
         {
-            characterUI.fastItemsInventory[consumable.Key].slotIndex = consumable.Key;
-            characterUI.fastItemsInventory[consumable.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[consumable.Key]);
+            characterUI.fastItemsInventory[fastItem.Key].slotIndex = fastItem.Key;
+            characterUI.fastItemsInventory[fastItem.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key]);
         }
 
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
@@ -286,11 +286,11 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         return null;
     }
-    public InventorySlot GetConsumableSlotByIndex(int index)
+    public InventorySlot GetFastItemSlotByIndex(int index)
     {
-        if (characterUI.fastItemsInventory.TryGetValue(index, out InventorySlot consumableSlot))
+        if (characterUI.fastItemsInventory.TryGetValue(index, out InventorySlot fastItemSlot))
         {
-            return consumableSlot;
+            return fastItemSlot;
         }
         return null;
     }

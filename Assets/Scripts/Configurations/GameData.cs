@@ -121,11 +121,11 @@ public class GameData : MonoBehaviour
         {
             foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
             {
-                foreach (KeyValuePair<int, CharacterData.CharacterItem> consumable in characterData.Value.fastItems)
+                foreach (KeyValuePair<int, CharacterData.CharacterItem> fastItem in characterData.Value.fastItems)
                 {
-                    if (consumable.Value.itemId != 0)
+                    if (fastItem.Value.itemId != 0)
                     {
-                        consumable.Value.itemBaseSO = itemsDBSO.data[consumable.Value.typeObject][consumable.Value.itemId];
+                        fastItem.Value.itemBaseSO = itemsDBSO.data[fastItem.Value.typeObject][fastItem.Value.itemId];
                     }
                 }
             }

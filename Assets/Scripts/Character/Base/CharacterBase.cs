@@ -77,7 +77,7 @@ public class CharacterBase : MonoBehaviour
                     {
                         model.Value[i].meshFilter.mesh = skinInfo.itemBaseSO.modelInfo.originalMesh[i];
                         Material[] materials = model.Value[i].meshRenderer.materials;
-                        if (!skinInfo.useTexture)
+                        if (!skinInfo.itemBaseSO.modelInfo.useTexture)
                         {
                             for (int j = 0; j < skinInfo.colors.Count; j++)
                             {
@@ -87,14 +87,14 @@ public class CharacterBase : MonoBehaviour
                         }
                         else
                         {
-                            for (int j = 0; j < skinInfo.textures.Count; j++)
+                            for (int j = 0; j < skinInfo.itemBaseSO.modelInfo.textures.Count; j++)
                             {
                                 materials[j].SetFloat("_UseTexture", 1f);
-                                materials[j].SetTexture("_MainTex", skinInfo.textures[j].texture);
+                                materials[j].SetTexture("_MainTex", skinInfo.itemBaseSO.modelInfo.textures[j].texture);
                                 SetTextureFromAtlas(
-                                    skinInfo.textures[j],
+                                    skinInfo.itemBaseSO.modelInfo.textures[j],
                                     characterModel.meshesData[model.Key][i].meshRenderer,
-                                    skinInfo.originalMesh[j]
+                                    skinInfo.itemBaseSO.modelInfo.originalMesh[j]
                                 );
                             }
                         }
