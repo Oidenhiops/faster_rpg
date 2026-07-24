@@ -15,12 +15,10 @@ MonoBehaviour:
   id: 1
   idText: 10
   modelInfo:
-    meshId: 0
     colors: []
     useTexture: 0
     textures: []
     originalMesh: []
-    occlude: 0
     occludedModels: 
   icon: {fileID: 505844233, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 15
@@ -47,7 +45,7 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
-    - Key: 16
+    - Key: 15
       Value:
         baseValue: 10
         aptitudeValue: 0
@@ -56,7 +54,7 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
-    - Key: 17
+    - Key: 16
       Value:
         baseValue: 0
         aptitudeValue: 0

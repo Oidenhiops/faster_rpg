@@ -15,7 +15,6 @@ MonoBehaviour:
   id: 5
   idText: 14
   modelInfo:
-    meshId: 3
     colors:
     - {r: 0.45490196, g: 0.38039216, b: 0.29411766, a: 1}
     - {r: 1, g: 1, b: 1, a: 1}
@@ -23,7 +22,6 @@ MonoBehaviour:
     textures: []
     originalMesh:
     - {fileID: -4086548920162585460, guid: 15b63b4dab1acfa42af982ed9c609d6e, type: 3}
-    occlude: 0
     occludedModels: 
   icon: {fileID: -1239926245, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 17
@@ -32,7 +30,7 @@ MonoBehaviour:
   useEnergy: 1
   itemStatistics:
     _serializedList:
-    - Key: 16
+    - Key: 15
       Value:
         baseValue: 240
         aptitudeValue: 0
@@ -41,7 +39,7 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
-    - Key: 17
+    - Key: 16
       Value:
         baseValue: 0
         aptitudeValue: 0

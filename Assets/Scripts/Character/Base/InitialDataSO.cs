@@ -8,7 +8,6 @@ public class InitialDataSO : ScriptableObject
         {CharacterData.TypeStatistic.Hp, new CharacterData.Statistic{ aptitudeValue = 100 }},
         {CharacterData.TypeStatistic.Sp, new CharacterData.Statistic{ aptitudeValue = 100 }},
         {CharacterData.TypeStatistic.Atk, new CharacterData.Statistic{ aptitudeValue = 100 }},
-        {CharacterData.TypeStatistic.Hit, new CharacterData.Statistic{ aptitudeValue = 100 }},
         {CharacterData.TypeStatistic.Int, new CharacterData.Statistic{ aptitudeValue = 100 }},
         {CharacterData.TypeStatistic.Def, new CharacterData.Statistic{ aptitudeValue = 100 }},
         {CharacterData.TypeStatistic.Res, new CharacterData.Statistic{ aptitudeValue = 100 }},

@@ -220,37 +220,14 @@ public class CharacterPlayerHud : MonoBehaviour
 
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO != null)
-            {
-                characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 1;
-                characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemIcon.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.icon;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = true;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.text = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
-                if (characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
-                {
-                    characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = true;
-                    characterUI.fastItems[fastItem.Key].fastItemDurability.text = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
-                    characterUI.fastItems[fastItem.Key].fastItemDurability.color = 
-                        GameData.Instance.utils.systemColors.TryGetValue(
-                            characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
-                            characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
-                }
-                else
-                {
-                    characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = false;
-                    characterUI.fastItems[fastItem.Key].fastItemDurability.text = "";
-                }
-            }
-            else
-            {
-                characterUI.fastItems[fastItem.Key].fastItemIcon.enabled = false;
-                characterUI.fastItems[fastItem.Key].fastItemCanvasGroup.alpha = 0.5f;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.enabled = false;
-                characterUI.fastItems[fastItem.Key].fastItemAmount.text = "";
-                characterUI.fastItems[fastItem.Key].fastItemDurability.enabled = false;
-                characterUI.fastItems[fastItem.Key].fastItemDurability.text = "";
-            }
+            bool hasDurability = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability);
+            bool hasAmount = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Amount);
+            fastItem.Value.UpdateData(
+                hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue : 0,
+                hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.icon : null,
+                hasDurability,
+                hasDurability ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability] : null
+            );
         }
     }
     public void RefreshEquipments()
@@ -306,14 +283,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
         {
-            if (fastItem.Key == characterPlayer.currentFastItemIndex)
-            {
-                characterUI.fastItems[fastItem.Key].fastItemBg.color = Color.yellow;
-            }
-            else
-            {
-                characterUI.fastItems[fastItem.Key].fastItemBg.color = Color.white;
-            }
+            characterUI.fastItems[fastItem.Key].SelectFastItem(fastItem.Key == characterPlayer.currentFastItemIndex);
         }
     }
     public void SetDescripitionData()
@@ -404,10 +374,50 @@ public class CharacterPlayerHud : MonoBehaviour
     public class FastItem
     {
         public CanvasGroup fastItemCanvasGroup;
+        public Image fastItemSelect;
         public Image fastItemBg;
         public Image fastItemIcon;
+        public GameObject fastItemAmountBg;
         public TMP_Text fastItemAmount;
-        public TMP_Text fastItemDurability;
+        public Image fastItemDurability;
+        public void UpdateData(float amount, Sprite sprite = null, bool hasDurability = false, CharacterData.Statistic durability = null, bool useEnergy = false)
+        {
+            fastItemAmountBg.SetActive(amount > 1);
+            if (amount != 0)
+            {
+                fastItemCanvasGroup.alpha = 1;
+                fastItemIcon.enabled = true;
+                if (sprite) fastItemIcon.sprite = sprite;
+                fastItemAmount.enabled = true;
+                fastItemAmount.text = amount.ToString();
+                if (hasDurability)
+                {
+                    float durabilityPorcent =durability.currentValue / durability.maxValue;
+                    fastItemDurability.enabled = true;
+                    fastItemDurability.fillAmount = durabilityPorcent > 0 ? durabilityPorcent : 1;
+                    if (durabilityPorcent >= 0.7f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyGood" : "DurabilityGood", out Color durabilityColor) ? durabilityColor : Color.white;
+                    else if (durabilityPorcent < 0.7f && durabilityPorcent >= 0.3f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyMedium" : "DurabilityMedium", out Color durabilityColor) ? durabilityColor : Color.white;
+                    else if (durabilityPorcent < 0.3f && durabilityPorcent > 0f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyBad" : "DurabilityBad", out Color durabilityColor) ? durabilityColor : Color.white;
+                    else fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "OutEnergy" : "OutDurability", out Color durabilityColor) ? durabilityColor : Color.white;
+                }
+                else
+                {
+                    fastItemDurability.enabled = false;
+                }
+            }
+            else
+            {
+                fastItemIcon.enabled = false;
+                fastItemCanvasGroup.alpha = 0.5f;
+                fastItemAmount.enabled = false;
+                fastItemAmount.text = "";
+                fastItemDurability.enabled = false;
+            }
+        }
+        public void SelectFastItem(bool isSelect)
+        {
+            fastItemSelect.enabled = isSelect;
+        }
     }
     [Serializable]
     public class ItemDescription

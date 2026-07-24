@@ -121,7 +121,6 @@ public class CharacterData
             return typeStatistic == TypeStatistic.Hp ||
                    typeStatistic == TypeStatistic.Sp ||
                    typeStatistic == TypeStatistic.Atk ||
-                   typeStatistic == TypeStatistic.Hit ||
                    typeStatistic == TypeStatistic.Int ||
                    typeStatistic == TypeStatistic.Def ||
                    typeStatistic == TypeStatistic.Res ||
@@ -200,19 +199,18 @@ public class CharacterData
         Hp = 1,
         Sp = 2,
         Atk = 3,
-        Hit = 4,
-        Int = 5,
-        Def = 6,
-        Res = 7,
-        Spd = 8,
-        Exp = 9,
-        Crtv = 10,
-        Crtd = 11,
-        BagSpace = 12,
-        Cd = 13,
-        JumpDistance = 14,
-        DropDistance = 15,
-        Durability = 16,
-        Amount = 17,
+        Int = 4,
+        Def = 5,
+        Res = 6,
+        Spd = 7,
+        Exp = 8,
+        Crtv = 9,
+        Crtd = 10,
+        BagSpace = 11,
+        Cd = 12,
+        JumpDistance = 13,
+        DropDistance = 14,
+        Durability = 15,
+        Amount = 16,
     }
 }
