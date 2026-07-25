@@ -229,7 +229,7 @@ TextureImporter:
         height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 5, y: 5, z: 5, w: 5}
       customData: 
       outline: []
       physicsShape: []
@@ -646,7 +646,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -655,6 +655,28 @@ TextureImporter:
       bones: []
       spriteID: 220f654d9ee9eae47a2ba35341a0a46b
       internalID: -1646095676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameplayUI_25
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be7cc09bbcc74624f9868b2ff2f3b7e4
+      internalID: -1674070816
       vertices: []
       indices: 
       edges: []
@@ -693,6 +715,7 @@ TextureImporter:
       GameplayUI_22: -1695410364
       GameplayUI_23: 296989373
       GameplayUI_24: -1646095676
+      GameplayUI_25: -1674070816
       GameplayUI_3: -1200450125
       GameplayUI_4: -1245561326
       GameplayUI_5: -725455671

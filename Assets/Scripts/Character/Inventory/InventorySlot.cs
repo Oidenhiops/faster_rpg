@@ -7,9 +7,10 @@ using UnityEngine.UI;
 public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CharacterPlayerHud characterPlayerHud;
+    public Image hasItem;
     public Image itemImage;
     public TMP_Text itemAmount;
-    public TMP_Text itemDurability;
+    public Image itemDurability;
     public ItemsDBSO.TypeModel typeInventorySlot;
     public CharacterData.CharacterItem characterItem;
     public int slotIndex;
@@ -17,35 +18,36 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (item.itemBaseSO?.icon)
         {
+            hasItem.enabled = true;            
             itemImage.sprite = item.itemBaseSO.icon;
             itemImage.enabled = true;
             itemAmount.enabled = true;
             itemAmount.text = item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
             if (item.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {
+                float durabilityPorcent = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue / item.itemStatistics[CharacterData.TypeStatistic.Durability].maxValue;
                 itemDurability.enabled = true;
-            itemDurability.text = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
-            itemDurability.color =
-                GameData.Instance.utils.systemColors.TryGetValue(
-                    item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
-                    item.itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
+                itemDurability.fillAmount = durabilityPorcent > 0 ? durabilityPorcent : 1;
+                if (durabilityPorcent >= 0.7f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyGood" : "DurabilityGood", out Color durabilityColor) ? durabilityColor : Color.white;
+                else if (durabilityPorcent < 0.7f && durabilityPorcent >= 0.3f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyMedium" : "DurabilityMedium", out Color durabilityColor) ? durabilityColor : Color.white;
+                else if (durabilityPorcent < 0.3f && durabilityPorcent > 0f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyBad" : "DurabilityBad", out Color durabilityColor) ? durabilityColor : Color.white;
+                else itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "OutEnergy" : "OutDurability", out Color durabilityColor) ? durabilityColor : Color.white;
             }
             else
             {
                 itemDurability.enabled = false;
-                itemDurability.text = "";
             }
             characterItem = item;
         }
         else
         {
+            hasItem.enabled = false;
             itemImage.sprite = null;
             itemImage.enabled = false;
             itemAmount.enabled = false;
             itemAmount.text = "";
             itemDurability.enabled = false;
-            itemDurability.text = "";
-            characterItem = new CharacterData.CharacterItem();
+            characterItem = new CharacterData.CharacterItem(typeInventorySlot);
         }
     }
     public void OnPointerEnter(PointerEventData eventData)

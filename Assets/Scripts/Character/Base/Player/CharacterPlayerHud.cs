@@ -226,7 +226,8 @@ public class CharacterPlayerHud : MonoBehaviour
                 hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue : 0,
                 hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.icon : null,
                 hasDurability,
-                hasDurability ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability] : null
+                hasDurability ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability] : null,
+                characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.useEnergy
             );
         }
     }
@@ -392,7 +393,7 @@ public class CharacterPlayerHud : MonoBehaviour
                 fastItemAmount.text = amount.ToString();
                 if (hasDurability)
                 {
-                    float durabilityPorcent =durability.currentValue / durability.maxValue;
+                    float durabilityPorcent = durability.currentValue / durability.maxValue;
                     fastItemDurability.enabled = true;
                     fastItemDurability.fillAmount = durabilityPorcent > 0 ? durabilityPorcent : 1;
                     if (durabilityPorcent >= 0.7f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyGood" : "DurabilityGood", out Color durabilityColor) ? durabilityColor : Color.white;

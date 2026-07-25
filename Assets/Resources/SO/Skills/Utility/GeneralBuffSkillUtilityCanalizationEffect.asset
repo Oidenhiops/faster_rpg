@@ -16,7 +16,7 @@ MonoBehaviour:
   maxStack: 0
   statusEffectStatistics:
     _serializedList:
-    - Key: 12
+    - Key: 13
       Value:
         baseValue: 2
         aptitudeValue: 0

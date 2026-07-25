@@ -117,10 +117,7 @@ public class CharacterBase : MonoBehaviour
         }
         else
         {
-            RefreshCharacterItemModel(new CharacterData.CharacterItem
-            {
-                typeObject = ItemsDBSO.TypeModel.FastItems,
-            }, false);
+            RefreshCharacterItemModel(new CharacterData.CharacterItem(ItemsDBSO.TypeModel.FastItems), false);
         }
     }
     public void RefreshCharacterItemModel(CharacterData.CharacterItem characterItem, bool isEquip, ItemsDBSO.TypeModel typeObject = ItemsDBSO.TypeModel.None)
@@ -206,10 +203,7 @@ public class CharacterBase : MonoBehaviour
         }
         else
         {
-            RefreshCharacterItemModel(new CharacterData.CharacterItem
-            {
-                typeObject = ItemsDBSO.TypeModel.FastItems,
-            }, false);
+            RefreshCharacterItemModel(new CharacterData.CharacterItem(ItemsDBSO.TypeModel.FastItems), false);
         }
     }
     void SetTextureFromAtlas(Sprite spriteFromAtlas, MeshRenderer meshRenderer, Mesh originalMesh)

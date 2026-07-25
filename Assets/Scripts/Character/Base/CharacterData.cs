@@ -149,6 +149,13 @@ public class CharacterData
             itemBaseSO = null;
             itemStatistics.Clear();
         }
+        public CharacterItem(ItemsDBSO.TypeModel typeModel)
+        {
+            itemId = 0;
+            typeObject = typeModel;
+            itemBaseSO = null;
+            itemStatistics.Clear();
+        }
         public CharacterItem(CharacterItem characterItem)
         {
             itemId = characterItem.itemId;
@@ -198,19 +205,20 @@ public class CharacterData
         None = 0,
         Hp = 1,
         Sp = 2,
-        Atk = 3,
-        Int = 4,
-        Def = 5,
-        Res = 6,
-        Spd = 7,
-        Exp = 8,
+        Str = 3,
+        Atk = 4,
+        Int = 5,
+        Def = 6,
+        Res = 7,
+        Spd = 8,
         Crtv = 9,
         Crtd = 10,
-        BagSpace = 11,
-        Cd = 12,
-        JumpDistance = 13,
-        DropDistance = 14,
-        Durability = 15,
-        Amount = 16,
+        Exp = 11,
+        BagSpace = 12,
+        Cd = 13,
+        JumpDistance = 14,
+        DropDistance = 15,
+        Durability = 16,
+        Amount = 17,
     }
 }

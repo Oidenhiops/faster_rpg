@@ -30,7 +30,7 @@ MonoBehaviour:
   useEnergy: 1
   itemStatistics:
     _serializedList:
-    - Key: 15
+    - Key: 16
       Value:
         baseValue: 240
         aptitudeValue: 0
@@ -38,8 +38,8 @@ MonoBehaviour:
         buffValue:
           _serializedList: []
         currentValue: 0
-        maxValue: 0
-    - Key: 16
+        maxValue: 1
+    - Key: 17
       Value:
         baseValue: 0
         aptitudeValue: 0
@@ -47,4 +47,4 @@ MonoBehaviour:
         buffValue:
           _serializedList: []
         currentValue: 0
-        maxValue: 1
+        maxValue: 5
