@@ -441,14 +441,14 @@ public class CharacterPlayer : CharacterBase
         characterPlayerHud.RefreshFastItems();
         if (fastItemSlotIndex == currentFastItemIndex)
         {
-            _ = charactersData[characterIndex].fastItems[bagSlotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[bagSlotIndex], false, true);
-            _ = charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].fastItems[fastItemSlotIndex], false, true);
+            if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) _ = charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].bag[bagSlotIndex], false, true);
+            if (charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO) _ = charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].fastItems[fastItemSlotIndex], false, true);
             UpdateFastItemModel();
         }
         else if (bagSlotIndex == currentFastItemIndex)
         {
-            _ = charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[fastItemSlotIndex], false, true);
-            _ = charactersData[characterIndex].fastItems[bagSlotIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].fastItems[bagSlotIndex], false, true);
+            if (charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO) _ = charactersData[characterIndex].fastItems[fastItemSlotIndex].itemBaseSO.DesEquipItem(this, charactersData[characterIndex].fastItems[fastItemSlotIndex], false, true);
+            if (charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO) _ = charactersData[characterIndex].bag[bagSlotIndex].itemBaseSO.EquipItem(this, charactersData[characterIndex].bag[bagSlotIndex], false, true);
             UpdateFastItemModel();
         }
         characterPlayerHud.RefreshCharacterStatistics();

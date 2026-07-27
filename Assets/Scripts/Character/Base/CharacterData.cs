@@ -22,6 +22,13 @@ public class CharacterData
     };
     public SerializedDictionary<int, CharacterItem> fastItems = new SerializedDictionary<int, CharacterItem>();
     public SerializedDictionary<int, CharacterItem> bag = new SerializedDictionary<int, CharacterItem>();
+    public SerializedDictionary<int, CharacterItem> ammo = new SerializedDictionary<int, CharacterItem>
+    {
+        {0, new CharacterItem()},
+        {1, new CharacterItem()},
+        {2, new CharacterItem()},
+        {3, new CharacterItem()}
+    };
     public SerializedDictionary<int, CharacterSkillInfo> skills = new SerializedDictionary<int, CharacterSkillInfo>
     {
         {0, new CharacterSkillInfo()},

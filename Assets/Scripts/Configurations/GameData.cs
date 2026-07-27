@@ -395,6 +395,13 @@ public class GameData : MonoBehaviour
                             { 3, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 4, 1) }
                         },
                         bag = bags[0],
+                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
+                        {
+                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
+                        },
                         models = itemsDBSO.GenerateRandomModel()
                     }
                 },
@@ -411,6 +418,13 @@ public class GameData : MonoBehaviour
                             { 3, new CharacterData.CharacterItem() }
                         },
                         bag = bags[1],
+                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
+                        {
+                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
+                        },
                         models = itemsDBSO.GenerateRandomModel()
                     }
                 },
@@ -427,6 +441,13 @@ public class GameData : MonoBehaviour
                             { 3, new CharacterData.CharacterItem() }
                         },
                         bag = bags[2],
+                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
+                        {
+                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
+                        },
                         models = itemsDBSO.GenerateRandomModel()
                     }
                 },
@@ -443,6 +464,13 @@ public class GameData : MonoBehaviour
                             { 3, new CharacterData.CharacterItem() }
                         },
                         bag = bags[3],
+                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
+                        {
+                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
+                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
+                        },
                         models = itemsDBSO.GenerateRandomModel()
                     }
                 },
@@ -477,7 +505,7 @@ public class GameData : MonoBehaviour
         {
             for (int i = 0; i < characterData.Value.statistics[CharacterData.TypeStatistic.BagSpace].currentValue; i++)
             {
-                characterData.Value.bag.Add(i, new CharacterData.CharacterItem());
+                characterData.Value.bag.Add(i, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Bag));
             }
         }
         bags[0][0] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 1, 3);

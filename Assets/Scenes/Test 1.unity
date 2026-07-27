@@ -2749,6 +2749,16 @@ MonoBehaviour:
           fastItemAmountBg: {fileID: 1686653615}
           fastItemAmount: {fileID: 312824617}
           fastItemDurability: {fileID: 521559128}
+    ammoInventory:
+      _serializedList:
+      - Key: 0
+        Value: {fileID: 1738693321}
+      - Key: 1
+        Value: {fileID: 625911178}
+      - Key: 2
+        Value: {fileID: 647319621}
+      - Key: 3
+        Value: {fileID: 1898889094}
     statistics:
       _serializedList:
       - Key: 1
@@ -8767,7 +8777,7 @@ MonoBehaviour:
   itemImage: {fileID: 1485359218}
   itemAmount: {fileID: 29826940}
   itemDurability: {fileID: 1439193443}
-  typeInventorySlot: 14
+  typeInventorySlot: 19
   characterItem:
     itemId: 0
     typeObject: 0
@@ -9372,7 +9382,7 @@ MonoBehaviour:
   itemImage: {fileID: 328177291}
   itemAmount: {fileID: 2137453845}
   itemDurability: {fileID: 1434882938}
-  typeInventorySlot: 14
+  typeInventorySlot: 19
   characterItem:
     itemId: 0
     typeObject: 0
@@ -20942,7 +20952,7 @@ MonoBehaviour:
   itemImage: {fileID: 2012818526}
   itemAmount: {fileID: 2048655140}
   itemDurability: {fileID: 2125743546}
-  typeInventorySlot: 14
+  typeInventorySlot: 19
   characterItem:
     itemId: 0
     typeObject: 0
@@ -22697,7 +22707,7 @@ MonoBehaviour:
   itemImage: {fileID: 1212728588}
   itemAmount: {fileID: 1361715607}
   itemDurability: {fileID: 1083906943}
-  typeInventorySlot: 14
+  typeInventorySlot: 19
   characterItem:
     itemId: 0
     typeObject: 0

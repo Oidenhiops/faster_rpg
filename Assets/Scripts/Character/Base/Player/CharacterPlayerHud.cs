@@ -58,13 +58,17 @@ public class CharacterPlayerHud : MonoBehaviour
         };
     public async Awaitable InitializeInventory()
     {
-        foreach (var item in characterUI.equipments)
+        foreach (var equipment in characterUI.equipments)
         {
-            item.Value.characterPlayerHud = this;
+            equipment.Value.characterPlayerHud = this;
         }
         foreach (var fastItem in characterUI.fastItemsInventory)
         {
             fastItem.Value.characterPlayerHud = this;
+        }
+        foreach (var ammo in characterUI.ammoInventory)
+        {
+            ammo.Value.characterPlayerHud = this;
         }
         SelectFastItem();
         await RefreshCharacterInventory();
@@ -127,6 +131,7 @@ public class CharacterPlayerHud : MonoBehaviour
             RefreshCharacterStatistics();
             RefreshFastItems();
             RefreshSkills();
+            RefreshAmmo();
             await Awaitable.NextFrameAsync();
             if (inventoryDraggedSlot) Destroy(inventoryDraggedSlot.gameObject);
             characterUI.panelToResetSelect.gameObject.SetActive(false);
@@ -224,10 +229,10 @@ public class CharacterPlayerHud : MonoBehaviour
             bool hasAmount = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Amount);
             fastItem.Value.UpdateData(
                 hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue : 0,
-                hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.icon : null,
+                hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO?.icon : null,
                 hasDurability,
                 hasDurability ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability] : null,
-                characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO.useEnergy
+                characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO?.useEnergy ?? false
             );
         }
     }
@@ -236,6 +241,13 @@ public class CharacterPlayerHud : MonoBehaviour
         foreach (KeyValuePair<ItemsDBSO.TypeModel, InventorySlot> item in characterUI.equipments)
         {
             characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
+        }
+    }
+    public void RefreshAmmo()
+    {
+        foreach (KeyValuePair<int, InventorySlot> item in characterUI.ammoInventory)
+        {
+            characterUI.ammoInventory[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].ammo[item.Key]);
         }
     }
     public void RefreshBag()
@@ -364,6 +376,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public SerializedDictionary<ItemsDBSO.TypeModel, InventorySlot> equipments = new SerializedDictionary<ItemsDBSO.TypeModel, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> fastItemsInventory = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
+        public SerializedDictionary<int, InventorySlot> ammoInventory = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
         public SerializedDictionary<int, SkillUi> skills = new SerializedDictionary<int, SkillUi>();
         public StatusEffectUI statusEffectUI;
