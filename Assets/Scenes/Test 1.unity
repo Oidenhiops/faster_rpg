@@ -2580,6 +2580,36 @@ MonoBehaviour:
       _serializedList: []
     bag:
       _serializedList: []
+    ammo:
+      _serializedList:
+      - Key: 0
+        Value:
+          itemId: 0
+          typeObject: 0
+          itemBaseSO: {fileID: 0}
+          itemStatistics:
+            _serializedList: []
+      - Key: 1
+        Value:
+          itemId: 0
+          typeObject: 0
+          itemBaseSO: {fileID: 0}
+          itemStatistics:
+            _serializedList: []
+      - Key: 2
+        Value:
+          itemId: 0
+          typeObject: 0
+          itemBaseSO: {fileID: 0}
+          itemStatistics:
+            _serializedList: []
+      - Key: 3
+        Value:
+          itemId: 0
+          typeObject: 0
+          itemBaseSO: {fileID: 0}
+          itemStatistics:
+            _serializedList: []
     skills:
       _serializedList:
       - Key: 0
@@ -11613,7 +11643,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 932, y: 432}
+  m_SizeDelta: {x: 932, y: 532}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &900661015
 MonoBehaviour:
@@ -13638,7 +13668,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 988, y: 952}
+  m_SizeDelta: {x: 988, y: 1052}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1152004491
 MonoBehaviour:
