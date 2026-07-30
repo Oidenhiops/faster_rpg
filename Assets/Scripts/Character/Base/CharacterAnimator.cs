@@ -25,7 +25,7 @@ public class CharacterAnimator : MonoBehaviour
     }
     public string GetAnimationAttack()
     {
-        characterBase.charactersData[characterBase.characterIndex].GetCurrentWeapon(out CharacterData.CharacterItem weapon);
+        characterBase.characterData.GetCurrentWeapon(out CharacterData.CharacterItem weapon);
         if (weapon != null)
         {
             return weapon.itemBaseSO.animationName;
@@ -90,11 +90,9 @@ public class CharacterAnimator : MonoBehaviour
 
     void RestoreOriginalColors()
     {
-        CharacterData data = characterBase.charactersData[characterBase.characterIndex];
         foreach (KeyValuePair<ItemsDBSO.TypeModel, List<CharacterBase.CharacterModelData>> model in characterBase.characterModel.meshesData)
         {
             if (model.Value == null) continue;
-            bool hasSkin = data.models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo);
             foreach (CharacterBase.CharacterModelData modelData in model.Value)
             {
                 Material[] mats = modelData.meshRenderer.materials;
@@ -102,7 +100,7 @@ public class CharacterAnimator : MonoBehaviour
                 {
                     if (mats[i].HasProperty("_Color"))
                     {
-                        if (hasSkin && i < skinInfo.colors.Count)
+                        if (characterBase.characterData.models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo) && i < skinInfo.colors.Count)
                         {
                             mats[i].SetColor("_Color", skinInfo.colors[i]);
                         }

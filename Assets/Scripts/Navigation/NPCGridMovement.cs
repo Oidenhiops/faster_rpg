@@ -67,8 +67,6 @@ public class NPCGridMovement : CharacterGridNavigator
 
     int ResolveSpeed()
     {
-        return (int)characterBase.charactersData[characterBase.characterIndex]
-                            .statistics[CharacterData.TypeStatistic.Spd]
-                            .currentValue;
+        return (int)characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue;
     }
 }

@@ -9,8 +9,7 @@ public class CharacterBase : MonoBehaviour
     public bool isInitialize;
     public bool autoInit;
     public CharacterModel characterModel;
-    public CharacterData[] charactersData;
-    public int characterIndex;
+    public CharacterData characterData;
     public int currentFastItemIndex;
     public Vector2 directionMovement = new Vector2();
     public GameObject floatingTextPrefab;
@@ -22,12 +21,10 @@ public class CharacterBase : MonoBehaviour
     public CharacterDirection characterDirection;
     public DissolvePlayer dissolvePlayer;
     public Animator characterAnimator;
-    public SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffects = new SerializedDictionary<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>>();
-    public SerializedDictionary<int, List<StatusEffectBaseSO>> statusToRemove = new SerializedDictionary<int, List<StatusEffectBaseSO>>();
-    List<int> statusEffectsCharacterKeysToRemove = new();
-    public SerializedDictionary<int, SerializedDictionary<int, SkillCd>> skillsCd = new SerializedDictionary<int, SerializedDictionary<int, SkillCd>>();
-    public SerializedDictionary<int, List<int>> skillsToRemove = new SerializedDictionary<int, List<int>>();
-    List<int> skillsCharacterKeysToRemove = new();
+    public SerializedDictionary<StatusEffectBaseSO, StatusEffect> statusEffects = new SerializedDictionary<StatusEffectBaseSO, StatusEffect>();
+    public List<StatusEffectBaseSO> statusToRemove = new List<StatusEffectBaseSO>();
+    public SerializedDictionary<int, SkillCd> skillsCd = new SerializedDictionary<int, SkillCd>();
+    public List<int> skillsToRemove = new List<int>();
     protected Coroutine handleStatusEffectCoroutine;
     protected Coroutine handleUseSkillCoroutine;
     public bool isGrounded => SetGrounded();
@@ -69,7 +66,7 @@ public class CharacterBase : MonoBehaviour
     {
         foreach (KeyValuePair<ItemsDBSO.TypeModel, List<CharacterModelData>> model in characterModel.meshesData)
         {
-            if (charactersData[characterIndex].models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo))
+            if (characterData.models.TryGetValue(model.Key, out CharacterData.CharacterSkinInfo skinInfo))
             {
                 if (skinInfo.itemId != 0)
                 {
@@ -111,9 +108,9 @@ public class CharacterBase : MonoBehaviour
                 }
             }
         }
-        if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
+        if (characterData.fastItems[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, ItemsDBSO.TypeModel.FastItems);
+            RefreshCharacterItemModel(characterData.fastItems[currentFastItemIndex], true, ItemsDBSO.TypeModel.FastItems);
         }
         else
         {
@@ -163,7 +160,7 @@ public class CharacterBase : MonoBehaviour
                 {
                     for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
                     {
-                        charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = true;
+                        characterData.models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = true;
                         foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
                         {
                             modelData.meshFilter.gameObject.SetActive(false);
@@ -175,7 +172,7 @@ public class CharacterBase : MonoBehaviour
             {
                 for (int i = 0; i < characterItem.itemBaseSO.modelInfo.occludedModels.Count; i++)
                 {
-                    charactersData[characterIndex].models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = false;
+                    characterData.models[characterItem.itemBaseSO.modelInfo.occludedModels[i]].occlude = false;
                     foreach (CharacterModelData modelData in characterModel.meshesData[characterItem.itemBaseSO.modelInfo.occludedModels[i]])
                     {
                         modelData.meshFilter.gameObject.SetActive(true);
@@ -193,9 +190,9 @@ public class CharacterBase : MonoBehaviour
     }
     public void UpdateFastItemModel()
     {
-        if (charactersData[characterIndex].fastItems[currentFastItemIndex].itemBaseSO)
+        if (characterData.fastItems[currentFastItemIndex].itemBaseSO)
         {
-            RefreshCharacterItemModel(charactersData[characterIndex].fastItems[currentFastItemIndex], true, ItemsDBSO.TypeModel.FastItems);
+            RefreshCharacterItemModel(characterData.fastItems[currentFastItemIndex], true, ItemsDBSO.TypeModel.FastItems);
             for (int i = 0; i < characterModel.meshesData[ItemsDBSO.TypeModel.FastItems].Count; i++)
             {
                 dissolvePlayer.NeedAppearSpecificObj(characterModel.meshesData[ItemsDBSO.TypeModel.FastItems][i].meshRenderer);
@@ -237,16 +234,16 @@ public class CharacterBase : MonoBehaviour
     public virtual void TakeExp(CharacterData.Statistic statistic)
     {
         int amount = Mathf.CeilToInt(statistic.maxValue * 0.1f);
-        charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue += amount;
+        characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue += amount;
         int level = 0;
-        while (charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue >= charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue)
+        while (characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue >= characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue)
         {
-            int spare = charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue > charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue ?
-                Mathf.CeilToInt(charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue - charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue) : 0;
-            charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].baseValue = Mathf.CeilToInt(charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue * 2.2f);
-            charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].maxValue = charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].baseValue;
-            charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Exp].currentValue = spare;
-            charactersData[characterIndex].LevelUp();
+            int spare = characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue > characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue ?
+                Mathf.CeilToInt(characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue - characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue) : 0;
+            characterData.statistics[CharacterData.TypeStatistic.Exp].baseValue = Mathf.CeilToInt(characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue * 2.2f);
+            characterData.statistics[CharacterData.TypeStatistic.Exp].maxValue = characterData.statistics[CharacterData.TypeStatistic.Exp].baseValue;
+            characterData.statistics[CharacterData.TypeStatistic.Exp].currentValue = spare;
+            characterData.LevelUp();
             level++;
         }
     }
@@ -288,21 +285,21 @@ public class CharacterBase : MonoBehaviour
     }
     public async Awaitable TakeDamage(CharacterBase characterMakeDamage, int damage)
     {
-        FloatingText floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity).GetComponent<FloatingText>();
+        FloatingText floatingText = Instantiate(GameData.Instance.utils.prefabs["FloatingText"], transform.position, Quaternion.identity).GetComponent<FloatingText>();
         _ = floatingText.SendText(damage.ToString(), Color.red, false);
-        if (charactersData[characterIndex].statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))
+        if (characterData.statistics.TryGetValue(CharacterData.TypeStatistic.Hp, out CharacterData.Statistic characterTakedDamageStatistic))
         {
             characterTakedDamageStatistic.currentValue -= damage;
         }
         characterAnimations.MakeEffect(AnimationEffectsSO.TypeAnimationsEffects.Shake);
         characterAnimations.MakeEffect(AnimationEffectsSO.TypeAnimationsEffects.Blink);
-        if (charactersData[characterIndex].statistics[CharacterData.TypeStatistic.Hp].currentValue <= 0) await Die(characterMakeDamage);
+        if (characterData.statistics[CharacterData.TypeStatistic.Hp].currentValue <= 0) await Die(characterMakeDamage);
         await Awaitable.NextFrameAsync();
     }
     public virtual async Awaitable Die(CharacterBase characterMakeDamage)
     {
         await Awaitable.WaitForSecondsAsync(0.3f);
-        GameObject dieEffect = Instantiate(dieEffectPrefab, transform.position, Quaternion.identity);
+        GameObject dieEffect = Instantiate(GameData.Instance.utils.prefabs["DieEffect"], transform.position, Quaternion.identity);
         await Awaitable.WaitForSecondsAsync(1);
         Destroy(dieEffect);
         // _ = GameManager.Instance.LoadScene(GameManager.TypeScene.HomeScene);
@@ -312,40 +309,32 @@ public class CharacterBase : MonoBehaviour
     {
         while (statusEffects.Count > 0)
         {
-            foreach (KeyValuePair<int, SerializedDictionary<StatusEffectBaseSO, StatusEffect>> statusEffect in statusEffects)
+            foreach (KeyValuePair<StatusEffectBaseSO, StatusEffect> status in statusEffects)
             {
-                foreach (KeyValuePair<StatusEffectBaseSO, StatusEffect> status in statusEffect.Value)
+                status.Value.cd -= Time.deltaTime;
+                if (status.Value.cd <= 0)
                 {
-                    status.Value.cd -= Time.deltaTime;
-                    if (status.Value.cd <= 0)
+                    status.Value.amount--;
+                    if (status.Value.amount > 0)
                     {
-                        status.Value.amount--;
-                        if (status.Value.amount > 0)
-                        {
-                            status.Value.cd = status.Value.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
-                            status.Value.statusEffectBaseSO.ReApplyEffect(this);
-                            if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
-                                characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].SetBannerData(status.Value);
-                        }
-                        else
-                        {
-                            status.Value.statusEffectBaseSO.RemoveEffect(this);
-                            if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
-                            {
-                                AddStatusEffectToRemove(statusEffect.Key, status.Key);
-                                if (statusEffect.Value.Count - statusToRemove[statusEffect.Key].Count <= 0)
-                                {
-                                    statusEffectsCharacterKeysToRemove.Add(statusEffect.Key);
-                                }
-                            }
-                            break;
-                        }
+                        status.Value.cd = status.Value.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
+                        status.Value.statusEffectBaseSO.ReApplyEffect(this);
+                        if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
+                            characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].SetBannerData(status.Value);
                     }
                     else
                     {
-                        if (statusEffects.ContainsKey(characterIndex))
-                            characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].RefreshCD(status.Value);
+                        status.Value.statusEffectBaseSO.RemoveEffect(this);
+                        if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
+                        {
+                            statusToRemove.Add(status.Key);
+                        }
+                        break;
                     }
+                }
+                else
+                {
+                    characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].RefreshCD(status.Value);
                 }
             }
             if (statusToRemove.Count > 0)
@@ -356,56 +345,28 @@ public class CharacterBase : MonoBehaviour
         }
         handleStatusEffectCoroutine = null;
     }
-    public void AddStatusEffectToRemove(int character, StatusEffectBaseSO status)
-    {
-        if (statusToRemove.ContainsKey(character))
-        {
-            statusToRemove[character].Add(status);
-        }
-        else
-        {
-            statusToRemove.Add(character, new List<StatusEffectBaseSO> { status });
-        }
-    }
     public void RemoveStatus()
     {
-        foreach (KeyValuePair<int, List<StatusEffectBaseSO>> character in statusToRemove)
+        foreach (StatusEffectBaseSO status in statusToRemove)
         {
-            foreach (StatusEffectBaseSO status in character.Value)
-            {
-                statusEffects[character.Key].Remove(status);
-                Destroy(characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status].gameObject);
-                characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status);
-            }
-        }
-        foreach (int character in statusEffectsCharacterKeysToRemove)
-        {
-            statusEffects.Remove(character);
+            statusEffects.Remove(status);
+            Destroy(characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status].gameObject);
+            characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status);
         }
         statusToRemove.Clear();
-        statusEffectsCharacterKeysToRemove.Clear();
     }
     public IEnumerator HandleUseSkill()
     {
         while (skillsCd.Count > 0)
         {
-            foreach (KeyValuePair<int, SerializedDictionary<int, SkillCd>> character in skillsCd)
+            foreach (KeyValuePair<int, SkillCd> skill in skillsCd)
             {
-                foreach (KeyValuePair<int, SkillCd> skill in character.Value)
+                skill.Value.currentCd -= Time.deltaTime;
+                characterPlayerHud?.characterUI.skills[skill.Key].RefreshCD(skill.Value);
+                if (skill.Value.currentCd <= 0)
                 {
-                    skill.Value.currentCd -= Time.deltaTime;
-                    if (character.Key == characterIndex)
-                    {
-                        characterPlayerHud?.characterUI.skills[skill.Key].RefreshCD(skill.Value);
-                    }
-                    if (skill.Value.currentCd <= 0)
-                    {
-                        AddSkillToRemove(character.Key, skill.Key);
-                        if (character.Value.Count - 1 <= 0)
-                        {
-                            skillsCharacterKeysToRemove.Add(character.Key);
-                        }
-                    }
+
+                    skillsToRemove.Add(skill.Key);
                 }
             }
             if (skillsToRemove.Count > 0)
@@ -416,54 +377,25 @@ public class CharacterBase : MonoBehaviour
         }
         handleUseSkillCoroutine = null;
     }
-    public void AddSkillToRemove(int character, int skillId)
-    {
-        if (skillsToRemove.ContainsKey(character))
-        {
-            skillsToRemove[character].Add(skillId);
-        }
-        else
-        {
-            skillsToRemove.Add(character, new List<int> { skillId });
-        }
-    }
     public void RemoveSkillCd()
     {
-        foreach (KeyValuePair<int, List<int>> character in skillsToRemove)
+        foreach (int skill in skillsToRemove)
         {
-            foreach (int skill in character.Value)
-            {
-                skillsCd[character.Key].Remove(skill);
-            }
-        }
-        foreach (int character in skillsCharacterKeysToRemove)
-        {
-            skillsCd.Remove(character);
+            skillsCd.Remove(skill);
         }
         skillsToRemove.Clear();
-        skillsCharacterKeysToRemove.Clear();
     }
     public void AddStatusEffect(StatusEffectBaseSO statusEffect)
     {
-        if (statusEffects.ContainsKey(characterIndex))
+        if (statusEffects.ContainsKey(statusEffect))
         {
-            if (statusEffects[characterIndex].ContainsKey(statusEffect))
-            {
-                statusEffects[characterIndex][statusEffect].AppendStatusEffect();
-            }
-            else
-            {
-                statusEffects[characterIndex].Add(statusEffect, new StatusEffect(statusEffect));
-            }
+            statusEffects[statusEffect].AppendStatusEffect();
         }
         else
         {
-            statusEffects.Add(characterIndex, new SerializedDictionary<StatusEffectBaseSO, StatusEffect>
-            {
-                {statusEffect, new StatusEffect(statusEffect)}
-            });
+            statusEffects.Add(statusEffect, new StatusEffect(statusEffect));
         }
-        characterPlayerHud?.AddStatusEffect(statusEffects[characterIndex][statusEffect]);
+        characterPlayerHud?.AddStatusEffect(statusEffects[statusEffect]);
 
         if (handleStatusEffectCoroutine == null)
         {
@@ -472,25 +404,15 @@ public class CharacterBase : MonoBehaviour
     }
     public void AddStatusEffect(int characterIndex, StatusEffectBaseSO statusEffect)
     {
-        if (statusEffects.ContainsKey(characterIndex))
+        if (statusEffects.ContainsKey(statusEffect))
         {
-            if (statusEffects[characterIndex].ContainsKey(statusEffect))
-            {
-                statusEffects[characterIndex][statusEffect].AppendStatusEffect();
-            }
-            else
-            {
-                statusEffects[characterIndex].Add(statusEffect, new StatusEffect(statusEffect));
-            }
+            statusEffects[statusEffect].AppendStatusEffect();
         }
         else
         {
-            statusEffects.Add(characterIndex, new SerializedDictionary<StatusEffectBaseSO, StatusEffect>
-            {
-                {statusEffect, new StatusEffect(statusEffect)}
-            });
+            statusEffects.Add(statusEffect, new StatusEffect(statusEffect));
         }
-        characterPlayerHud?.AddStatusEffect(statusEffects[characterIndex][statusEffect]);
+        characterPlayerHud?.AddStatusEffect(statusEffects[statusEffect]);
 
         if (handleStatusEffectCoroutine == null)
         {

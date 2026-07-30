@@ -22,7 +22,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
                 elapsedTime += Time.deltaTime;
                 if (character.cancelCanalization)
                 {
-                    character.AddStatusEffectToRemove(character.characterIndex, canalizationEffect);
+                    character.statusToRemove.Add(canalizationEffect);
                     cancelSkill = true;
                     break;
                 }

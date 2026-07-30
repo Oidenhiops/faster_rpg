@@ -17,11 +17,11 @@ public class ItemBaseSO : ScriptableObject
     public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem) { Debug.LogError("EquipItem not implemented"); }
     public virtual void EquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem)
     {
-        character.charactersData[character.characterIndex].models[typeObject].itemId = id;
-        character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>(modelInfo.colors);
+        character.characterData.models[typeObject].itemId = id;
+        character.characterData.models[typeObject].colors = new List<Color>(modelInfo.colors);
         foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
-            character.charactersData[character.characterIndex].models[occludedModel].occlude = true;
+            character.characterData.models[occludedModel].occlude = true;
         }
         if (refreshModel)
         {
@@ -31,11 +31,11 @@ public class ItemBaseSO : ScriptableObject
     public virtual async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem) { Debug.LogError("DesEquipItem not implemented"); }
     public void DesEquipModelItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem)
     {
-        character.charactersData[character.characterIndex].models[typeObject].itemId = 0;
-        character.charactersData[character.characterIndex].models[typeObject].colors = new List<Color>();
+        character.characterData.models[typeObject].itemId = 0;
+        character.characterData.models[typeObject].colors = new List<Color>();
         foreach (ItemsDBSO.TypeModel occludedModel in modelInfo.occludedModels)
         {
-            character.charactersData[character.characterIndex].models[occludedModel].occlude = false;
+            character.characterData.models[occludedModel].occlude = false;
         }
         if (refreshModel)
         {

@@ -7,8 +7,11 @@ using UnityEngine.UI;
 public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CharacterPlayerHud characterPlayerHud;
+    public CanvasGroup canvasGroup;
+    public Image itemSelect;
     public Image hasItem;
     public Image itemImage;
+    public GameObject itemAmountBg;
     public TMP_Text itemAmount;
     public Image itemDurability;
     public ItemsDBSO.TypeModel typeInventorySlot;
@@ -22,7 +25,9 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             itemImage.sprite = item.itemBaseSO.icon;
             itemImage.enabled = true;
             itemAmount.enabled = true;
-            itemAmount.text = item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
+            itemAmountBg.SetActive(item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1);
+            itemAmount.text = item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString();
+            canvasGroup.alpha = 1;
             if (item.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {
                 float durabilityPorcent = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue / item.itemStatistics[CharacterData.TypeStatistic.Durability].maxValue;
@@ -41,6 +46,8 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         }
         else
         {
+            itemAmountBg.SetActive(false);
+            canvasGroup.alpha = 0.5f;
             hasItem.enabled = false;
             itemImage.sprite = null;
             itemImage.enabled = false;
@@ -49,6 +56,10 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             itemDurability.enabled = false;
             characterItem = new CharacterData.CharacterItem(typeInventorySlot);
         }
+    }
+    public void SelectFastItem(bool isSelect)
+    {
+        itemSelect.enabled = isSelect;
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -62,7 +73,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (characterItem.itemBaseSO != null)
         {
-            characterPlayerHud.inventoryDraggedSlot = Instantiate(Resources.Load<GameObject>("Prefabs/DraggedSlot/DraggedSlot"), eventData.position, Quaternion.identity, characterPlayerHud.hudTransform).GetComponent<InventoryDraggedSlot>();
+            characterPlayerHud.inventoryDraggedSlot = Instantiate(GameData.Instance.utils.prefabs["DraggedSlot"], eventData.position, Quaternion.identity, characterPlayerHud.hudTransform).GetComponent<InventoryDraggedSlot>();
             characterPlayerHud.inventoryDraggedSlot.InitializeDraggedSlot(characterItem);
             characterPlayerHud.inventoryDraggedSlot.itemDraged = this;
             characterPlayerHud.inventoryDraggedSlot.rectTransform.sizeDelta = Vector2.one * 100;
@@ -80,22 +91,46 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (characterItem.itemBaseSO == null) return;
         characterPlayerHud.characterUI.itemDescription.descriptionCanvasGroup.alpha = 1;
         characterPlayerHud.isDraggingItem = false;
-        if (characterPlayerHud.lastSelectedSlot != null)
+        if (characterPlayerHud.inventoryDraggedSlot == null) return;
+
+        InventorySlot draggedSlot = characterPlayerHud.inventoryDraggedSlot.itemDraged;
+        InventorySlot targetSlot = characterPlayerHud.lastSelectedSlot;
+        if (targetSlot != null && draggedSlot != null)
         {
-            characterPlayerHud.characterPlayer.ChangeObjectPosition();
+            characterPlayerHud.characterPlayer.ChangeObjectPosition(
+                GetItemInfo(draggedSlot),
+                GetItemInfo(targetSlot)
+            );
         }
         else
         {
-            _ = characterPlayerHud.characterPlayer.DropItem();
+            _ = characterPlayerHud.characterPlayer.DropItem(this);
         }
         characterPlayerHud.lastSelectedSlot = null;
         Destroy(characterPlayerHud.inventoryDraggedSlot.gameObject);
+    }
+    ItemInfo GetItemInfo(InventorySlot slot)
+    {
+        return new ItemInfo
+        {
+            typeItem = slot.typeInventorySlot,
+            index = slot.slotIndex,
+            itemData = characterPlayerHud.characterPlayer.GetItem(slot.typeInventorySlot, slot.slotIndex),
+            inventorySlot = slot
+        };
     }
     public void FastEquipItem()
     {
         if (characterItem.itemBaseSO != null)
         {
-            characterPlayerHud.characterPlayer.FastEquipItem(slotIndex);
+            characterPlayerHud.characterPlayer.FastEquipItem(slotIndex, this);
         }
+    }
+    public class ItemInfo
+    {
+        public ItemsDBSO.TypeModel typeItem;
+        public int index;
+        public CharacterData.CharacterItem itemData;
+        public InventorySlot inventorySlot;
     }
 }

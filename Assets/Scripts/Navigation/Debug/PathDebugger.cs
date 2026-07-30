@@ -83,10 +83,8 @@ public class PathDebugger : MonoBehaviour
     static int ResolveStat(CharacterBase c, CharacterData.TypeStatistic type)
     {
         if (c == null) return 0;
-        if (c.charactersData == null || c.charactersData.Length == 0) return 0;
-        var data = c.charactersData[c.characterIndex];
-        if (data == null || data.statistics == null) return 0;
-        if (!data.statistics.TryGetValue(type, out var stat)) return 0;
+        if (c.characterData == null || c.characterData.statistics == null) return 0;
+        if (!c.characterData.statistics.TryGetValue(type, out var stat)) return 0;
         return (int)stat.currentValue;
     }
 

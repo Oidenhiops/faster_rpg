@@ -8,10 +8,10 @@ public class ConsumableItemSO : ItemBaseSO
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
         {
-            if (useItemInfo.character.charactersData[useItemInfo.character.characterIndex].statistics.ContainsKey(statistic.Key))
+            if (useItemInfo.character.characterData.statistics.ContainsKey(statistic.Key))
             {
-                useItemInfo.character.charactersData[useItemInfo.character.characterIndex].statistics[statistic.Key].currentValue += statistic.Value.baseValue;
-                useItemInfo.character.charactersData[useItemInfo.character.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                useItemInfo.character.characterData.statistics[statistic.Key].currentValue += statistic.Value.baseValue;
+                useItemInfo.character.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
         GameObject effect = Instantiate(useEffectPrefab, useItemInfo.character.transform.position + Vector3.up * 0.5f, Quaternion.identity);

@@ -87,39 +87,6 @@ public class CharacterPlayerHud : MonoBehaviour
             Cursor.visible = true;
         }
     }
-    public async Awaitable ChangeCharacterPortrait()
-    {
-        try
-        {
-            foreach (var portrait in characterUI.characterPortraits)
-            {
-                portrait.characterCounterText.text = "1";
-                portrait.characterCounter.fillAmount = 1f;
-            }
-            float elapsedTime = 0f;
-            float duration = 1f;
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float fillAmount = Mathf.Lerp(1, 0, elapsedTime / duration);
-                foreach (var character in characterUI.characterPortraits)
-                {
-                    character.characterCounter.fillAmount = fillAmount;
-                    character.characterCounterText.text = fillAmount.ToString("F1");
-                }
-                await Awaitable.NextFrameAsync();
-            }
-            foreach (var character in characterUI.characterPortraits)
-            {
-                character.characterCounterText.text = "";
-            }
-            await Awaitable.NextFrameAsync();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error changing character portrait: {ex.Message}");
-        }
-    }
     public async Awaitable RefreshCharacterInventory()
     {
         try
@@ -152,7 +119,7 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, TMP_Text> statistic in characterUI.statistics)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
+            if (characterPlayer.characterData.statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
             {
                 if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp)
                 {
@@ -170,9 +137,9 @@ public class CharacterPlayerHud : MonoBehaviour
     {
         foreach (KeyValuePair<int, SkillUi> skill in characterUI.skills)
         {
-            if (characterPlayer.charactersData[characterPlayer.characterIndex].skills[skill.Key].skillsBaseSO)
+            if (characterPlayer.characterData.skills[skill.Key].skillsBaseSO)
             {
-                skill.Value.skillImage.sprite = characterPlayer.charactersData[characterPlayer.characterIndex].skills[skill.Key].skillsBaseSO.icon;
+                skill.Value.skillImage.sprite = characterPlayer.characterData.skills[skill.Key].skillsBaseSO.icon;
                 skill.Value.lockImage.gameObject.SetActive(false);
                 skill.Value.skillImage.gameObject.SetActive(true);
                 skill.Value.RefreshCD(new CharacterBase.SkillCd { currentCd = 0, maxCd = 0 });
@@ -192,14 +159,11 @@ public class CharacterPlayerHud : MonoBehaviour
             Destroy(statusEffect.gameObject);
         }
         characterUI.statusEffectUI.statusEffectsBanners.Clear();
-        if (characterPlayer.statusEffects.ContainsKey(characterPlayer.characterIndex))
+        foreach (KeyValuePair<StatusEffectBaseSO, CharacterBase.StatusEffect> statusEffect in characterPlayer.statusEffects)
         {
-            foreach(KeyValuePair<StatusEffectBaseSO, CharacterBase.StatusEffect> statusEffect in characterPlayer.statusEffects[characterPlayer.characterIndex])
-            {
-                StatusEffectBanner statusEffectBanner = Instantiate(characterUI.statusEffectUI.statusEffectPrefab, characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
-                statusEffectBanner.SetBannerData(statusEffect.Value);
-                characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.Key, statusEffectBanner);
-            }
+            StatusEffectBanner statusEffectBanner = Instantiate(GameData.Instance.utils.prefabs["StatusEffect"], characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
+            statusEffectBanner.SetBannerData(statusEffect.Value);
+            characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.Key, statusEffectBanner);
         }
     }
     public void AddStatusEffect(CharacterBase.StatusEffect statusEffect)
@@ -210,7 +174,7 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         else
         {
-            StatusEffectBanner statusEffectBanner = Instantiate(characterUI.statusEffectUI.statusEffectPrefab, characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
+            StatusEffectBanner statusEffectBanner = Instantiate(GameData.Instance.utils.prefabs["StatusEffect"], characterUI.statusEffectUI.statusEffectContainer.transform).GetComponent<StatusEffectBanner>();
             statusEffectBanner.SetBannerData(statusEffect);
             characterUI.statusEffectUI.statusEffectsBanners.Add(statusEffect.statusEffectBaseSO, statusEffectBanner);
         }
@@ -220,34 +184,26 @@ public class CharacterPlayerHud : MonoBehaviour
         foreach (KeyValuePair<int, InventorySlot> fastItem in characterUI.fastItemsInventory)
         {
             characterUI.fastItemsInventory[fastItem.Key].slotIndex = fastItem.Key;
-            characterUI.fastItemsInventory[fastItem.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key]);
+            characterUI.fastItemsInventory[fastItem.Key].InitializeSlot(characterPlayer.characterData.fastItems[fastItem.Key]);
         }
 
-        foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
+        foreach (KeyValuePair<int, InventorySlot> fastItem in characterUI.fastItems)
         {
-            bool hasDurability = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability);
-            bool hasAmount = characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Amount);
-            fastItem.Value.UpdateData(
-                hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Amount].currentValue : 0,
-                hasAmount ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO?.icon : null,
-                hasDurability,
-                hasDurability ? characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemStatistics[CharacterData.TypeStatistic.Durability] : null,
-                characterPlayer.charactersData[characterPlayer.characterIndex].fastItems[fastItem.Key].itemBaseSO?.useEnergy ?? false
-            );
+            fastItem.Value.InitializeSlot(characterPlayer.characterData.fastItems[fastItem.Key]);
         }
     }
     public void RefreshEquipments()
     {
         foreach (KeyValuePair<ItemsDBSO.TypeModel, InventorySlot> item in characterUI.equipments)
         {
-            characterUI.equipments[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].equipments[item.Key]);
+            characterUI.equipments[item.Key].InitializeSlot(characterPlayer.characterData.equipments[item.Key]);
         }
     }
     public void RefreshAmmo()
     {
         foreach (KeyValuePair<int, InventorySlot> item in characterUI.ammoInventory)
         {
-            characterUI.ammoInventory[item.Key].InitializeSlot(characterPlayer.charactersData[characterPlayer.characterIndex].ammo[item.Key]);
+            characterUI.ammoInventory[item.Key].InitializeSlot(characterPlayer.characterData.ammo[item.Key]);
         }
     }
     public void RefreshBag()
@@ -258,9 +214,9 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         int index = 0;
         characterUI.characterBag.inventorySlots.Clear();
-        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.charactersData[characterPlayer.characterIndex].bag)
+        foreach (KeyValuePair<int, CharacterData.CharacterItem> bagSlot in characterPlayer.characterData.bag)
         {
-            InventorySlot bagSlotPrefab = Instantiate(Resources.Load<GameObject>("Prefabs/BagSlot/BagSlot"), characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
+            InventorySlot bagSlotPrefab = Instantiate(GameData.Instance.utils.prefabs["BagSlot"], characterUI.characterBag.bagContainer).GetComponent<InventorySlot>();
             bagSlotPrefab.characterPlayerHud = this;
             bagSlotPrefab.slotIndex = bagSlot.Key;
             bagSlotPrefab.InitializeSlot(bagSlot.Value);
@@ -284,6 +240,14 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         return null;
     }
+    public InventorySlot GetAmmoSlotByIndex(int index)
+    {
+        if (characterUI.ammoInventory.TryGetValue(index, out InventorySlot ammoSlot))
+        {
+            return ammoSlot;
+        }
+        return null;
+    }
     public InventorySlot GetEquipmentSlotByIndex(ItemsDBSO.TypeModel index)
     {
         if (characterUI.equipments.TryGetValue(index, out InventorySlot equipmentSlot))
@@ -294,7 +258,7 @@ public class CharacterPlayerHud : MonoBehaviour
     }
     public void SelectFastItem()
     {
-        foreach (KeyValuePair<int, FastItem> fastItem in characterUI.fastItems)
+        foreach (KeyValuePair<int, InventorySlot> fastItem in characterUI.fastItems)
         {
             characterUI.fastItems[fastItem.Key].SelectFastItem(fastItem.Key == characterPlayer.currentFastItemIndex);
         }
@@ -357,7 +321,7 @@ public class CharacterPlayerHud : MonoBehaviour
             characterUI.interactables.interactablesPanel.SetActive(true);
             foreach (KeyValuePair<InteractableBase, GameObject> interactable in characterPlayer.interactables)
             {
-                InteractableBanner interactablePrefab = Instantiate(characterPlayer.interactableBannerPrefab, characterUI.interactables.container).GetComponent<InteractableBanner>();
+                InteractableBanner interactablePrefab = Instantiate(GameData.Instance.utils.prefabs["InteractableBanner"], characterUI.interactables.container).GetComponent<InteractableBanner>();
                 interactablePrefab.interactable = interactable.Key;
                 interactablePrefab.character = characterPlayer;
                 interactablePrefab.InitializeBanner(interactable.Key);
@@ -371,11 +335,10 @@ public class CharacterPlayerHud : MonoBehaviour
     [Serializable]
     public class CharacterUI
     {
-        public CharacterPortrait[] characterPortraits;
         public CharacterBag characterBag;
         public SerializedDictionary<ItemsDBSO.TypeModel, InventorySlot> equipments = new SerializedDictionary<ItemsDBSO.TypeModel, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> fastItemsInventory = new SerializedDictionary<int, InventorySlot>();
-        public SerializedDictionary<int, FastItem> fastItems = new SerializedDictionary<int, FastItem>();
+        public SerializedDictionary<int, InventorySlot> fastItems = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<int, InventorySlot> ammoInventory = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
         public SerializedDictionary<int, SkillUi> skills = new SerializedDictionary<int, SkillUi>();
@@ -383,55 +346,6 @@ public class CharacterPlayerHud : MonoBehaviour
         public InteractableUI interactables;
         public ItemDescription itemDescription;
         public Transform panelToResetSelect;
-    }
-    [Serializable]
-    public class FastItem
-    {
-        public CanvasGroup fastItemCanvasGroup;
-        public Image fastItemSelect;
-        public Image fastItemBg;
-        public Image fastItemIcon;
-        public GameObject fastItemAmountBg;
-        public TMP_Text fastItemAmount;
-        public Image fastItemDurability;
-        public void UpdateData(float amount, Sprite sprite = null, bool hasDurability = false, CharacterData.Statistic durability = null, bool useEnergy = false)
-        {
-            fastItemAmountBg.SetActive(amount > 1);
-            if (amount != 0)
-            {
-                fastItemCanvasGroup.alpha = 1;
-                fastItemIcon.enabled = true;
-                if (sprite) fastItemIcon.sprite = sprite;
-                fastItemAmount.enabled = true;
-                fastItemAmount.text = amount.ToString();
-                if (hasDurability)
-                {
-                    float durabilityPorcent = durability.currentValue / durability.maxValue;
-                    fastItemDurability.enabled = true;
-                    fastItemDurability.fillAmount = durabilityPorcent > 0 ? durabilityPorcent : 1;
-                    if (durabilityPorcent >= 0.7f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyGood" : "DurabilityGood", out Color durabilityColor) ? durabilityColor : Color.white;
-                    else if (durabilityPorcent < 0.7f && durabilityPorcent >= 0.3f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyMedium" : "DurabilityMedium", out Color durabilityColor) ? durabilityColor : Color.white;
-                    else if (durabilityPorcent < 0.3f && durabilityPorcent > 0f) fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "EnergyBad" : "DurabilityBad", out Color durabilityColor) ? durabilityColor : Color.white;
-                    else fastItemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(useEnergy ? "OutEnergy" : "OutDurability", out Color durabilityColor) ? durabilityColor : Color.white;
-                }
-                else
-                {
-                    fastItemDurability.enabled = false;
-                }
-            }
-            else
-            {
-                fastItemIcon.enabled = false;
-                fastItemCanvasGroup.alpha = 0.5f;
-                fastItemAmount.enabled = false;
-                fastItemAmount.text = "";
-                fastItemDurability.enabled = false;
-            }
-        }
-        public void SelectFastItem(bool isSelect)
-        {
-            fastItemSelect.enabled = isSelect;
-        }
     }
     [Serializable]
     public class ItemDescription
@@ -443,15 +357,6 @@ public class CharacterPlayerHud : MonoBehaviour
         public TMP_Text itemName;
         public TMP_Text itemDescription;
         public RectTransform panelToResetSelect;
-    }
-    [Serializable]
-    public class CharacterPortrait
-    {
-        public GameObject portraitObject;
-        public Image characterBg;
-        public Image characterSprite;
-        public Image characterCounter;
-        public TMP_Text characterCounterText;
     }
     [Serializable]
     public class CharacterBag

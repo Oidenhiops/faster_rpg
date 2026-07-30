@@ -5,8 +5,9 @@ using UnityEngine.UI;
 public class InventoryDraggedSlot : MonoBehaviour
 {
     public Image itemImage;
+    public GameObject itemAmountBg;
     public TMP_Text itemAmount;
-    public TMP_Text itemDurability;
+    public Image itemDurability;
     public InventorySlot itemDraged;
     public RectTransform rectTransform;
 
@@ -15,21 +16,21 @@ public class InventoryDraggedSlot : MonoBehaviour
         itemImage.sprite = item.itemBaseSO.icon;
         itemImage.enabled = true;
         itemAmount.enabled = true;
-        itemAmount.text = item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1 ? item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString() : "";
-        itemDurability.enabled = true;
+        itemAmountBg.SetActive(item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue > 1);
+        itemAmount.text = item.itemStatistics[CharacterData.TypeStatistic.Amount].currentValue.ToString();
         if (item.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
         {
+            float durabilityPorcent = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue / item.itemStatistics[CharacterData.TypeStatistic.Durability].maxValue;
             itemDurability.enabled = true;
-            itemDurability.text = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue.ToString("F0");
-            itemDurability.color =
-                GameData.Instance.utils.systemColors.TryGetValue(
-                    item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 ?
-                    item.itemBaseSO.useEnergy ? "Energy" : "Durability" : "Broken", out Color durabilityColor) ? durabilityColor : Color.white;
+            itemDurability.fillAmount = durabilityPorcent > 0 ? durabilityPorcent : 1;
+            if (durabilityPorcent >= 0.7f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyGood" : "DurabilityGood", out Color durabilityColor) ? durabilityColor : Color.white;
+            else if (durabilityPorcent < 0.7f && durabilityPorcent >= 0.3f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyMedium" : "DurabilityMedium", out Color durabilityColor) ? durabilityColor : Color.white;
+            else if (durabilityPorcent < 0.3f && durabilityPorcent > 0f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyBad" : "DurabilityBad", out Color durabilityColor) ? durabilityColor : Color.white;
+            else itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "OutEnergy" : "OutDurability", out Color durabilityColor) ? durabilityColor : Color.white;
         }
         else
         {
             itemDurability.enabled = false;
-            itemDurability.text = "";
         }
     }
 }

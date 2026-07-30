@@ -103,14 +103,11 @@ public class GameData : MonoBehaviour
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterData.CharacterItem> item in gameDataSlot.character.equipments)
             {
-                foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterData.CharacterItem> item in characterData.Value.equipments)
+                if (item.Value.itemId != 0)
                 {
-                    if (item.Value.itemId != 0)
-                    {
-                        item.Value.itemBaseSO = itemsDBSO.data[item.Value.typeObject][item.Value.itemId];
-                    }
+                    item.Value.itemBaseSO = itemsDBSO.data[item.Value.typeObject][item.Value.itemId];
                 }
             }
         }
@@ -119,14 +116,11 @@ public class GameData : MonoBehaviour
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            foreach (KeyValuePair<int, CharacterData.CharacterItem> fastItem in gameDataSlot.character.fastItems)
             {
-                foreach (KeyValuePair<int, CharacterData.CharacterItem> fastItem in characterData.Value.fastItems)
+                if (fastItem.Value.itemId != 0)
                 {
-                    if (fastItem.Value.itemId != 0)
-                    {
-                        fastItem.Value.itemBaseSO = itemsDBSO.data[fastItem.Value.typeObject][fastItem.Value.itemId];
-                    }
+                    fastItem.Value.itemBaseSO = itemsDBSO.data[fastItem.Value.typeObject][fastItem.Value.itemId];
                 }
             }
         }
@@ -135,14 +129,11 @@ public class GameData : MonoBehaviour
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            foreach (KeyValuePair<int, CharacterData.CharacterItem> bagItem in gameDataSlot.character.bag)
             {
-                foreach (KeyValuePair<int, CharacterData.CharacterItem> bagItem in characterData.Value.bag)
+                if (bagItem.Value.itemId != 0)
                 {
-                    if (bagItem.Value.itemId != 0)
-                    {
-                        bagItem.Value.itemBaseSO = itemsDBSO.data[bagItem.Value.typeObject][bagItem.Value.itemId];
-                    }
+                    bagItem.Value.itemBaseSO = itemsDBSO.data[bagItem.Value.typeObject][bagItem.Value.itemId];
                 }
             }
         }
@@ -151,14 +142,11 @@ public class GameData : MonoBehaviour
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterData.CharacterSkinInfo> modelItem in gameDataSlot.character.models)
             {
-                foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterData.CharacterSkinInfo> modelItem in characterData.Value.models)
+                if (modelItem.Value.itemId != 0)
                 {
-                    if (modelItem.Value.itemId != 0)
-                    {
-                        modelItem.Value.itemBaseSO = itemsDBSO.data[modelItem.Value.typeObject][modelItem.Value.itemId];
-                    }
+                    modelItem.Value.itemBaseSO = itemsDBSO.data[modelItem.Value.typeObject][modelItem.Value.itemId];
                 }
             }
         }
@@ -167,14 +155,11 @@ public class GameData : MonoBehaviour
     {
         foreach (GameDataSlot gameDataSlot in gameDataInfo.gameDataSlots)
         {
-            foreach (KeyValuePair<string, CharacterData> characterData in gameDataSlot.characters)
+            foreach (KeyValuePair<int, CharacterData.CharacterSkillInfo> skill in gameDataSlot.character.skills)
             {
-                foreach (KeyValuePair<int, CharacterData.CharacterSkillInfo> skill in characterData.Value.skills)
+                if (skill.Value.skillId != 0)
                 {
-                    if (skill.Value.skillId != 0)
-                    {
-                        skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
-                    }
+                    skill.Value.skillsBaseSO = skillsDBSO.data[skill.Value.skillId];
                 }
             }
         }
@@ -341,42 +326,18 @@ public class GameData : MonoBehaviour
     }
     public GameDataSlot SetStartingSolt()
     {
-        string[] randomNames = new string[]
-        {
-            charactersDBSO.GenerateFantasyName(),
-            charactersDBSO.GenerateFantasyName(),
-            charactersDBSO.GenerateFantasyName(),
-            charactersDBSO.GenerateFantasyName()
-        };
-
-        List<SerializedDictionary<int, CharacterData.CharacterItem>> bags = new List<SerializedDictionary<int, CharacterData.CharacterItem>>
-        {
-            new SerializedDictionary<int, CharacterData.CharacterItem>(),
-            new SerializedDictionary<int, CharacterData.CharacterItem>(),
-            new SerializedDictionary<int, CharacterData.CharacterItem>(),
-            new SerializedDictionary<int, CharacterData.CharacterItem>()
-        };
-        List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> characterStatistics = new List<SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>
-        {
-            charactersDBSO.data[1].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[1].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[1].initialDataSO.CloneStatistics(),
-            charactersDBSO.data[1].initialDataSO.CloneStatistics()
-        };
         GameDataSlot newSlotData = new GameDataSlot
         {
             isUse = true,
             createdDate = DateTime.Now.ToString(),
             lastSaveDate = DateTime.Now.ToString(),
             currentZone = GameManager.TypeScene.CityScene,
-            characters = new SerializedDictionary<string, CharacterData>()
+            character = new CharacterData
             {
-                { randomNames[0], new CharacterData()
-                    {
-                        level = 1,
-                        name = randomNames[0],
-                        statistics = characterStatistics[0],
-                        equipments = new SerializedDictionary<ItemsDBSO.TypeModel, CharacterData.CharacterItem>()
+                level = 1,
+                name = charactersDBSO.GenerateFantasyName(),
+                statistics = charactersDBSO.data[1].initialDataSO.CloneStatistics(),
+                equipments = new SerializedDictionary<ItemsDBSO.TypeModel, CharacterData.CharacterItem>()
                         {
                             { ItemsDBSO.TypeModel.Boots, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Boots, 1) },
                             { ItemsDBSO.TypeModel.Front, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Front, 1) },
@@ -387,164 +348,54 @@ public class GameData : MonoBehaviour
                             { ItemsDBSO.TypeModel.Ring, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Ring, 1) },
                             { ItemsDBSO.TypeModel.Weapon, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Weapon, 1) },
                         },
-                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
+                fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
                         {
                             { 0, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 1, 3) },
                             { 1, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 2, 2) },
                             { 2, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 3, 1) },
                             { 3, itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 4, 1) }
                         },
-                        bag = bags[0],
-                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
+                bag = new SerializedDictionary<int, CharacterData.CharacterItem>(),
+                ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
                         {
                             {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
                             {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
                             {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
                             {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
                         },
-                        models = itemsDBSO.GenerateRandomModel()
-                    }
-                },
-                { randomNames[1], new CharacterData()
-                    {
-                        level = 1,
-                        name = randomNames[1],
-                        statistics = characterStatistics[1],
-                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
-                        {
-                            { 0, new CharacterData.CharacterItem() },
-                            { 1, new CharacterData.CharacterItem() },
-                            { 2, new CharacterData.CharacterItem() },
-                            { 3, new CharacterData.CharacterItem() }
-                        },
-                        bag = bags[1],
-                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
-                        {
-                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
-                        },
-                        models = itemsDBSO.GenerateRandomModel()
-                    }
-                },
-                { randomNames[2], new CharacterData()
-                    {
-                        level = 1,
-                        name = randomNames[2],
-                        statistics = characterStatistics[2],
-                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
-                        {
-                            { 0, new CharacterData.CharacterItem() },
-                            { 1, new CharacterData.CharacterItem() },
-                            { 2, new CharacterData.CharacterItem() },
-                            { 3, new CharacterData.CharacterItem() }
-                        },
-                        bag = bags[2],
-                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
-                        {
-                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
-                        },
-                        models = itemsDBSO.GenerateRandomModel()
-                    }
-                },
-                { randomNames[3], new CharacterData()
-                    {
-                        level = 1,
-                        name = randomNames[3],
-                        statistics = characterStatistics[3],
-                        fastItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
-                        {
-                            { 0, new CharacterData.CharacterItem() },
-                            { 1, new CharacterData.CharacterItem() },
-                            { 2, new CharacterData.CharacterItem() },
-                            { 3, new CharacterData.CharacterItem() }
-                        },
-                        bag = bags[3],
-                        ammo = new SerializedDictionary<int, CharacterData.CharacterItem>
-                        {
-                            {0, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {1, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
-                            {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
-                        },
-                        models = itemsDBSO.GenerateRandomModel()
-                    }
-                },
+                models = itemsDBSO.GenerateRandomModel()
             }
         };
 
-        foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
+        foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterData.CharacterItem> equipment in newSlotData.character.equipments)
         {
-            foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterData.CharacterItem> equipment in characterData.Value.equipments)
+            if (equipment.Value != null && equipment.Value?.itemId != 0)
             {
-                if (equipment.Value != null && equipment.Value?.itemId != 0)
-                {
-                    equipment.Value.itemBaseSO = itemsDBSO.data[equipment.Value.typeObject][equipment.Value.itemId];
-                    equipment.Value.itemBaseSO.EquipItem(characterData.Value, equipment.Value);
-                }
+                equipment.Value.itemBaseSO = itemsDBSO.data[equipment.Value.typeObject][equipment.Value.itemId];
+                equipment.Value.itemBaseSO.EquipItem(newSlotData.character, equipment.Value);
             }
         }
 
-        foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
+        foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in newSlotData.character.statistics)
         {
-            foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in characterData.Value.statistics)
+            if (statistic.Key != CharacterData.TypeStatistic.Exp)
             {
-                if (statistic.Key != CharacterData.TypeStatistic.Exp)
-                {
-                    statistic.Value.RefreshValue((int)statistic.Key);
-                    statistic.Value.SetMaxValue();
-                }
+                statistic.Value.RefreshValue((int)statistic.Key);
+                statistic.Value.SetMaxValue();
             }
         }
 
-        foreach (KeyValuePair<string, CharacterData> characterData in newSlotData.characters)
+        for (int i = 0; i < newSlotData.character.statistics[CharacterData.TypeStatistic.BagSpace].currentValue; i++)
         {
-            for (int i = 0; i < characterData.Value.statistics[CharacterData.TypeStatistic.BagSpace].currentValue; i++)
-            {
-                characterData.Value.bag.Add(i, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Bag));
-            }
+            newSlotData.character.bag.Add(i, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Bag));
         }
-        bags[0][0] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 1, 3);
-        bags[0][1] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 2, 2);
-        bags[0][2] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 3, 1);
-        bags[0][3] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Weapon, 2, 1);
-        bags[0][4] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Helmet, 1);
-        bags[0][5] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 5);
+        newSlotData.character.bag[0] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 1, 3);
+        newSlotData.character.bag[1] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 2, 2);
+        newSlotData.character.bag[2] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 3, 1);
+        newSlotData.character.bag[3] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Weapon, 2, 1);
+        newSlotData.character.bag[4] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Helmet, 1);
+        newSlotData.character.bag[5] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 5);
         return newSlotData;
-    }
-    public void SetStartingItems()
-    {
-        gameDataInfo.gameDataSlots[systemDataInfo.currentGameDataIndex].bagItems = new SerializedDictionary<int, CharacterData.CharacterItem>()
-        {
-            {0, new CharacterData.CharacterItem()},
-            {1, new CharacterData.CharacterItem()},
-            {2, new CharacterData.CharacterItem()},
-            {3, new CharacterData.CharacterItem()},
-            {4, new CharacterData.CharacterItem()},
-            {5, new CharacterData.CharacterItem()},
-            {6, new CharacterData.CharacterItem()},
-            {7, new CharacterData.CharacterItem()},
-            {8, new CharacterData.CharacterItem()},
-            {9, new CharacterData.CharacterItem()},
-            {10, new CharacterData.CharacterItem()},
-            {11, new CharacterData.CharacterItem()},
-            {12, new CharacterData.CharacterItem()},
-            {13, new CharacterData.CharacterItem()},
-            {14, new CharacterData.CharacterItem()},
-            {15, new CharacterData.CharacterItem()},
-        };
-    }
-    public void SetInitalPositions()
-    {
-        gameDataInfo.gameDataSlots[systemDataInfo.currentGameDataIndex].positionsSave = new SerializedDictionary<string, Vector3Int>()
-        {
-            { GameManager.TypeScene.CityScene.ToString(), new Vector3Int(0,0,0) },
-            { GameManager.TypeScene.TavernScene.ToString(), new Vector3Int(0,0,0) },
-        };
     }
     void SetStartingDataSound(ref SystemDataInfo dataInfo)
     {
@@ -625,8 +476,7 @@ public class GameData : MonoBehaviour
         public string lastSaveDate = "";
         public GameManager.TypeScene currentZone;
         public SerializedDictionary<string, Vector3Int> positionsSave = new SerializedDictionary<string, Vector3Int>();
-        public SerializedDictionary<int, CharacterData.CharacterItem> bagItems = new SerializedDictionary<int, CharacterData.CharacterItem>();
-        public SerializedDictionary<string, CharacterData> characters = new SerializedDictionary<string, CharacterData>();
+        public CharacterData character = new CharacterData();
     }
     [Serializable]
     public class ConfigurationsInfo
@@ -688,6 +538,7 @@ public class GameData : MonoBehaviour
     public class Utils
     {
         public SerializedDictionary<string, Color> systemColors = new SerializedDictionary<string, Color>();
+        public SerializedDictionary<string, GameObject> prefabs = new SerializedDictionary<string, GameObject>();
     }
     public enum TypeLanguage
     {

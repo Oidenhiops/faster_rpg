@@ -10,10 +10,10 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
         {
             if (statistic.Key != CharacterData.TypeStatistic.Cd)
             {
-                if (!characterToMakeEffect.charactersData[characterToMakeEffect.characterIndex].statistics[statistic.Key].buffValue.ContainsKey(this))
+                if (!characterToMakeEffect.characterData.statistics[statistic.Key].buffValue.ContainsKey(this))
                 {
-                    characterToMakeEffect.charactersData[characterToMakeEffect.characterIndex].statistics[statistic.Key].buffValue.Add(this, statistic.Value.baseValue);
-                    characterToMakeEffect.charactersData[characterToMakeEffect.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                    characterToMakeEffect.characterData.statistics[statistic.Key].buffValue.Add(this, statistic.Value.baseValue);
+                    characterToMakeEffect.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
                 }
             }
         }
@@ -30,10 +30,10 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
         {
             if (statistic.Key != CharacterData.TypeStatistic.Cd)
             {
-                if (characterToMakeEffect.charactersData[characterToMakeEffect.characterIndex].statistics[statistic.Key].buffValue.ContainsKey(this))
+                if (characterToMakeEffect.characterData.statistics[statistic.Key].buffValue.ContainsKey(this))
                 {
-                    characterToMakeEffect.charactersData[characterToMakeEffect.characterIndex].statistics[statistic.Key].buffValue.Remove(this);
-                    characterToMakeEffect.charactersData[characterToMakeEffect.characterIndex].statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                    characterToMakeEffect.characterData.statistics[statistic.Key].buffValue.Remove(this);
+                    characterToMakeEffect.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
                 }
             }
         }

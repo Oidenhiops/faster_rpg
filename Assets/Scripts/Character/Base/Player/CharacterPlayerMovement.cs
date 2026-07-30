@@ -25,20 +25,20 @@ public class CharacterPlayerMovement : CharacterMovementBase
             if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
             if (characterBase.directionMovement != Vector2.zero)
             {
-                directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
-                directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
+                directionFromCamera.x *= characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
+                directionFromCamera.z *= characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
             }
             else
             {
                 Vector3 launchDirection = characterBase.characterModel.modelTransform.forward;
                 launchDirection.y = 0;
-                directionFromCamera = launchDirection * (characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
+                directionFromCamera = launchDirection * (characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4);
             }
         }
         else if (!characterBase.isInCanalization)
         {
-            directionFromCamera.x *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * (characterBase.isRunning ? 1.5f : 1);
-            directionFromCamera.z *= characterBase.charactersData[characterBase.characterIndex].statistics[CharacterData.TypeStatistic.Spd].currentValue * (characterBase.isRunning ? 1.5f : 1);
+            directionFromCamera.x *= characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * (characterBase.isRunning ? 1.5f : 1);
+            directionFromCamera.z *= characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * (characterBase.isRunning ? 1.5f : 1);
         }
         else
         {
