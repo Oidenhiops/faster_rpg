@@ -24,13 +24,13 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
         }
         character.isInCanalization = false;
         character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), 0);
-        character.characterPlayerHud.RefreshFastItems();
         if (!cancelAction)
         {
             if (characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {
                 characterItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue--;
             }
+            character.characterPlayerHud.RefreshFastItems();
             statusEffectBaseSO.ApplyEffect(character);
             GameObject effectPrefab = Instantiate(skillVFXPrefab, character.transform.position, Quaternion.identity, character.transform);
             Destroy(effectPrefab, skillVFXDuration);
