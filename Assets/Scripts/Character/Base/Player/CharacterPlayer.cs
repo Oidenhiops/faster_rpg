@@ -113,7 +113,7 @@ public class CharacterPlayer : CharacterBase
                 characterData.fastItems[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) &&
                 characterData.fastItems[currentFastItemIndex].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0)
             {
-                characterData.fastItems[currentFastItemIndex].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(
+                _ = characterData.fastItems[currentFastItemIndex].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(
                     character: this,
                     characterItem: characterData.fastItems[currentFastItemIndex],
                     isFastItem: true

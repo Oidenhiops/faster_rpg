@@ -4,7 +4,7 @@ using UnityEngine;
 public class ConsumableSkillSO : ItemBaseSO
 {
     public SkillsBaseSO skillsBaseSO;
-    public override void UseItem(UseItemInfo useItemInfo)
+    public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
         if (skillsBaseSO)
         {

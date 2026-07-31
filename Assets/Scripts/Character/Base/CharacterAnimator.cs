@@ -12,7 +12,12 @@ public class CharacterAnimator : MonoBehaviour
     float animSpeed;
     public void HandleAnimation()
     {
-        if (characterBase.isInCanalization) return;
+        if (characterBase.isInCanalization)
+        {
+            animSpeed = Mathf.MoveTowards(characterBase.characterAnimator.GetFloat("speed"), 0, Time.deltaTime * 10f);
+            characterBase.characterAnimator.SetFloat("speed", animSpeed);
+            return;
+        }
         animSpeed = Mathf.MoveTowards(characterBase.characterAnimator.GetFloat("speed"), GetAnimationSpeed(), Time.deltaTime * 10f);
         characterBase.characterAnimator.SetFloat("speed", animSpeed);
         characterBase.characterAnimator.SetBool("isGrounded", characterBase.isGrounded);
@@ -22,15 +27,6 @@ public class CharacterAnimator : MonoBehaviour
         if (characterBase.directionMovement == Vector2.zero) return 0f;
         else if (characterBase.isRunning) return 1;
         else return 0.5f;
-    }
-    public string GetAnimationAttack()
-    {
-        characterBase.characterData.GetCurrentWeapon(out CharacterData.CharacterItem weapon);
-        if (weapon != null)
-        {
-            return weapon.itemBaseSO.animationName;
-        }
-        return "FistAttack";
     }
     public void MakeEffect(AnimationEffectsSO.TypeAnimationsEffects typeEffect)
     {

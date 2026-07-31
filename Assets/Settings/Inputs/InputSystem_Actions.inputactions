@@ -88,15 +88,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ChangeCharacter",
-                    "type": "Value",
-                    "id": "c341c5a3-44bd-4050-aed1-32008878e4d3",
-                    "expectedControlType": "Integer",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "ToggleInventory",
                     "type": "Button",
                     "id": "b8dcfa7d-bbb5-4da9-9993-30244c9a79de",
@@ -450,50 +441,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "47fc04a3-6fa8-4cc2-9dcc-1bb28f3958a5",
-                    "path": "<Keyboard>/1",
-                    "interactions": "",
-                    "processors": "Scale(factor=0)",
-                    "groups": "",
-                    "action": "ChangeCharacter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "24384434-e3f5-4e6c-94ce-2acaaaa7381f",
-                    "path": "<Keyboard>/2",
-                    "interactions": "",
-                    "processors": "Scale",
-                    "groups": "",
-                    "action": "ChangeCharacter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "35baaab7-9e12-4ecd-89ec-4d5535f461be",
-                    "path": "<Keyboard>/3",
-                    "interactions": "",
-                    "processors": "Scale(factor=2)",
-                    "groups": "",
-                    "action": "ChangeCharacter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "a6be0c98-96c1-4c8d-9173-23519fc5f001",
-                    "path": "<Keyboard>/4",
-                    "interactions": "",
-                    "processors": "Scale(factor=3)",
-                    "groups": "",
-                    "action": "ChangeCharacter",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

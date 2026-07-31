@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 160f0c11bcad4fb4b98016af2cfea0d1, type: 3}
-  m_Name: ConsumableItem3
+  m_Name: BasicMpPotion
   m_EditorClassIdentifier: Assembly-CSharp::ConsumableItemSO
   id: 3
   idText: 3
@@ -24,8 +24,10 @@ MonoBehaviour:
     occludedModels: 
   icon: {fileID: 1062106936, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 17
+  canalizationEffect: {fileID: 11400000, guid: e22915689f4a33e42bd3ab0f832772b0, type: 2}
   typeWeapon: 0
-  animationName: 
+  animationValueName: 1
+  animationValue: 3
   useEnergy: 0
   itemStatistics:
     _serializedList:

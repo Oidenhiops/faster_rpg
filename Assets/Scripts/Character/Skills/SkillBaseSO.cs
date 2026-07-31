@@ -13,7 +13,7 @@ public class SkillsBaseSO : ScriptableObject
     public string generalAnimationSkillName;
     public GameObject skillVFXPrefab;
     public float skillVFXDuration = 1f;
-    public CanalizationEffect canalizationEffect;
+    public StatusEffectBaseSO canalizationEffect;
     public SerializedDictionary<int, SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>> statistics = new SerializedDictionary<int, SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>>();
     public ItemBaseSO.TypeWeapon weaponForUseSkill;
     public virtual async Awaitable UseSkill(CharacterMakeSkillData characterMakeSkillData, int skillIndex) { Debug.LogError("UseSkill non implemented");}

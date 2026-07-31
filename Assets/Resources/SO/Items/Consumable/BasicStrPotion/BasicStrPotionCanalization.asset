@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3896cb0c26898be45be89b585bf6b201, type: 3}
-  m_Name: GeneralBuffSkillUtilityCanalizationEffect
+  m_Name: BasicStrPotionCanalization
   m_EditorClassIdentifier: Assembly-CSharp::CanalizationEffect
-  icon: {fileID: -754691181, guid: 27af2e198b6d9b248a9463cc96797d07, type: 3}
-  maxStack: 0
+  icon: {fileID: 1544862734, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
+  maxStack: 1
   statusEffectStatistics:
     _serializedList:
     - Key: 13
@@ -25,4 +25,3 @@ MonoBehaviour:
           _serializedList: []
         currentValue: 0
         maxValue: 0
-  canalizationAnimationName: Canalization

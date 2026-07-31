@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 160f0c11bcad4fb4b98016af2cfea0d1, type: 3}
-  m_Name: ConsumableItem1
+  m_Name: BasicStrPotion
   m_EditorClassIdentifier: Assembly-CSharp::ConsumableItemSO
   id: 1
   idText: 1
@@ -24,21 +24,14 @@ MonoBehaviour:
     occludedModels: 
   icon: {fileID: 1544862734, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 17
+  canalizationEffect: {fileID: 11400000, guid: add87433b4e6f7a4d9b626456c311ba7, type: 2}
   typeWeapon: 0
-  animationName: 
+  animationValueName: 1
+  animationValue: 3
   useEnergy: 0
   itemStatistics:
     _serializedList:
-    - Key: 1
-      Value:
-        baseValue: 10
-        aptitudeValue: 0
-        itemValue: 0
-        buffValue:
-          _serializedList: []
-        currentValue: 0
-        maxValue: 0
-    - Key: 2
+    - Key: 3
       Value:
         baseValue: 10
         aptitudeValue: 0

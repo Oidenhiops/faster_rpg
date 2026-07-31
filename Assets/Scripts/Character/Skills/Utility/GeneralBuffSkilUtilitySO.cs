@@ -7,32 +7,30 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
     public override async Awaitable UseSkill(CharacterBase character, CharacterData.CharacterItem characterItem)
     {
         float elapsedTime = 0f;
-        bool cancelSkill = false;
-        if (characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+        bool cancelAction = false;
+        character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), characterItem.itemBaseSO.animationValue);
+        character.isInCanalization = true;
+        character.AddStatusEffect(canalizationEffect);
+        while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
         {
-            characterItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue -= 1;
-        }
-        if (canalizationEffect != null)
-        {
-            character.characterAnimator.Play(canalizationEffect.canalizationAnimationName, -1, 0f);
-            character.isInCanalization = true;
-            character.AddStatusEffect(canalizationEffect);
-            while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
+            elapsedTime += Time.deltaTime;
+            if (character.cancelCanalization)
             {
-                elapsedTime += Time.deltaTime;
-                if (character.cancelCanalization)
-                {
-                    character.statusToRemove.Add(canalizationEffect);
-                    cancelSkill = true;
-                    break;
-                }
-                await Awaitable.NextFrameAsync();
+                character.statusToRemove.Add(canalizationEffect);
+                cancelAction = true;
+                break;
             }
-            character.isInCanalization = false;
+            await Awaitable.NextFrameAsync();
         }
+        character.isInCanalization = false;
+        character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), 0);
         character.characterPlayerHud.RefreshFastItems();
-        if (!cancelSkill)
+        if (!cancelAction)
         {
+            if (characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+            {
+                characterItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue--;
+            }
             statusEffectBaseSO.ApplyEffect(character);
             GameObject effectPrefab = Instantiate(skillVFXPrefab, character.transform.position, Quaternion.identity, character.transform);
             Destroy(effectPrefab, skillVFXDuration);

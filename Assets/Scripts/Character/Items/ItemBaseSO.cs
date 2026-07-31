@@ -10,8 +10,10 @@ public class ItemBaseSO : ScriptableObject
     public ItemModelInfo modelInfo;
     public Sprite icon;
     public ItemsDBSO.TypeModel typeObject;
+    public StatusEffectBaseSO canalizationEffect;
     public TypeWeapon typeWeapon;
-    public string animationName;
+    public TypeAnimationLayer animationValueName;
+    public int animationValue;
     public bool useEnergy;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
     public virtual async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem) { Debug.LogError("EquipItem not implemented"); }
@@ -83,7 +85,7 @@ public class ItemBaseSO : ScriptableObject
             characterData.models[occludedModel].occlude = false;
         }
     }
-    public virtual void UseItem(UseItemInfo useItemInfo) { Debug.LogError("UseItem not implemented"); }
+    public virtual async Awaitable UseItem(UseItemInfo useItemInfo) { Debug.LogError("UseItem not implemented"); }
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> CloneStatistics()
     {
         var clone = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
@@ -137,5 +139,11 @@ public class ItemBaseSO : ScriptableObject
         Axe = 5,
         Staff = 6,
         Monster = 7
+    }
+    public enum TypeAnimationLayer
+    {
+        Base = 0,
+        LeftHand = 1,
+        RightHand = 2
     }
 }
