@@ -2725,6 +2725,7 @@ GameObject:
   - component: {fileID: 207459724}
   - component: {fileID: 207459726}
   - component: {fileID: 207459725}
+  - component: {fileID: 207459727}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -2851,6 +2852,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207459723}
   m_CullTransparentMesh: 1
+--- !u!114 &207459727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207459723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 207459725}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &211714501
 GameObject:
   m_ObjectHideFlags: 0
@@ -4591,6 +4614,7 @@ GameObject:
   - component: {fileID: 318842495}
   - component: {fileID: 318842497}
   - component: {fileID: 318842496}
+  - component: {fileID: 318842498}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -4717,6 +4741,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 318842494}
   m_CullTransparentMesh: 1
+--- !u!114 &318842498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318842494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 318842496}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &326049585
 GameObject:
   m_ObjectHideFlags: 0
@@ -4896,8 +4942,8 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
-    width: 1
+    y: -0.27777776
+    width: 0.33333334
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
@@ -6091,6 +6137,7 @@ GameObject:
   - component: {fileID: 422297863}
   - component: {fileID: 422297865}
   - component: {fileID: 422297864}
+  - component: {fileID: 422297866}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -6217,6 +6264,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 422297862}
   m_CullTransparentMesh: 1
+--- !u!114 &422297866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422297862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 422297864}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &422535963
 GameObject:
   m_ObjectHideFlags: 0
@@ -6228,6 +6297,7 @@ GameObject:
   - component: {fileID: 422535964}
   - component: {fileID: 422535966}
   - component: {fileID: 422535965}
+  - component: {fileID: 422535967}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -6354,6 +6424,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 422535963}
   m_CullTransparentMesh: 1
+--- !u!114 &422535967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422535963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 422535965}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &430574338
 GameObject:
   m_ObjectHideFlags: 0
@@ -6554,6 +6646,7 @@ GameObject:
   - component: {fileID: 444134340}
   - component: {fileID: 444134342}
   - component: {fileID: 444134341}
+  - component: {fileID: 444134343}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -6680,6 +6773,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 444134339}
   m_CullTransparentMesh: 1
+--- !u!114 &444134343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 444134339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 444134341}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &449510433
 GameObject:
   m_ObjectHideFlags: 0
@@ -13062,6 +13177,7 @@ GameObject:
   - component: {fileID: 1061265089}
   - component: {fileID: 1061265091}
   - component: {fileID: 1061265090}
+  - component: {fileID: 1061265092}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -13188,6 +13304,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1061265088}
   m_CullTransparentMesh: 1
+--- !u!114 &1061265092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061265088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 1061265090}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &1078156350
 GameObject:
   m_ObjectHideFlags: 0
@@ -13779,6 +13917,7 @@ GameObject:
   - component: {fileID: 1112056945}
   - component: {fileID: 1112056947}
   - component: {fileID: 1112056946}
+  - component: {fileID: 1112056948}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -13905,6 +14044,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1112056944}
   m_CullTransparentMesh: 1
+--- !u!114 &1112056948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112056944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 1112056946}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &1120216170
 GameObject:
   m_ObjectHideFlags: 0
@@ -18143,6 +18304,7 @@ GameObject:
   - component: {fileID: 1449426826}
   - component: {fileID: 1449426828}
   - component: {fileID: 1449426827}
+  - component: {fileID: 1449426829}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -18269,6 +18431,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1449426825}
   m_CullTransparentMesh: 1
+--- !u!114 &1449426829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449426825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 1449426827}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &1461875786
 GameObject:
   m_ObjectHideFlags: 0
@@ -21570,6 +21754,7 @@ GameObject:
   - component: {fileID: 1742046239}
   - component: {fileID: 1742046241}
   - component: {fileID: 1742046240}
+  - component: {fileID: 1742046242}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -21696,6 +21881,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1742046238}
   m_CullTransparentMesh: 1
+--- !u!114 &1742046242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742046238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 1742046240}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &1756176662
 GameObject:
   m_ObjectHideFlags: 0
@@ -24360,6 +24567,7 @@ GameObject:
   - component: {fileID: 1974020650}
   - component: {fileID: 1974020652}
   - component: {fileID: 1974020651}
+  - component: {fileID: 1974020653}
   m_Layer: 5
   m_Name: StatisticValue
   m_TagString: Untagged
@@ -24486,6 +24694,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1974020649}
   m_CullTransparentMesh: 1
+--- !u!114 &1974020653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1974020649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15cd1cba1ac9c324684cd464c42c89f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextFx
+  target: {fileID: 1974020651}
+  effects: []
+  entrance: 1
+  exit: 1
+  entranceDuration: 0.22
+  charsPerSecond: 28
+  punctuationPause: 0.12
+  entranceDistance: 30
+  scaleWithFontSize: 1
+  useUnscaledTime: 1
 --- !u!1 &1980883484
 GameObject:
   m_ObjectHideFlags: 0

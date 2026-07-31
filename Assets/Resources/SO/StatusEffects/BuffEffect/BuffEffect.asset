@@ -18,14 +18,14 @@ MonoBehaviour:
     _serializedList:
     - Key: 4
       Value:
-        baseValue: 100
+        baseValue: -200
         aptitudeValue: 0
         itemValue: 0
         buffValue:
           _serializedList: []
         currentValue: 0
         maxValue: 0
-    - Key: 12
+    - Key: 13
       Value:
         baseValue: 10
         aptitudeValue: 0

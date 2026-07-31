@@ -121,14 +121,19 @@ public class CharacterPlayerHud : MonoBehaviour
         {
             if (characterPlayer.characterData.statistics.TryGetValue(statistic.Key, out CharacterData.Statistic stat))
             {
-                if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp)
+                if (statistic.Key == CharacterData.TypeStatistic.Hp || statistic.Key == CharacterData.TypeStatistic.Sp || statistic.Key == CharacterData.TypeStatistic.Str)
                 {
                     statistic.Value.text = $"{stat.currentValue}/{stat.maxValue}";
                 }
                 else
                 {
-                    float otherStatsValue = stat.currentValue;
-                    statistic.Value.text = stat.baseValue.ToString() + (otherStatsValue - stat.baseValue != 0 ? $" (+{otherStatsValue - stat.baseValue})" : "");
+                    bool hasStat = stat.currentValue - stat.baseValue != 0;
+                    bool sumStat = stat.currentValue - stat.baseValue > 0;
+                    statistic.Value.SetTextFx((stat.baseValue.ToString() + (hasStat ? sumStat ? $" (+{stat.currentValue - stat.baseValue})" : $" ({stat.currentValue - stat.baseValue})" : "")).ToString());
+                    statistic.Value.ApplyColor(
+                        new[] {hasStat ? sumStat ? $" (+{stat.currentValue - stat.baseValue})" : $" ({stat.currentValue - stat.baseValue})" : ""},
+                        new[] {hasStat ? sumStat ? Color.green : Color.red : Color.white}
+                    );
                 }
             }
         }
