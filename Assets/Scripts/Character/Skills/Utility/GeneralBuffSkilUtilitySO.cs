@@ -31,7 +31,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
                 characterItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue--;
             }
             character.characterPlayerHud.RefreshFastItems();
-            statusEffectBaseSO.ApplyEffect(character);
+            character.AddStatusEffect(statusEffectBaseSO);
             GameObject effectPrefab = Instantiate(skillVFXPrefab, character.transform.position, Quaternion.identity, character.transform);
             Destroy(effectPrefab, skillVFXDuration);
         }

@@ -9,7 +9,6 @@ public class ConsumableItemSO : ItemBaseSO
         float elapsedTime = 0f;
         bool cancelAction = false;
         useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), useItemInfo.characterItem.itemBaseSO.animationValue);
-        useItemInfo.character.isInCanalization = true;
         useItemInfo.character.AddStatusEffect(canalizationEffect);
         while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
         {
@@ -22,7 +21,6 @@ public class ConsumableItemSO : ItemBaseSO
             }
             await Awaitable.NextFrameAsync();
         }
-        useItemInfo.character.isInCanalization = false;
         useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), 0);
         if (!cancelAction)
         {

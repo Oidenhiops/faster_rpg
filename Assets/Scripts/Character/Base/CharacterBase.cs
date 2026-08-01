@@ -408,23 +408,7 @@ public class CharacterBase : MonoBehaviour
         else
         {
             statusEffects.Add(statusEffect, new StatusEffect(statusEffect));
-        }
-        characterPlayerHud?.AddStatusEffect(statusEffects[statusEffect]);
-
-        if (handleStatusEffectCoroutine == null)
-        {
-            handleStatusEffectCoroutine = StartCoroutine(HandleStatusEffect());
-        }
-    }
-    public void AddStatusEffect(int characterIndex, StatusEffectBaseSO statusEffect)
-    {
-        if (statusEffects.ContainsKey(statusEffect))
-        {
-            statusEffects[statusEffect].AppendStatusEffect();
-        }
-        else
-        {
-            statusEffects.Add(statusEffect, new StatusEffect(statusEffect));
+            statusEffect.ApplyEffect(this);
         }
         characterPlayerHud?.AddStatusEffect(statusEffects[statusEffect]);
 

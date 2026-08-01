@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3896cb0c26898be45be89b585bf6b201, type: 3}
+  m_Name: GeneralConsumableCanalization
+  m_EditorClassIdentifier: Assembly-CSharp::CanalizationEffectSO
+  icon: {fileID: -883870379, guid: 27af2e198b6d9b248a9463cc96797d07, type: 3}
+  maxStack: 1
+  statusEffectStatistics:
+    _serializedList:
+    - Key: 8
+      Value:
+        isPercentage: 1
+        baseValue: -75
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue: 0
+        buffValuePorcent:
+          _serializedList: []
+        _currentValue: 0
+        maxValue: 0
+    - Key: 13
+      Value:
+        isPercentage: 0
+        baseValue: 2
+        aptitudeValue: 0
+        itemValue: 0
+        buffValue: 0
+        buffValuePorcent:
+          _serializedList: []
+        _currentValue: 0
+        maxValue: 2

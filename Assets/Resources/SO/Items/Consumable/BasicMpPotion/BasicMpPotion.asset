@@ -24,29 +24,34 @@ MonoBehaviour:
     occludedModels: 
   icon: {fileID: 1062106936, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 17
-  canalizationEffect: {fileID: 11400000, guid: e22915689f4a33e42bd3ab0f832772b0, type: 2}
+  canalizationEffect: {fileID: 11400000, guid: 1c56c8a30dd302a4d9475035abebc371, type: 2}
   typeWeapon: 0
   animationValueName: 1
+  costPerUse: 0
   animationValue: 3
   useEnergy: 0
   itemStatistics:
     _serializedList:
     - Key: 2
       Value:
+        isPercentage: 0
         baseValue: 20
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 0
     - Key: 17
       Value:
+        isPercentage: 0
         baseValue: 0
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 5
   useEffectPrefab: {fileID: 2420060085027401915, guid: 193a1bdf70f3ef145936fb8e851712f0, type: 3}

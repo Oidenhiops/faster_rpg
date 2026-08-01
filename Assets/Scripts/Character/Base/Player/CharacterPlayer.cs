@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AYellowpaper.SerializedCollections;
@@ -16,6 +17,9 @@ public class CharacterPlayer : CharacterBase
     public bool isChangingCharacter;
     public bool isInventoryOpen;
     public CharacterPlayerCamera characterPlayerCamera;
+    public Coroutine recoverStrCoroutine;
+    [Tooltip("Segundos que tarda la barra de Str en pasar de 0 a maxValue.")]
+    public float strFullRecoverTime = 2f;
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
@@ -67,14 +71,6 @@ public class CharacterPlayer : CharacterBase
         }
         try
         {
-            await InitializeModels();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error initializing characters models: {ex.Message}");
-        }
-        try
-        {
             characterMovement.HandleInitialize();
         }
         catch (Exception ex)
@@ -90,11 +86,64 @@ public class CharacterPlayer : CharacterBase
         {
             Debug.LogError($"Error initializing characters dissolve: {ex.Message}");
         }
+        try
+        {
+            await InitializeModels();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters models: {ex.Message}");
+        }
+        try
+        {
+            await InitialiceActions();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters actions: {ex.Message}");
+        }
         isInitialize = true;
     }
     async Awaitable InitializeItems()
     {
         characterData.InitializeItems();
+    }
+    async Awaitable InitialiceActions()
+    {
+        characterData.statistics[CharacterData.TypeStatistic.Str].OnCurrentValueChanged = new Action(RecoverStr);
+    }
+    void RecoverStr()
+    {
+        if (recoverStrCoroutine != null) StopCoroutine(recoverStrCoroutine);
+        recoverStrCoroutine = StartCoroutine(HandleRecoverStr());
+    }
+    public IEnumerator HandleRecoverStr()
+    {
+        yield return new WaitForSeconds(2f);
+        CharacterData.Statistic str = characterData.statistics[CharacterData.TypeStatistic.Str];
+
+        if (strFullRecoverTime <= 0f)
+        {
+            str.currentValue = str.maxValue;
+            characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str);
+            yield break;
+        }
+
+        float accumulated = 0f;
+
+        while (str.currentValue < str.maxValue)
+        {
+            yield return null;
+
+            accumulated += Time.deltaTime * (str.maxValue / strFullRecoverTime);
+
+            if (accumulated < 1f) continue;
+
+            int points = Mathf.FloorToInt(accumulated);
+            accumulated -= points;
+            str.currentValue += points;
+            characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str, false);
+        }
     }
     public void OnHandleMoveCamera(InputAction.CallbackContext context)
     {
@@ -109,16 +158,17 @@ public class CharacterPlayer : CharacterBase
     {
         if (isInitialize && !isInventoryOpen && !isInCanalization && characterAnimator.GetFloat("RightHand") == 0)
         {
-            characterAnimator.SetFloat("RightHand", 0.1f);
             if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO)
             {
                 if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse >= 0)
                 {
+                    characterAnimator.SetFloat("RightHand", 0.1f);
                     _ = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
                 }
             }
             else if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - 1 >= 0)
             {
+                characterAnimator.SetFloat("RightHand", 0.1f);
                 _ = AwaitForHandAttack();
             }
         }

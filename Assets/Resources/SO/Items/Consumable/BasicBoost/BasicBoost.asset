@@ -24,47 +24,56 @@ MonoBehaviour:
     occludedModels: 
   icon: {fileID: -1917821749, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 17
-  canalizationEffect: {fileID: 11400000, guid: 14a97df3bbd56dc4cb2ae847d2c7c55a, type: 2}
+  canalizationEffect: {fileID: 11400000, guid: 1c56c8a30dd302a4d9475035abebc371, type: 2}
   typeWeapon: 0
   animationValueName: 1
+  costPerUse: 0
   animationValue: 2
   useEnergy: 1
   itemStatistics:
     _serializedList:
     - Key: 4
       Value:
+        isPercentage: 0
         baseValue: 10
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 0
     - Key: 13
       Value:
+        isPercentage: 0
         baseValue: 10
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 0
     - Key: 16
       Value:
+        isPercentage: 0
         baseValue: 5
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 0
     - Key: 17
       Value:
+        isPercentage: 0
         baseValue: 0
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 1
   skillsBaseSO: {fileID: 11400000, guid: 7f3fe7183eb82ec47ae2e8db055d0107, type: 2}

@@ -101,27 +101,39 @@ public class CharacterData
     [Serializable]
     public class Statistic
     {
+        public bool isPercentage = false;
         public float baseValue = 0;
         public float aptitudeValue = 0;
         public float itemValue = 0;
-        public SerializedDictionary<StatusEffectBaseSO, float> buffValue = new SerializedDictionary<StatusEffectBaseSO, float>();
+        public float buffValue = 0;
+        public SerializedDictionary<StatusEffectBaseSO, float> buffValuePorcent = new SerializedDictionary<StatusEffectBaseSO, float>();
+        public Action OnCurrentValueChanged;
         public float _currentValue = 0;
         public float currentValue
         {
             get => _currentValue;
-            set => _currentValue = Mathf.Clamp(value, 0, maxValue);
+            set
+            {
+                float previous = _currentValue;
+                _currentValue = Mathf.Clamp(value, 0, maxValue);
+                if (_currentValue < previous) OnCurrentValueChanged?.Invoke();
+            }
         }
         public float maxValue = 0;
         public void RefreshValue(int typeStatistic = 0)
         {
-            float baseWhitItem = baseValue + itemValue;
-            float totalBuffValue = 0;
-            foreach (KeyValuePair<StatusEffectBaseSO, float> buff in buffValue) totalBuffValue += buff.Value;
-            float baseWhitBuff = Mathf.CeilToInt(baseValue * totalBuffValue / 100);
-            float finalValue = Mathf.CeilToInt(baseWhitItem + baseWhitBuff);
+            float baseWhitItemAndBuff = baseValue + itemValue + buffValue;
+            float totalBuffValuePorcent = 0;
+            foreach (KeyValuePair<StatusEffectBaseSO, float> buff in buffValuePorcent) totalBuffValuePorcent += buff.Value;
+            float baseWhitBuff = Mathf.CeilToInt(baseWhitItemAndBuff * totalBuffValuePorcent / 100);
+            float finalValue = Mathf.CeilToInt(baseWhitItemAndBuff + baseWhitBuff);
             float whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
             maxValue = Mathf.Clamp(whitAptitude, 1, 99999);
             if (currentValue > maxValue) currentValue = maxValue;
+            if (typeStatistic == (int)TypeStatistic.Spd)
+            {
+                currentValue = maxValue;
+            }
         }
         public void SetMaxValue()
         {

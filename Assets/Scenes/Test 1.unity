@@ -3140,7 +3140,18 @@ MonoBehaviour:
     level: 0
     name: 
     statistics:
-      _serializedList: []
+      _serializedList:
+      - Key: 0
+        Value:
+          isPercentage: 0
+          baseValue: 0
+          aptitudeValue: 0
+          itemValue: 0
+          buffValue: 0
+          buffValuePorcent:
+            _serializedList: []
+          _currentValue: 0
+          maxValue: 0
     equipments:
       _serializedList:
       - Key: 9
@@ -3414,6 +3425,7 @@ MonoBehaviour:
   isChangingCharacter: 0
   isInventoryOpen: 0
   characterPlayerCamera: {fileID: 211714509}
+  strFullRecoverTime: 1
 --- !u!114 &211714511
 MonoBehaviour:
   m_ObjectHideFlags: 0
