@@ -22,8 +22,10 @@ MonoBehaviour:
     occludedModels: 
   icon: {fileID: -2075115643, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 13
+  canalizationEffect: {fileID: 0}
   typeWeapon: 0
-  animationName: 
+  animationValueName: 3
+  animationValue: 1
   useEnergy: 0
   itemStatistics:
     _serializedList:

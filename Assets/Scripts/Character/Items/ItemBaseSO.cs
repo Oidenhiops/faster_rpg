@@ -13,6 +13,7 @@ public class ItemBaseSO : ScriptableObject
     public StatusEffectBaseSO canalizationEffect;
     public TypeWeapon typeWeapon;
     public TypeAnimationLayer animationValueName;
+    public CharacterData.Statistic strStatistic;
     public int animationValue;
     public bool useEnergy;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();
@@ -105,6 +106,14 @@ public class ItemBaseSO : ScriptableObject
 
         return clone;
     }
+    public string GetHandLayer(TypeAnimationLayer typeAnimationLayer, bool isFastItem)
+    {
+        if (typeAnimationLayer == TypeAnimationLayer.DecideByHand)
+        {
+            return !isFastItem ? TypeAnimationLayer.RightHand.ToString() : TypeAnimationLayer.LeftHand.ToString();
+        }
+        else return typeAnimationLayer.ToString();
+    }
     [Serializable]
     public class ItemModelInfo
     {
@@ -144,6 +153,7 @@ public class ItemBaseSO : ScriptableObject
     {
         Base = 0,
         LeftHand = 1,
-        RightHand = 2
+        RightHand = 2,
+        DecideByHand = 3
     }
 }

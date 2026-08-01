@@ -28,4 +28,38 @@ public class EquipableItemSO : ItemBaseSO
         }
         DesEquipModelItem(character, characterItem, true, isFastItem);
     }
+    public override async Awaitable UseItem(UseItemInfo useItemInfo)
+    {
+        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
+        while (true)
+        {
+            if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(2).IsName("RightHand") ||
+                useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(1).IsName("LeftHand"))
+            {
+                break;
+            }
+            await Awaitable.NextFrameAsync();
+        }
+        while (true)
+        {
+            if (!useItemInfo.isFastItem)
+            {
+                if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(2).normalizedTime > 0.9)
+                {
+                    Debug.Log("RightHand finish animation");
+                    break;
+                }
+            }
+            else
+            {
+                if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime > 0.9)
+                {
+                    Debug.Log("LeftHand finish animation");
+                    break;
+                }                
+            }
+            await Awaitable.NextFrameAsync();
+        }
+        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), 0);
+    }
 }

@@ -27,6 +27,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.MoveCamera.performed += OnHandleMoveCamera;
         inputActions.Player.MoveCamera.canceled += OnHandleMoveCamera;
         inputActions.Player.SetFreeCamera.performed += OnHandleSetFreeCamera;
+        inputActions.Player.Attack.performed += OnHandleAttack;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -94,6 +95,34 @@ public class CharacterPlayer : CharacterBase
     public void OnHandleSetFreeCamera(InputAction.CallbackContext context)
     {
         characterPlayerCamera.OnHandleSetFreeCamera(context);
+    }
+    public void OnHandleAttack(InputAction.CallbackContext context)
+    {
+        if (isInitialize && !isInventoryOpen && !isInCanalization && !characterAnimator.GetCurrentAnimatorStateInfo(1).IsName("RightHand"))
+        {
+            if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO && characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.strStatistic.baseValue >= 0)
+            {
+                _ = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
+            }
+            else if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - 1 >= 0)
+            {
+                _= AwaitForHandAttack();
+            }
+        }
+    }
+    async Awaitable AwaitForHandAttack()
+    {
+        characterAnimator.SetFloat("RightHand", 1);
+        await Awaitable.NextFrameAsync();
+        while (true)
+        {
+            if (!characterAnimator.GetCurrentAnimatorStateInfo(2).IsName("RightHand"))
+            {
+                Debug.Log("RightHand finish animation");
+                break;
+            }
+        }
+        characterAnimator.SetFloat("RightHand", 0);
     }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {

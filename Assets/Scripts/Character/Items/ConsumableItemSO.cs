@@ -14,7 +14,7 @@ public class ConsumableItemSO : ItemBaseSO
         while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
         {
             elapsedTime += Time.deltaTime;
-            if (useItemInfo.character.cancelCanalization)
+            if (useItemInfo.character.cancelActions)
             {
                 useItemInfo.character.statusToRemove.Add(canalizationEffect);
                 cancelAction = true;

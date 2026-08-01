@@ -31,13 +31,13 @@ public class CharacterBase : MonoBehaviour
     public bool isDashing;
     public bool isRunning;
     public bool isInCanalization;
-    public bool _cancelCanalization;
-    public bool cancelCanalization
+    public bool _cancelActions;
+    public bool cancelActions
     {
-        get => _cancelCanalization;
+        get => _cancelActions;
         set
         {
-            _cancelCanalization = value;
+            _cancelActions = value;
             if (value)
             {
                 StartCoroutine(ResetCancelCanalization());
@@ -430,7 +430,7 @@ public class CharacterBase : MonoBehaviour
     IEnumerator ResetCancelCanalization()
     {
         yield return null;
-        cancelCanalization = false;
+        cancelActions = false;
     }
     [Serializable]
     public class CharacterModelData

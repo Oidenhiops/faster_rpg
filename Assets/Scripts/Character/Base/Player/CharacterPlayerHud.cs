@@ -288,6 +288,10 @@ public class CharacterPlayerHud : MonoBehaviour
         SetAnchorPreset(characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.TopRight);
         SetAnchorPreset(characterUI.itemDescription.descriptionTextTransform, AnchorPreset.TopLeft);
     }
+    public void ChangeBar(CharacterData.TypeStatistic typeBar)
+    {
+        
+    }
     public void ResetDescription()
     {
         characterUI.itemDescription.descriptionCanvasGroup.alpha = 0;
@@ -347,6 +351,7 @@ public class CharacterPlayerHud : MonoBehaviour
         public SerializedDictionary<int, InventorySlot> ammoInventory = new SerializedDictionary<int, InventorySlot>();
         public SerializedDictionary<CharacterData.TypeStatistic, TMP_Text> statistics = new SerializedDictionary<CharacterData.TypeStatistic, TMP_Text>();
         public SerializedDictionary<int, SkillUi> skills = new SerializedDictionary<int, SkillUi>();
+        public SerializedDictionary<CharacterData.TypeStatistic, BarsInfo> bars = new SerializedDictionary<CharacterData.TypeStatistic, BarsInfo>();
         public StatusEffectUI statusEffectUI;
         public InteractableUI interactables;
         public ItemDescription itemDescription;
@@ -402,6 +407,15 @@ public class CharacterPlayerHud : MonoBehaviour
         public Transform statusEffectContainer;
         public GameObject statusEffectPrefab;
         public SerializedDictionary<StatusEffectBaseSO, StatusEffectBanner> statusEffectsBanners = new SerializedDictionary<StatusEffectBaseSO, StatusEffectBanner>();
+    }
+    [Serializable]
+    public class BarsInfo
+    {
+        public Transform gameObjectBar;
+        public Image delayBar;
+        public Image plainBar;
+        public Image flashBar;
+        public TMP_Text textBar;
     }
     public enum AnchorPreset
     {
