@@ -349,6 +349,7 @@ public class CharacterBase : MonoBehaviour
     {
         foreach (StatusEffectBaseSO status in statusToRemove)
         {
+            status.RemoveEffect(this);
             statusEffects.Remove(status);
             Destroy(characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status].gameObject);
             characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners.Remove(status);

@@ -154,7 +154,9 @@ public class CharacterPlayer : CharacterBase
         {
             if (!characterData.fastItems[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) || 
                 characterData.fastItems[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) &&
-                characterData.fastItems[currentFastItemIndex].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0)
+                characterData.fastItems[currentFastItemIndex].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 &&
+                (characterData.fastItems[currentFastItemIndex].itemBaseSO.costPerUse == 0 || 
+                characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.fastItems[currentFastItemIndex].itemBaseSO.costPerUse >= 0))
             {
                 _ = characterData.fastItems[currentFastItemIndex].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(
                     character: this,
