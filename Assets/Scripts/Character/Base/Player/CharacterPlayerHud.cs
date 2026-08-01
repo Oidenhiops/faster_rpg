@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using AYellowpaper.SerializedCollections;
 using TMPro;
 using UnityEngine;
@@ -56,6 +57,14 @@ public class CharacterPlayerHud : MonoBehaviour
 
             { AnchorPreset.StretchFull, (new Vector2(0, 0), new Vector2(1, 1)) },
         };
+    public async Awaitable InitializeBars()
+    {
+        foreach (KeyValuePair<CharacterData.TypeStatistic, BarsInfo> bar in characterUI.bars)
+        {
+            ChangeBar(bar.Key, false);
+        }
+        await Awaitable.NextFrameAsync();
+    }
     public async Awaitable InitializeInventory()
     {
         foreach (var equipment in characterUI.equipments)
@@ -72,6 +81,18 @@ public class CharacterPlayerHud : MonoBehaviour
         }
         SelectFastItem();
         await RefreshCharacterInventory();
+    }
+    [NaughtyAttributes.Button]
+    public void HpBarPlus()
+    {
+        characterPlayer.characterData.statistics[CharacterData.TypeStatistic.Hp].currentValue += 10;
+        ChangeBar(CharacterData.TypeStatistic.Hp);
+    }
+    [NaughtyAttributes.Button]
+    public void HpBarDiscount()
+    {
+        characterPlayer.characterData.statistics[CharacterData.TypeStatistic.Hp].currentValue -= 10;
+        ChangeBar(CharacterData.TypeStatistic.Hp);
     }
     public async Awaitable ToggleCharacterInventory()
     {
@@ -288,9 +309,25 @@ public class CharacterPlayerHud : MonoBehaviour
         SetAnchorPreset(characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.TopRight);
         SetAnchorPreset(characterUI.itemDescription.descriptionTextTransform, AnchorPreset.TopLeft);
     }
-    public void ChangeBar(CharacterData.TypeStatistic typeBar)
+    /// <summary>
+    /// Refresca una barra del HUD. Con animate = false se coloca en su valor sin animar
+    /// (util al inicializar el HUD o al cargar partida).
+    /// </summary>
+    public void ChangeBar(CharacterData.TypeStatistic typeBar, bool animate = true)
     {
-        
+        if (!characterUI.bars.TryGetValue(typeBar, out BarsInfo bar)) return;
+        if (!characterPlayer.characterData.statistics.TryGetValue(typeBar, out CharacterData.Statistic stat)) return;
+
+        float ratio = stat.maxValue <= 0f ? 0f : stat.currentValue / stat.maxValue;
+
+        if (animate) bar.Play(ratio, destroyCancellationToken);
+        else bar.SetInstant(ratio);
+
+        if (bar.textBar)
+        {
+            bar.textBar.SetTextFx($"{stat.currentValue} / {stat.maxValue}");
+            if (animate) bar.textBar.PlayEffect(TextFxType.Wave);
+        }
     }
     public void ResetDescription()
     {
@@ -416,6 +453,163 @@ public class CharacterPlayerHud : MonoBehaviour
         public Image plainBar;
         public Image flashBar;
         public TMP_Text textBar;
+
+        [Header("Animacion")]
+        [Tooltip("Segundos que tarda la barra principal en llegar al valor nuevo.")]
+        public float plainDuration = 0.25f;
+
+        [Tooltip("Espera antes de que la barra de retardo empiece a moverse.")]
+        public float delayWait = 0.4f;
+
+        [Tooltip("Segundos que tarda la barra de retardo en alcanzar a la principal.")]
+        public float delayDuration = 0.45f;
+
+        [Tooltip("Color del flash. Su alpha es el valor de arranque.")]
+        public Color flashColor = Color.white;
+
+        [Tooltip("Segundos que tarda el flash en apagarse.")]
+        public float flashDuration = 0.18f;
+
+        [Tooltip("Ignorar Time.timeScale (la barra sigue animando con el juego en pausa).")]
+        public bool useUnscaledTime = false;
+
+        /// <summary>Cancela las animaciones anteriores de ESTA barra: cada llamada invalida la previa.</summary>
+        private int token;
+
+        private float Delta => useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+
+        /// <summary>Coloca la barra en su valor sin animar (inicializacion, cargar partida, etc).</summary>
+        public void SetInstant(float ratio)
+        {
+            token++;
+            ratio = Mathf.Clamp01(ratio);
+
+            if (plainBar) plainBar.fillAmount = ratio;
+            if (delayBar) delayBar.fillAmount = ratio;
+            if (flashBar) flashBar.color = WithAlpha(flashColor, 0f);
+        }
+
+        /// <summary>
+        /// Anima la barra hasta el nuevo valor: la principal se mueve ya, la de retardo espera
+        /// un momento y luego la alcanza, y el flash hace un destello que se apaga.
+        /// </summary>
+        public void Play(float ratio, CancellationToken ct)
+        {
+            ratio = Mathf.Clamp01(ratio);
+            int myToken = ++token;
+
+            _ = AnimatePlain(myToken, ratio, ct);
+            _ = AnimateDelay(myToken, ratio, ct);
+            _ = AnimateFlash(myToken, ct);
+        }
+
+        private async Awaitable AnimatePlain(int myToken, float target, CancellationToken ct)
+        {
+            if (plainBar == null) return;
+
+            float from = plainBar.fillAmount;
+            if (Mathf.Approximately(from, target) || plainDuration <= 0f)
+            {
+                plainBar.fillAmount = target;
+                return;
+            }
+
+            try
+            {
+                float t = 0f;
+                while (t < 1f)
+                {
+                    t += Delta / plainDuration;
+                    plainBar.fillAmount = Mathf.Lerp(from, target, EaseOutCubic(Mathf.Clamp01(t)));
+
+                    await Awaitable.NextFrameAsync(ct);
+                    if (myToken != token || plainBar == null) return; // llego otro cambio de valor
+                }
+
+                plainBar.fillAmount = target;
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        private async Awaitable AnimateDelay(int myToken, float target, CancellationToken ct)
+        {
+            if (delayBar == null) return;
+
+            float from = delayBar.fillAmount;
+
+            // Al curar no hay nada que "drenar": la barra de retardo se pone ya en el valor
+            // nuevo para que no tape a la principal mientras sube.
+            if (from <= target + 0.0001f)
+            {
+                delayBar.fillAmount = target;
+                return;
+            }
+
+            try
+            {
+                if (delayWait > 0f)
+                {
+                    await Awaitable.WaitForSecondsAsync(delayWait, ct);
+                    if (myToken != token || delayBar == null) return;
+                }
+
+                if (delayDuration <= 0f)
+                {
+                    delayBar.fillAmount = plainBar ? plainBar.fillAmount : target;
+                    return;
+                }
+
+                float t = 0f;
+                while (t < 1f)
+                {
+                    t += Delta / delayDuration;
+
+                    // Persigue el valor VIVO de la principal, no una foto: si la principal
+                    // todavia se esta moviendo las dos acaban juntas.
+                    float live = plainBar ? plainBar.fillAmount : target;
+                    delayBar.fillAmount = Mathf.Lerp(from, live, EaseOutCubic(Mathf.Clamp01(t)));
+
+                    await Awaitable.NextFrameAsync(ct);
+                    if (myToken != token || delayBar == null) return;
+                }
+
+                delayBar.fillAmount = plainBar ? plainBar.fillAmount : target;
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        private async Awaitable AnimateFlash(int myToken, CancellationToken ct)
+        {
+            if (flashBar == null) return;
+
+            flashBar.color = flashColor;
+
+            if (flashDuration <= 0f)
+            {
+                flashBar.color = WithAlpha(flashColor, 0f);
+                return;
+            }
+
+            try
+            {
+                float t = 0f;
+                while (t < 1f)
+                {
+                    t += Delta / flashDuration;
+                    flashBar.color = WithAlpha(flashColor, flashColor.a * (1f - Mathf.Clamp01(t)));
+
+                    await Awaitable.NextFrameAsync(ct);
+                    if (myToken != token || flashBar == null) return;
+                }
+
+                flashBar.color = WithAlpha(flashColor, 0f);
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        private static Color WithAlpha(Color c, float a) => new Color(c.r, c.g, c.b, a);
+
+        private static float EaseOutCubic(float t) => 1f - Mathf.Pow(1f - t, 3f);
     }
     public enum AnchorPreset
     {

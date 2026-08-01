@@ -73,6 +73,40 @@ public static class TextFxExtensions
         return fx;
     }
 
+    /// <summary>
+    /// Aplica el efecto y lo programa para que se quite tras N oscilaciones completas.
+    /// </summary>
+    public static TextFx PlayEffect(this TMP_Text label, TextFxType type, int cycles = 1, int from = -1, int to = -1)
+    {
+        TextFx fx = label.Fx();
+        fx.PlayEffect(type, cycles, from, to);
+        return fx;
+    }
+
+    /// <summary>Los efectos de ese tipo se quitan al cerrar su oscilacion en curso.</summary>
+    public static TextFx StopEffectsAfterFinish(this TMP_Text label, TextFxType type, int cycles = 1)
+    {
+        TextFx fx = label.Fx();
+        fx.StopEffectsAfterFinish(type, cycles);
+        return fx;
+    }
+
+    /// <summary>Todos los efectos activos se quitan al cerrar su oscilacion en curso.</summary>
+    public static TextFx StopEffectsAfterFinish(this TMP_Text label, int cycles = 1)
+    {
+        TextFx fx = label.Fx();
+        fx.StopEffectsAfterFinish(cycles);
+        return fx;
+    }
+
+    /// <summary>El efecto vive los segundos indicados y luego termina cerrando su ciclo.</summary>
+    public static TextFx StopEffectAfter(this TMP_Text label, TextFxType type, float seconds, bool finishCycle = true)
+    {
+        TextFx fx = label.Fx();
+        fx.StopEffectAfter(type, seconds, finishCycle);
+        return fx;
+    }
+
     /// <summary>Contorno del label completo (no admite rango: es una propiedad del material).</summary>
     public static TextFx ApplyOutline(this TMP_Text label, Color color, float width = 0.2f)
     {

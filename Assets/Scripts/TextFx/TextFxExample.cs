@@ -78,6 +78,20 @@ public class TextFxExample : MonoBehaviour
         Label.Fx().ApplyEffect(fx);
     }
 
+    [Button("6b. Efecto finito (se para solo)", EButtonEnableMode.Playmode)]
+    private void EfectoFinito()
+    {
+        Label.SetTextFx("120 / 200");
+
+        // Una sola oscilacion y el efecto se quita solo.
+        Label.ApplyEffect(TextFxType.Wave);
+        Label.StopEffectsAfterFinish(TextFxType.Wave);
+
+        // Equivalente en una linea: Label.PlayEffect(TextFxType.Wave);
+        // Tres oscilaciones:        Label.PlayEffect(TextFxType.Wave, 3);
+        // Por tiempo:              Label.StopEffectAfter(TextFxType.Shake, 0.5f);
+    }
+
     // ---------------------------------------------------------------- typewriter
 
     [Button("7. Typewriter (letra por letra)", EButtonEnableMode.Playmode)]

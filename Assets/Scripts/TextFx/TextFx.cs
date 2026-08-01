@@ -65,6 +65,9 @@ public class TextFx : MonoBehaviour
     /// <summary>Se dispara cada vez que el typewriter revela una letra. Util para SFX.</summary>
     public event Action<int> OnCharacterRevealed;
 
+    /// <summary>Se dispara cuando un efecto termina su ciclo de vida y se quita solo.</summary>
+    public event Action<TextFxInstance> OnEffectFinished;
+
     /// <summary>Momento en que cada letra fue revelada. -1 = todavia oculta.</summary>
     private float[] revealAt = Array.Empty<float>();
 
@@ -152,6 +155,7 @@ public class TextFx : MonoBehaviour
         if (target == null) return;
         if (geometryDirty) CacheGeometry();
 
+        UpdateEffectLifetimes(Now);
         UpdateOutline();
 
         if (textInfo == null || textInfo.characterCount == 0) return;
@@ -170,6 +174,70 @@ public class TextFx : MonoBehaviour
         }
 
         ApplyToMesh();
+    }
+
+    /// <summary>
+    /// Avanza el ciclo de vida de los efectos: cierra la oscilacion en curso, hace la rampa
+    /// final y quita del listado los que ya terminaron.
+    /// </summary>
+    private void UpdateEffectLifetimes(float time)
+    {
+        for (int e = effects.Count - 1; e >= 0; e--)
+        {
+            TextFxInstance fx = effects[e];
+            if (fx == null)
+            {
+                effects.RemoveAt(e);
+                continue;
+            }
+
+            // Los efectos puestos desde el inspector no pasan por ApplyEffect().
+            if (fx.startTime < 0f) fx.startTime = time;
+
+            if (!fx.IsStopping)
+            {
+                fx.weight = 1f;
+                continue;
+            }
+
+            float end = EffectEndTime(fx);
+
+            if (time < end)
+            {
+                fx.weight = 1f;
+                continue;
+            }
+
+            // Rampa final: los efectos con desfase entre letras (frequency != 0) nunca vuelven
+            // todos a la vez a su posicion base, asi que se apagan interpolando.
+            if (fx.fadeOut > 0f)
+            {
+                float t = (time - end) / fx.fadeOut;
+                if (t < 1f)
+                {
+                    fx.weight = 1f - t;
+                    continue;
+                }
+            }
+
+            fx.weight = 0f;
+            effects.RemoveAt(e);
+            OnEffectFinished?.Invoke(fx);
+        }
+    }
+
+    /// <summary>Momento en que el efecto deja de animar (ya redondeado al final de su ciclo).</summary>
+    private static float EffectEndTime(TextFxInstance fx)
+    {
+        if (!fx.finishCycle) return fx.stopAt;
+
+        float period = fx.CyclePeriod;
+        if (period <= 0f) return fx.stopAt; // Shake / Outline: no hay ciclo que cerrar
+
+        // Ciclos completos desde el arranque, respetando el minimo pedido.
+        float wanted = Mathf.Max(fx.stopAt - fx.startTime, Mathf.Max(0, fx.stopCycles) * period);
+        float cycles = Mathf.Ceil(wanted / period - 0.0001f);
+        return fx.startTime + cycles * period;
     }
 
     /// <summary>
@@ -205,7 +273,7 @@ public class TextFx : MonoBehaviour
         }
 
         Color c = outlineFx.color;
-        float w = Mathf.Clamp01(outlineFx.amplitude);
+        float w = Mathf.Clamp01(outlineFx.amplitude) * Mathf.Clamp01(outlineFx.weight);
 
         if (outlineApplied && lastOutlineColor == c && Mathf.Approximately(lastOutlineWidth, w)) return;
 
@@ -377,7 +445,8 @@ public class TextFx : MonoBehaviour
         ref Vector3 offset, ref float scale, ref float rotation, ref Color color, ref float alphaMul)
     {
         float phase = time * fx.speed + i * fx.frequency;
-        float amp = fx.amplitude;
+        float amp = fx.amplitude * Mathf.Clamp01(fx.weight);
+        if (amp == 0f && fx.type != TextFxType.Outline) return;
 
         switch (fx.type)
         {
@@ -564,6 +633,7 @@ public class TextFx : MonoBehaviour
     public TextFxInstance ApplyEffect(TextFxType type, int from = -1, int to = -1)
     {
         TextFxInstance fx = TextFxInstance.Default(type, from, to);
+        fx.startTime = Now;
         effects.Add(fx);
         return fx;
     }
@@ -588,8 +658,97 @@ public class TextFx : MonoBehaviour
     /// <summary>Agrega un efecto ya configurado (util para tunear amplitud/velocidad).</summary>
     public TextFxInstance ApplyEffect(TextFxInstance fx)
     {
-        if (fx != null) effects.Add(fx);
+        if (fx == null) return null;
+        fx.startTime = Now;
+        fx.weight = 1f;
+        effects.Add(fx);
         return fx;
+    }
+
+    /// <summary>
+    /// Aplica el efecto y lo deja programado para quitarse tras N oscilaciones completas.
+    /// Atajo de ApplyEffect + StopEffectsAfterFinish.
+    /// </summary>
+    public TextFxInstance PlayEffect(TextFxType type, int cycles = 1, int from = -1, int to = -1)
+    {
+        TextFxInstance fx = ApplyEffect(type, from, to);
+        StopEffectAfterFinish(fx, cycles);
+        return fx;
+    }
+
+    // ---------------------------------------------------------------- parar efectos
+
+    /// <summary>
+    /// Marca los efectos de ese tipo para que se quiten al cerrar su oscilacion en curso,
+    /// en lugar de cortarse en seco a mitad de movimiento.
+    /// </summary>
+    /// <param name="cycles">Minimo de oscilaciones completas contadas desde que arranco el efecto.</param>
+    public void StopEffectsAfterFinish(TextFxType type, int cycles = 1)
+    {
+        for (int e = 0; e < effects.Count; e++)
+            if (effects[e] != null && effects[e].type == type)
+                StopEffectAfterFinish(effects[e], cycles);
+    }
+
+    /// <summary>Igual que StopEffectsAfterFinish pero para todos los efectos activos.</summary>
+    public void StopEffectsAfterFinish(int cycles = 1)
+    {
+        for (int e = 0; e < effects.Count; e++)
+            StopEffectAfterFinish(effects[e], cycles);
+    }
+
+    /// <summary>Igual que StopEffectsAfterFinish pero para los efectos con ese id.</summary>
+    public void StopEffectsAfterFinish(string id, int cycles = 1)
+    {
+        for (int e = 0; e < effects.Count; e++)
+            if (effects[e] != null && effects[e].id == id)
+                StopEffectAfterFinish(effects[e], cycles);
+    }
+
+    /// <summary>Programa el final de una instancia concreta.</summary>
+    public void StopEffectAfterFinish(TextFxInstance fx, int cycles = 1)
+    {
+        if (fx == null || fx.IsStopping) return; // ya estaba terminando: no reiniciar la cuenta
+        if (fx.startTime < 0f) fx.startTime = Now;
+        fx.stopCycles = cycles;
+        fx.finishCycle = true;
+        fx.stopAt = Now;
+    }
+
+    /// <summary>
+    /// El efecto sigue vivo los segundos indicados y luego termina.
+    /// Con finishCycle = true espera ademas a cerrar la oscilacion en curso.
+    /// </summary>
+    public void StopEffectAfter(TextFxType type, float seconds, bool finishCycle = true)
+    {
+        for (int e = 0; e < effects.Count; e++)
+        {
+            TextFxInstance fx = effects[e];
+            if (fx == null || fx.type != type || fx.IsStopping) continue;
+            if (fx.startTime < 0f) fx.startTime = Now;
+            fx.stopCycles = 0;
+            fx.finishCycle = finishCycle;
+            fx.stopAt = Now + Mathf.Max(0f, seconds);
+        }
+    }
+
+    /// <summary>True si algun efecto de ese tipo sigue animando (aunque ya este apagandose).</summary>
+    public bool HasEffect(TextFxType type)
+    {
+        for (int e = 0; e < effects.Count; e++)
+            if (effects[e] != null && effects[e].type == type) return true;
+        return false;
+    }
+
+    /// <summary>Espera a que no quede ningun efecto activo. Util tras PlayEffect().</summary>
+    public async Awaitable WaitForEffects()
+    {
+        try
+        {
+            while (effects.Count > 0)
+                await Awaitable.NextFrameAsync(destroyCancellationToken);
+        }
+        catch (OperationCanceledException) { }
     }
 
     /// <summary>

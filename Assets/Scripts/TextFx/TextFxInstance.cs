@@ -31,6 +31,56 @@ public class TextFxInstance
     /// <summary>Identificador opcional para poder quitar el efecto luego con RemoveEffect(id).</summary>
     [HideInInspector] public string id;
 
+    // ------------------------------------------------------------ ciclo de vida
+
+    /// <summary>Momento en que el efecto entro en juego. -1 = lo pone TextFx en el primer frame.</summary>
+    [HideInInspector] public float startTime = -1f;
+
+    /// <summary>Momento a partir del cual el efecto debe terminar. -1 = infinito.</summary>
+    [HideInInspector] public float stopAt = -1f;
+
+    /// <summary>Minimo de oscilaciones completas antes de terminar (solo si stopAt >= 0).</summary>
+    [HideInInspector] public int stopCycles = 1;
+
+    /// <summary>Si es true espera a cerrar la oscilacion en curso antes de apagarse.</summary>
+    [HideInInspector] public bool finishCycle = true;
+
+    /// <summary>Rampa final para volver a la posicion base sin salto. 0 = corte seco.</summary>
+    [HideInInspector] public float fadeOut = 0.12f;
+
+    /// <summary>Peso interno 0..1 que usa la rampa final. No tocar a mano.</summary>
+    [HideInInspector] public float weight = 1f;
+
+    /// <summary>True si ya se le pidio terminar.</summary>
+    public bool IsStopping => stopAt >= 0f;
+
+    /// <summary>Duracion de una oscilacion completa en segundos. 0 = el efecto no es ciclico.</summary>
+    public float CyclePeriod
+    {
+        get
+        {
+            float s = Mathf.Abs(speed);
+            if (s <= 0.0001f) return 0f;
+
+            switch (type)
+            {
+                case TextFxType.Wave:
+                case TextFxType.Wiggle:
+                case TextFxType.Bounce:
+                case TextFxType.Pulse:
+                case TextFxType.Swing:
+                case TextFxType.Blink:
+                    return 2f * Mathf.PI / s;
+
+                case TextFxType.Rainbow:
+                    return 1f / s;
+
+                default:
+                    return 0f; // Shake (ruido) y Outline (estatico) no tienen ciclo
+            }
+        }
+    }
+
     /// <summary>True si esta letra entra en el rango del efecto.</summary>
     public bool Covers(int charIndex, int totalChars)
     {
@@ -51,6 +101,9 @@ public class TextFxInstance
             frequency = frequency,
             color = color,
             id = id,
+            stopCycles = stopCycles,
+            finishCycle = finishCycle,
+            fadeOut = fadeOut,
         };
     }
 

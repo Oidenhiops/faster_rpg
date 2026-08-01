@@ -105,7 +105,12 @@ public class CharacterData
         public float aptitudeValue = 0;
         public float itemValue = 0;
         public SerializedDictionary<StatusEffectBaseSO, float> buffValue = new SerializedDictionary<StatusEffectBaseSO, float>();
-        public float currentValue = 0;
+        public float _currentValue = 0;
+        public float currentValue
+        {
+            get => _currentValue;
+            set => _currentValue = Mathf.Clamp(value, 0, maxValue);
+        }
         public float maxValue = 0;
         public void RefreshValue(int typeStatistic = 0)
         {

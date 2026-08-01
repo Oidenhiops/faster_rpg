@@ -50,6 +50,14 @@ public class CharacterPlayer : CharacterBase
         }
         try
         {
+            await characterPlayerHud.InitializeBars();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error initializing characters bars: {ex.Message}");
+        }
+        try
+        {
             await characterPlayerHud.InitializeInventory();
         }
         catch (Exception ex)
