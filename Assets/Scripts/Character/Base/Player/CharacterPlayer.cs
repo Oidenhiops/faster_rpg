@@ -23,6 +23,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.ToggleInventory.performed += OnHandleToggleInventory;
         inputActions.Player.ChangeFastItem.performed += OnHandleChangeFastItem;
         inputActions.Player.UseFastItem.performed += OnHandleUseFastItem;
+        inputActions.Player.UseFastItem.canceled += OnHandleUseFastItem;
         inputActions.Player.UseSkill.performed += OnHandleUseSkill;
         inputActions.Player.MoveCamera.performed += OnHandleMoveCamera;
         inputActions.Player.MoveCamera.canceled += OnHandleMoveCamera;
@@ -145,11 +146,17 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleUseFastItem(InputAction.CallbackContext context)
     {
-        if (!isInventoryOpen && !isInCanalization) UseFastItem();
+        if (context.performed)
+        {
+            if (!isInventoryOpen && !isInCanalization) UseFastItem();
+        }
+        else if (context.canceled)
+        {
+            cancelUseFastItem = true;
+        }
     }
     public override void UseFastItem()
     {
-        if (isInventoryOpen || isInCanalization) return;
         if (characterData.fastItems[currentFastItemIndex].itemBaseSO)
         {
             if (!characterData.fastItems[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) || 

@@ -31,16 +31,29 @@ public class CharacterBase : MonoBehaviour
     public bool isDashing;
     public bool isRunning;
     public bool isInCanalization;
-    public bool _cancelActions;
-    public bool cancelActions
+    public bool _cancelCanalization;
+    public bool cancelCanalization
     {
-        get => _cancelActions;
+        get => _cancelCanalization;
         set
         {
-            _cancelActions = value;
+            _cancelCanalization = value;
             if (value)
             {
                 StartCoroutine(ResetCancelCanalization());
+            }
+        }
+    }
+    public bool _cancelUseFastItem;
+    public bool cancelUseFastItem
+    {
+        get => _cancelUseFastItem;
+        set
+        {
+            _cancelUseFastItem = value;
+            if (value)
+            {
+                StartCoroutine(ResetCancelUseFastItem());
             }
         }
     }
@@ -420,6 +433,16 @@ public class CharacterBase : MonoBehaviour
             handleStatusEffectCoroutine = StartCoroutine(HandleStatusEffect());
         }
     }
+    IEnumerator ResetCancelCanalization()
+    {
+        yield return null;
+        cancelCanalization = false;
+    }
+    IEnumerator ResetCancelUseFastItem()
+    {
+        yield return null;
+        cancelUseFastItem = false;
+    }
     [Serializable]
     public class CharacterModel
     {
@@ -427,11 +450,6 @@ public class CharacterBase : MonoBehaviour
         public Transform modelTransform;
         public Transform leftHand;
         public Transform rightHand;
-    }
-    IEnumerator ResetCancelCanalization()
-    {
-        yield return null;
-        cancelActions = false;
     }
     [Serializable]
     public class CharacterModelData

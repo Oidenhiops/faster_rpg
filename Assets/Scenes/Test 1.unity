@@ -3406,7 +3406,8 @@ MonoBehaviour:
   isDashing: 0
   isRunning: 0
   isInCanalization: 0
-  _cancelActions: 0
+  _cancelCanalization: 0
+  _cancelUseFastItem: 0
   interactableBannerPrefab: {fileID: 1398121657027770714, guid: bc98a0c87e9c98a49a7144748c5c1581, type: 3}
   interactables:
     _serializedList: []
@@ -5043,7 +5044,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 5.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -11622,10 +11623,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 430574339}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: -45, y: -150}
-  m_SizeDelta: {x: 60, y: -390}
+  m_SizeDelta: {x: 112, y: 640}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &816561605
 MonoBehaviour:
@@ -11644,11 +11645,11 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
-  m_StartCorner: 2
+  m_ChildAlignment: 2
+  m_StartCorner: 1
   m_StartAxis: 0
-  m_CellSize: {x: 41.25, y: 41.25}
-  m_Spacing: {x: 16, y: 16}
+  m_CellSize: {x: 144, y: 96}
+  m_Spacing: {x: 32, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &816561606

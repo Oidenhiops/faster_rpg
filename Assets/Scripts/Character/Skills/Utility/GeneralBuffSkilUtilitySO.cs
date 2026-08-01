@@ -14,7 +14,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
         while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
         {
             elapsedTime += Time.deltaTime;
-            if (character.cancelActions)
+            if (character.cancelCanalization)
             {
                 character.statusToRemove.Add(canalizationEffect);
                 cancelAction = true;

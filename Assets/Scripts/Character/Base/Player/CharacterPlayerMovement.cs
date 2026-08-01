@@ -22,7 +22,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
         directionFromCamera.y = rb.linearVelocity.y;
         if (characterBase.isDashing)
         {
-            if (characterBase.isInCanalization) characterBase.cancelActions = true;
+            if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
             if (characterBase.directionMovement != Vector2.zero)
             {
                 directionFromCamera.x *= characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);
@@ -83,7 +83,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
     }
     public async Awaitable MakeJump()
     {
-        if (characterBase.isInCanalization) characterBase.cancelActions = true;
+        if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
         rb.AddForce(Vector3.up * 5, ForceMode.Impulse);
         await Awaitable.WaitForSecondsAsync(0.1f);
     }
