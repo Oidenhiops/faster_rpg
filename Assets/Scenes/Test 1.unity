@@ -2928,6 +2928,7 @@ GameObject:
   - component: {fileID: 211714511}
   - component: {fileID: 211714516}
   - component: {fileID: 211714515}
+  - component: {fileID: 211714517}
   m_Layer: 3
   m_Name: CharacterPlayer
   m_TagString: Player
@@ -3535,6 +3536,13 @@ MonoBehaviour:
           plainBar: {fileID: 386568905}
           flashBar: {fileID: 2085116387}
           textBar: {fileID: 950302296}
+          plainDuration: 0.25
+          delayWait: 0.4
+          delayDuration: 0.45
+          flashColor: {r: 1, g: 1, b: 1, a: 1}
+          flashDuration: 0.18
+          flashOnlyOnLoss: 1
+          useUnscaledTime: 0
       - Key: 2
         Value:
           gameObjectBar: {fileID: 1221266166}
@@ -3542,6 +3550,13 @@ MonoBehaviour:
           plainBar: {fileID: 815338839}
           flashBar: {fileID: 639589529}
           textBar: {fileID: 1556188046}
+          plainDuration: 0.25
+          delayWait: 0.4
+          delayDuration: 0.45
+          flashColor: {r: 1, g: 1, b: 1, a: 1}
+          flashDuration: 0.18
+          flashOnlyOnLoss: 1
+          useUnscaledTime: 0
       - Key: 3
         Value:
           gameObjectBar: {fileID: 1272660544}
@@ -3549,6 +3564,13 @@ MonoBehaviour:
           plainBar: {fileID: 305084003}
           flashBar: {fileID: 1114697590}
           textBar: {fileID: 367082448}
+          plainDuration: 0.25
+          delayWait: 0.4
+          delayDuration: 0.45
+          flashColor: {r: 1, g: 1, b: 1, a: 1}
+          flashDuration: 0.18
+          flashOnlyOnLoss: 1
+          useUnscaledTime: 0
     statusEffectUI:
       statusEffectContainer: {fileID: 816561604}
       statusEffectPrefab: {fileID: 6917333200606152589, guid: 2e7b3ea104b67b94ab3764e775701540, type: 3}
@@ -3603,6 +3625,19 @@ MonoBehaviour:
   cameraTransform: {fileID: 330585546}
   rotationSpeed: 10
   direction: {x: 0, y: 0, z: 0}
+--- !u!114 &211714517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211714501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a21bcb165109d948a18ba86bbc5a83c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterTest
+  characterPlayer: {fileID: 211714510}
 --- !u!1 &219281684
 GameObject:
   m_ObjectHideFlags: 0
@@ -4438,7 +4473,7 @@ MonoBehaviour:
   m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
-  m_FillOrigin: 0
+  m_FillOrigin: 1
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
 --- !u!222 &305084004
@@ -5008,7 +5043,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5.4
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -11544,7 +11579,7 @@ MonoBehaviour:
   m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
-  m_FillOrigin: 0
+  m_FillOrigin: 1
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
 --- !u!222 &815338840

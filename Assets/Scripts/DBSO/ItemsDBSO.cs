@@ -43,8 +43,8 @@ public class ItemsDBSO : ScriptableObject
             };
             if (newItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
             {
-                newItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue = newItem.itemStatistics[CharacterData.TypeStatistic.Durability].baseValue;
                 newItem.itemStatistics[CharacterData.TypeStatistic.Durability].maxValue = newItem.itemStatistics[CharacterData.TypeStatistic.Durability].baseValue;
+                newItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue = newItem.itemStatistics[CharacterData.TypeStatistic.Durability].baseValue;
             }
             return newItem;
         }

@@ -13,7 +13,7 @@ public class ItemBaseSO : ScriptableObject
     public StatusEffectBaseSO canalizationEffect;
     public TypeWeapon typeWeapon;
     public TypeAnimationLayer animationValueName;
-    public CharacterData.Statistic strStatistic;
+    public float costPerUse;
     public int animationValue;
     public bool useEnergy;
     public SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic> itemStatistics = new SerializedDictionary<CharacterData.TypeStatistic, CharacterData.Statistic>();

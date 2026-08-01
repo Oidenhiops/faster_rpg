@@ -25,7 +25,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 2
       Value:
-        baseValue: 2
+        baseValue: 100
         aptitudeValue: 100
         itemValue: 0
         buffValue:
@@ -34,7 +34,7 @@ MonoBehaviour:
         maxValue: 0
     - Key: 3
       Value:
-        baseValue: 3
+        baseValue: 100
         aptitudeValue: 100
         itemValue: 0
         buffValue:

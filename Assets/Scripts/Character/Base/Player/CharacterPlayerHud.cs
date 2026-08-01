@@ -82,18 +82,6 @@ public class CharacterPlayerHud : MonoBehaviour
         SelectFastItem();
         await RefreshCharacterInventory();
     }
-    [NaughtyAttributes.Button]
-    public void HpBarPlus()
-    {
-        characterPlayer.characterData.statistics[CharacterData.TypeStatistic.Hp].currentValue += 10;
-        ChangeBar(CharacterData.TypeStatistic.Hp);
-    }
-    [NaughtyAttributes.Button]
-    public void HpBarDiscount()
-    {
-        characterPlayer.characterData.statistics[CharacterData.TypeStatistic.Hp].currentValue -= 10;
-        ChangeBar(CharacterData.TypeStatistic.Hp);
-    }
     public async Awaitable ToggleCharacterInventory()
     {
         characterInventoryAnim.SetBool("isOpen", characterPlayer.isInventoryOpen);
@@ -470,6 +458,9 @@ public class CharacterPlayerHud : MonoBehaviour
         [Tooltip("Segundos que tarda el flash en apagarse.")]
         public float flashDuration = 0.18f;
 
+        [Tooltip("El flash solo aparece cuando la barra baja. Desactivalo para que destelle tambien al subir.")]
+        public bool flashOnlyOnLoss = true;
+
         [Tooltip("Ignorar Time.timeScale (la barra sigue animando con el juego en pausa).")]
         public bool useUnscaledTime = false;
 
@@ -491,16 +482,29 @@ public class CharacterPlayerHud : MonoBehaviour
 
         /// <summary>
         /// Anima la barra hasta el nuevo valor: la principal se mueve ya, la de retardo espera
-        /// un momento y luego la alcanza, y el flash hace un destello que se apaga.
+        /// un momento y luego la alcanza, y el flash destella solo si la barra baja.
         /// </summary>
         public void Play(float ratio, CancellationToken ct)
         {
             ratio = Mathf.Clamp01(ratio);
             int myToken = ++token;
 
+            // La referencia es la barra principal ANTES de moverla.
+            float current = plainBar ? plainBar.fillAmount : (delayBar ? delayBar.fillAmount : ratio);
+            bool isLoss = ratio < current - 0.0001f;
+
             _ = AnimatePlain(myToken, ratio, ct);
             _ = AnimateDelay(myToken, ratio, ct);
-            _ = AnimateFlash(myToken, ct);
+
+            if (isLoss || !flashOnlyOnLoss)
+            {
+                _ = AnimateFlash(myToken, ct);
+            }
+            else if (flashBar)
+            {
+                // Apaga un flash previo que se hubiera quedado a medias.
+                flashBar.color = WithAlpha(flashColor, 0f);
+            }
         }
 
         private async Awaitable AnimatePlain(int myToken, float target, CancellationToken ct)

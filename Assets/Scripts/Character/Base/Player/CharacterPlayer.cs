@@ -106,20 +106,26 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleAttack(InputAction.CallbackContext context)
     {
-        if (isInitialize && !isInventoryOpen && !isInCanalization && !characterAnimator.GetCurrentAnimatorStateInfo(1).IsName("RightHand"))
+        if (isInitialize && !isInventoryOpen && !isInCanalization && characterAnimator.GetFloat("RightHand") == 0)
         {
-            if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO && characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.strStatistic.baseValue >= 0)
+            characterAnimator.SetFloat("RightHand", 0.1f);
+            if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO)
             {
-                _ = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
+                if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse >= 0)
+                {
+                    _ = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
+                }
             }
             else if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - 1 >= 0)
             {
-                _= AwaitForHandAttack();
+                _ = AwaitForHandAttack();
             }
         }
     }
     async Awaitable AwaitForHandAttack()
     {
+        characterData.statistics[CharacterData.TypeStatistic.Str].currentValue--;
+        characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str);
         characterAnimator.SetFloat("RightHand", 1);
         await Awaitable.NextFrameAsync();
         while (true)

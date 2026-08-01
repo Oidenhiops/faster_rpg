@@ -14,6 +14,7 @@ public class EquipableItemSO : ItemBaseSO
                 character.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
+        await character.characterPlayerHud.InitializeBars();
         EquipModelItem(character, characterItem, true, isFastItem);
     }
     public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem)
@@ -26,10 +27,13 @@ public class EquipableItemSO : ItemBaseSO
                 character.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
+        await character.characterPlayerHud.InitializeBars();
         DesEquipModelItem(character, characterItem, true, isFastItem);
     }
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
+        useItemInfo.character.characterData.statistics[CharacterData.TypeStatistic.Str].currentValue -= useItemInfo.character.characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse;
+        useItemInfo.character.characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str);
         useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
         while (true)
         {

@@ -32,7 +32,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             {
                 float durabilityPorcent = item.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue / item.itemStatistics[CharacterData.TypeStatistic.Durability].maxValue;
                 itemDurability.enabled = true;
-                itemDurability.fillAmount = durabilityPorcent > 0 ? durabilityPorcent : 1;
+                itemDurability.fillAmount = durabilityPorcent;
                 if (durabilityPorcent >= 0.7f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyGood" : "DurabilityGood", out Color durabilityColor) ? durabilityColor : Color.white;
                 else if (durabilityPorcent < 0.7f && durabilityPorcent >= 0.3f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyMedium" : "DurabilityMedium", out Color durabilityColor) ? durabilityColor : Color.white;
                 else if (durabilityPorcent < 0.3f && durabilityPorcent > 0f) itemDurability.color = GameData.Instance.utils.systemColors.TryGetValue(item.itemBaseSO.useEnergy ? "EnergyBad" : "DurabilityBad", out Color durabilityColor) ? durabilityColor : Color.white;
