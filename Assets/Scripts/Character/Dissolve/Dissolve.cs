@@ -7,6 +7,7 @@ public class Dissolve : MonoBehaviour
     public List<Renderer> objectsToDisolve;
     public float dissolveDuration = 1f;
     public bool needAppear = false;
+    readonly Dictionary<Renderer, Coroutine> runningSpecificRoutines = new Dictionary<Renderer, Coroutine>();
     private void Awake()
     {
         ObtainCharacterModels();
@@ -27,9 +28,13 @@ public class Dissolve : MonoBehaviour
     {
         if (renderer != null)
         {
+            if (runningSpecificRoutines.TryGetValue(renderer, out Coroutine running) && running != null)
+            {
+                StopCoroutine(running);
+            }
             renderer.material.SetFloat("_DissolveAmount", 1);
             Shader.SetGlobalFloat("_DissolveAmount", 1);
-            StartCoroutine(AppearSpecificObj(renderer));
+            runningSpecificRoutines[renderer] = StartCoroutine(AppearSpecificObj(renderer));
         }
     }
     [NaughtyAttributes.Button]
@@ -118,6 +123,7 @@ public class Dissolve : MonoBehaviour
                 Shader.SetGlobalFloat("_DissolveAmount", normalizedValue);
                 yield return null;
             }
+            runningSpecificRoutines.Remove(renderer);
         }
     }
 }

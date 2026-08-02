@@ -14,8 +14,8 @@ public class EquipableItemSO : ItemBaseSO
                 character.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
-        await character.characterPlayerHud.InitializeBars();
         EquipModelItem(character, characterItem, refreshModel, isFastItem);
+        await character.characterPlayerHud.InitializeBars();
     }
     public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem)
     {
@@ -27,8 +27,8 @@ public class EquipableItemSO : ItemBaseSO
                 character.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
         }
-        await character.characterPlayerHud.InitializeBars();
         DesEquipModelItem(character, characterItem, refreshModel, isFastItem);
+        await character.characterPlayerHud.InitializeBars();
     }
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {

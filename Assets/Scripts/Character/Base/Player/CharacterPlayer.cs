@@ -88,6 +88,7 @@ public class CharacterPlayer : CharacterBase
         }
         try
         {
+            await Awaitable.NextFrameAsync();
             await InitializeModels();
         }
         catch (Exception ex)
@@ -265,7 +266,7 @@ public class CharacterPlayer : CharacterBase
         currentFastItemIndex += (int)context.ReadValue<float>();
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
-        EquipSlotItem(GetFastItemItemByIndex(currentFastItemIndex), ItemsDBSO.TypeModel.FastItems);
+        EquipSlotItem(GetFastItemItemByIndex(currentFastItemIndex), ItemsDBSO.TypeModel.FastItems, true);
         characterPlayerHud.SelectFastItem();
         UpdateFastItemModel();
         characterPlayerHud.RefreshCharacterStatistics();
@@ -351,10 +352,10 @@ public class CharacterPlayer : CharacterBase
 
         characterPlayerHud.RefreshCharacterStatistics();
     }
-    void EquipSlotItem(CharacterData.CharacterItem item, ItemsDBSO.TypeModel slotType)
+    void EquipSlotItem(CharacterData.CharacterItem item, ItemsDBSO.TypeModel slotType, bool cancelRefreshModel = false)
     {
         if (!AppliesEquipEffects(item)) return;
-        _ = item.itemBaseSO.EquipItem(this, item, true, slotType == ItemsDBSO.TypeModel.FastItems);
+        _ = item.itemBaseSO.EquipItem(this, item, !cancelRefreshModel, slotType == ItemsDBSO.TypeModel.FastItems);
     }
     void DesEquipSlotItem(CharacterData.CharacterItem item, ItemsDBSO.TypeModel slotType, bool cancelRefreshModel = false)
     {
