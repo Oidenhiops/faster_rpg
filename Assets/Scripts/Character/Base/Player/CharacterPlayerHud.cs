@@ -313,7 +313,7 @@ public class CharacterPlayerHud : MonoBehaviour
 
         if (bar.textBar)
         {
-            bar.textBar.SetTextFx($"{stat.currentValue} / {stat.maxValue}");
+            bar.textBar.SetTextFx($"{stat.currentValue}/{stat.maxValue}");
             if (animate) bar.textBar.PlayEffect(TextFxType.Wave);
         }
     }

@@ -15,7 +15,7 @@ public class EquipableItemSO : ItemBaseSO
             }
         }
         await character.characterPlayerHud.InitializeBars();
-        EquipModelItem(character, characterItem, true, isFastItem);
+        EquipModelItem(character, characterItem, refreshModel, isFastItem);
     }
     public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem)
     {
@@ -28,39 +28,25 @@ public class EquipableItemSO : ItemBaseSO
             }
         }
         await character.characterPlayerHud.InitializeBars();
-        DesEquipModelItem(character, characterItem, true, isFastItem);
+        DesEquipModelItem(character, characterItem, refreshModel, isFastItem);
     }
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
+        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
         useItemInfo.character.characterData.statistics[CharacterData.TypeStatistic.Str].currentValue -= useItemInfo.character.characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse;
         useItemInfo.character.characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str);
-        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
         while (true)
         {
-            if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(2).IsName("RightHand") ||
-                useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(1).IsName("LeftHand"))
-            {
-                break;
-            }
+            if (useItemInfo.isFastItem && useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(1).IsName("LeftHand")) break;
+            else if (!useItemInfo.isFastItem && useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(2).IsName("RightHand")) break;
             await Awaitable.NextFrameAsync();
         }
         while (true)
         {
-            if (!useItemInfo.isFastItem)
+            if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(useItemInfo.isFastItem ? 1 : 2).normalizedTime > 0.9)
             {
-                if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(2).normalizedTime > 0.9)
-                {
-                    Debug.Log("RightHand finish animation");
-                    break;
-                }
-            }
-            else
-            {
-                if (useItemInfo.character.characterAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime > 0.9)
-                {
-                    Debug.Log("LeftHand finish animation");
-                    break;
-                }                
+                Debug.Log("RightHand finish animation");
+                break;
             }
             await Awaitable.NextFrameAsync();
         }

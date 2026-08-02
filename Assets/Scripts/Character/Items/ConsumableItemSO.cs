@@ -6,9 +6,9 @@ public class ConsumableItemSO : ItemBaseSO
     public GameObject useEffectPrefab;
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
+        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), useItemInfo.characterItem.itemBaseSO.animationValue);
         float elapsedTime = 0f;
         bool cancelAction = false;
-        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), useItemInfo.characterItem.itemBaseSO.animationValue);
         useItemInfo.character.AddStatusEffect(canalizationEffect);
         while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
         {

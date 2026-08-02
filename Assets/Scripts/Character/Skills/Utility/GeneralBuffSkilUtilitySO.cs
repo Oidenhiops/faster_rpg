@@ -6,9 +6,9 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
     public StatusEffectBaseSO statusEffectBaseSO;
     public override async Awaitable UseSkill(CharacterBase character, CharacterData.CharacterItem characterItem)
     {
+        character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), characterItem.itemBaseSO.animationValue);
         float elapsedTime = 0f;
         bool cancelAction = false;
-        character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), characterItem.itemBaseSO.animationValue);
         character.isInCanalization = true;
         character.AddStatusEffect(canalizationEffect);
         while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)

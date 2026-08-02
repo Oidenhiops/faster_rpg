@@ -162,13 +162,11 @@ public class CharacterPlayer : CharacterBase
             {
                 if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse >= 0)
                 {
-                    characterAnimator.SetFloat("RightHand", 0.1f);
                     _ = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
                 }
             }
             else if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - 1 >= 0)
             {
-                characterAnimator.SetFloat("RightHand", 0.1f);
                 _ = AwaitForHandAttack();
             }
         }
@@ -213,7 +211,7 @@ public class CharacterPlayer : CharacterBase
                 characterData.fastItems[currentFastItemIndex].itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability) &&
                 characterData.fastItems[currentFastItemIndex].itemStatistics[CharacterData.TypeStatistic.Durability].currentValue > 0 &&
                 (characterData.fastItems[currentFastItemIndex].itemBaseSO.costPerUse == 0 || 
-                characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.fastItems[currentFastItemIndex].itemBaseSO.costPerUse >= 0))
+                characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.fastItems[currentFastItemIndex].itemBaseSO.costPerUse >= 0 && characterAnimator.GetFloat("LeftHand") == 0))
             {
                 _ = characterData.fastItems[currentFastItemIndex].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(
                     character: this,
@@ -263,7 +261,7 @@ public class CharacterPlayer : CharacterBase
     void OnHandleChangeFastItem(InputAction.CallbackContext context)
     {
         if (isInventoryOpen || isInCanalization) return;
-        DesEquipSlotItem(GetFastItemItemByIndex(currentFastItemIndex), ItemsDBSO.TypeModel.FastItems);
+        DesEquipSlotItem(GetFastItemItemByIndex(currentFastItemIndex), ItemsDBSO.TypeModel.FastItems, true);
         currentFastItemIndex += (int)context.ReadValue<float>();
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
         else if (currentFastItemIndex >= characterPlayerHud.characterUI.fastItems.Count) currentFastItemIndex = 0;
@@ -358,10 +356,10 @@ public class CharacterPlayer : CharacterBase
         if (!AppliesEquipEffects(item)) return;
         _ = item.itemBaseSO.EquipItem(this, item, true, slotType == ItemsDBSO.TypeModel.FastItems);
     }
-    void DesEquipSlotItem(CharacterData.CharacterItem item, ItemsDBSO.TypeModel slotType)
+    void DesEquipSlotItem(CharacterData.CharacterItem item, ItemsDBSO.TypeModel slotType, bool cancelRefreshModel = false)
     {
         if (!AppliesEquipEffects(item)) return;
-        _ = item.itemBaseSO.DesEquipItem(this, item, true, slotType == ItemsDBSO.TypeModel.FastItems);
+        _ = item.itemBaseSO.DesEquipItem(this, item, !cancelRefreshModel, slotType == ItemsDBSO.TypeModel.FastItems);
     }
     bool AppliesEquipEffects(CharacterData.CharacterItem item)
     {

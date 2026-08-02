@@ -130,7 +130,7 @@ public class CharacterData
             float whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
             maxValue = Mathf.Clamp(whitAptitude, 1, 99999);
             if (currentValue > maxValue) currentValue = maxValue;
-            if (typeStatistic == (int)TypeStatistic.Spd)
+            if (typeStatistic != (int)TypeStatistic.Hp && typeStatistic != (int)TypeStatistic.Sp && typeStatistic != (int)TypeStatistic.Str)
             {
                 currentValue = maxValue;
             }

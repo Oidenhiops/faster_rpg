@@ -331,13 +331,12 @@ public class CharacterBase : MonoBehaviour
                     if (status.Value.amount > 0)
                     {
                         status.Value.cd = status.Value.statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
-                        status.Value.statusEffectBaseSO.ReApplyEffect(this);
+                        status.Value.statusEffectBaseSO.DiscountEffect(this);
                         if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
                             characterPlayerHud?.characterUI.statusEffectUI.statusEffectsBanners[status.Key].SetBannerData(status.Value);
                     }
                     else
                     {
-                        status.Value.statusEffectBaseSO.RemoveEffect(this);
                         if (characterPlayerHud.characterUI.statusEffectUI.statusEffectsBanners.ContainsKey(status.Key))
                         {
                             statusToRemove.Add(status.Key);
@@ -404,6 +403,7 @@ public class CharacterBase : MonoBehaviour
         if (statusEffects.ContainsKey(statusEffect))
         {
             statusEffects[statusEffect].AppendStatusEffect();
+            statusEffect.ReApplyEffect(this);
         }
         else
         {

@@ -8,17 +8,19 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in statusEffectStatistics)
         {
-            if (statistic.Value.isPercentage)
+            if (characterToMakeEffect.characterData.statistics.ContainsKey(statistic.Key))
             {
-                characterToMakeEffect.characterData.statistics[statistic.Key].buffValuePorcent.Add(this, statistic.Value.baseValue);
+                if (statistic.Value.isPercentage)
+                {
+                    characterToMakeEffect.characterData.statistics[statistic.Key].buffValuePorcent.Add(this, statistic.Value.baseValue);
+                }
+                else
+                {
+                    characterToMakeEffect.characterData.statistics[statistic.Key].buffValue += statistic.Value.baseValue;
+                }
+                characterToMakeEffect.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
-            else
-            {
-                characterToMakeEffect.characterData.statistics[statistic.Key].buffValue += statistic.Value.baseValue;
-            }
-            characterToMakeEffect.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
         }
-        characterToMakeEffect.AddStatusEffect(this);
         characterToMakeEffect.characterPlayerHud?.RefreshCharacterStatistics();
     }
     public override void ReApplyEffect(CharacterBase characterToMakeEffect)
@@ -29,15 +31,18 @@ public class StatusEffectsGeneralSO : StatusEffectBaseSO
     {
         foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in statusEffectStatistics)
         {
-            if (statistic.Value.isPercentage)
+            if (characterToMakeEffect.characterData.statistics.ContainsKey(statistic.Key))
             {
-                characterToMakeEffect.characterData.statistics[statistic.Key].buffValuePorcent.Remove(this);
+                if (statistic.Value.isPercentage)
+                {
+                    characterToMakeEffect.characterData.statistics[statistic.Key].buffValuePorcent.Remove(this);
+                }
+                else
+                {
+                    characterToMakeEffect.characterData.statistics[statistic.Key].buffValue -= statistic.Value.baseValue;
+                }
+                characterToMakeEffect.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
             }
-            else
-            {
-                characterToMakeEffect.characterData.statistics[statistic.Key].buffValue -= statistic.Value.baseValue;
-            }
-            characterToMakeEffect.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
         }
         characterToMakeEffect.characterPlayerHud?.RefreshCharacterStatistics();
     }

@@ -19,7 +19,7 @@ MonoBehaviour:
   generalAnimationSkillName: 
   skillVFXPrefab: {fileID: 2420060085027401915, guid: c32dbe8bbf79e144ba730ec635bab52c, type: 3}
   skillVFXDuration: 1
-  canalizationEffect: {fileID: 11400000, guid: 14a97df3bbd56dc4cb2ae847d2c7c55a, type: 2}
+  canalizationEffect: {fileID: 11400000, guid: 1c56c8a30dd302a4d9475035abebc371, type: 2}
   statistics:
     _serializedList:
     - Key: 0
@@ -27,12 +27,14 @@ MonoBehaviour:
         _serializedList:
         - Key: 13
           Value:
+            isPercentage: 0
             baseValue: 15
             aptitudeValue: 0
             itemValue: 0
-            buffValue:
+            buffValue: 0
+            buffValuePorcent:
               _serializedList: []
-            currentValue: 0
+            _currentValue: 0
             maxValue: 0
   weaponForUseSkill: 0
   statusEffectBaseSO: {fileID: 11400000, guid: 6512928ac73b76744898e80a43915b80, type: 2}
