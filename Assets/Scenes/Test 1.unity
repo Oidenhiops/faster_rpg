@@ -3134,8 +3134,6 @@ MonoBehaviour:
         - meshFilter: {fileID: 63059158}
           meshRenderer: {fileID: 63059157}
     modelTransform: {fileID: 2123386579}
-    leftHand: {fileID: 0}
-    rightHand: {fileID: 0}
   characterData:
     level: 0
     name: 
@@ -3270,12 +3268,6 @@ MonoBehaviour:
           skillsBaseSO: {fileID: 0}
           level: 0
           cd: 0
-      - Key: 4
-        Value:
-          skillId: 0
-          skillsBaseSO: {fileID: 0}
-          level: 0
-          cd: 0
     models:
       _serializedList:
       - Key: 1
@@ -3399,9 +3391,6 @@ MonoBehaviour:
           colors: []
   currentFastItemIndex: 0
   directionMovement: {x: 0, y: 0}
-  floatingTextPrefab: {fileID: 0}
-  dieEffectPrefab: {fileID: 0}
-  itempDroppedPrefab: {fileID: 5039564025520718109, guid: ef92ee4a6e7ecff41b4381680dd28c07, type: 3}
   characterPlayerHud: {fileID: 211714511}
   characterMovement: {fileID: 211714506}
   characterAnimations: {fileID: 211714503}
@@ -3419,7 +3408,6 @@ MonoBehaviour:
   isInCanalization: 0
   _cancelCanalization: 0
   _cancelUseFastItem: 0
-  interactableBannerPrefab: {fileID: 1398121657027770714, guid: bc98a0c87e9c98a49a7144748c5c1581, type: 3}
   interactables:
     _serializedList: []
   isChangingCharacter: 0

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 92e423c8b8b4d39469e809663f6c8220, type: 3}
   m_Name: BasicBoost
-  m_EditorClassIdentifier: Assembly-CSharp::SkillUtilitySO
+  m_EditorClassIdentifier: Assembly-CSharp::ReusableItemSO
   id: 4
   idText: 12
   modelInfo:
@@ -76,4 +76,5 @@ MonoBehaviour:
           _serializedList: []
         _currentValue: 0
         maxValue: 1
-  skillsBaseSO: {fileID: 11400000, guid: 7f3fe7183eb82ec47ae2e8db055d0107, type: 2}
+  statusEffectBaseSO: {fileID: 11400000, guid: 6512928ac73b76744898e80a43915b80, type: 2}
+  useEffectPrefab: {fileID: 2420060085027401915, guid: c1b5b95ce690a7041a2188ab987c79ee, type: 3}

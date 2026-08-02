@@ -1,0 +1,47 @@
+using System.Collections.Generic;
+using UnityEngine;
+[CreateAssetMenu(fileName = "ReusableItem", menuName = "ScriptableObjects/Items/ReusableItem", order = 1)]
+public class ReusableItemSO : ItemBaseSO
+{
+    public StatusEffectBaseSO statusEffectBaseSO;
+    public GameObject useEffectPrefab;
+    public override async Awaitable UseItem(UseItemInfo useItemInfo)
+    {
+        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), useItemInfo.characterItem.itemBaseSO.animationValue);
+        float elapsedTime = 0f;
+        bool cancelAction = false;
+        useItemInfo.character.AddStatusEffect(canalizationEffect);
+        while (elapsedTime < canalizationEffect.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue)
+        {
+            elapsedTime += Time.deltaTime;
+            if (useItemInfo.character.cancelUseFastItem)
+            {
+                useItemInfo.character.statusToRemove.Add(canalizationEffect);
+                cancelAction = true;
+                break;
+            }
+            await Awaitable.NextFrameAsync();
+        }
+        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), 0);
+        if (!cancelAction)
+        {
+            if (useItemInfo.characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))
+            {
+                useItemInfo.characterItem.itemStatistics[CharacterData.TypeStatistic.Durability].currentValue--;
+            }
+            foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> statistic in itemStatistics)
+            {
+                if (useItemInfo.character.characterData.statistics.ContainsKey(statistic.Key))
+                {
+                    useItemInfo.character.characterData.statistics[statistic.Key].currentValue += statistic.Value.baseValue;
+                    useItemInfo.character.characterData.statistics[statistic.Key].RefreshValue((int)statistic.Key);
+                }
+            }
+            useItemInfo.character.AddStatusEffect(statusEffectBaseSO);
+            GameObject effect = Instantiate(useEffectPrefab, useItemInfo.character.transform.position + Vector3.up * 0.5f, Quaternion.identity);
+            effect.transform.SetParent(useItemInfo.character.transform);
+            Destroy(effect, 2f);
+            useItemInfo.character.characterPlayerHud?.RefreshFastItems();
+        }
+    }
+}

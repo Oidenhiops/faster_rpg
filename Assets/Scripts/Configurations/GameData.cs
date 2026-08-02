@@ -363,7 +363,14 @@ public class GameData : MonoBehaviour
                             {2, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)},
                             {3, new CharacterData.CharacterItem(ItemsDBSO.TypeModel.Ammo)}
                         },
-                models = itemsDBSO.GenerateRandomModel()
+                models = itemsDBSO.GenerateRandomModel(),
+                skills = new SerializedDictionary<int, CharacterData.CharacterSkillInfo>
+                {
+                    {0, new CharacterData.CharacterSkillInfo()},
+                    {1, new CharacterData.CharacterSkillInfo()},
+                    {2, new CharacterData.CharacterSkillInfo()},
+                    {3, new CharacterData.CharacterSkillInfo()}
+                }
             }
         };
 
@@ -395,6 +402,15 @@ public class GameData : MonoBehaviour
         newSlotData.character.bag[3] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Weapon, 2, 1);
         newSlotData.character.bag[4] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.Helmet, 1);
         newSlotData.character.bag[5] = itemsDBSO.GenerateItem(ItemsDBSO.TypeModel.FastItems, 5);
+        for (int i = 0; i < charactersDBSO.data[1].initialDataSO.initialSkills.Count; i++)
+        {
+            newSlotData.character.skills[i] = new CharacterData.CharacterSkillInfo
+            {
+                skillId = charactersDBSO.data[1].initialDataSO.initialSkills[i].skillsBaseSO.skillId,
+                skillsBaseSO = charactersDBSO.data[1].initialDataSO.initialSkills[i].skillsBaseSO,
+                level = 1
+            };
+        }
         return newSlotData;
     }
     void SetStartingDataSound(ref SystemDataInfo dataInfo)
