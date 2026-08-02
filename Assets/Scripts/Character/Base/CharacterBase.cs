@@ -41,6 +41,7 @@ public class CharacterBase : MonoBehaviour
             }
         }
     }
+    public bool isUsingFastItem;
     public bool _cancelUseFastItem;
     public bool cancelUseFastItem
     {

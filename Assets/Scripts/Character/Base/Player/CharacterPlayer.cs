@@ -189,6 +189,7 @@ public class CharacterPlayer : CharacterBase
     }
     void OnHandleToggleInventory(InputAction.CallbackContext context)
     {
+        if (isInCanalization || isUsingFastItem) return;
         isInventoryOpen = !isInventoryOpen;
         _ = characterPlayerHud.ToggleCharacterInventory();
     }
@@ -196,7 +197,7 @@ public class CharacterPlayer : CharacterBase
     {
         if (context.performed)
         {
-            if (!isInventoryOpen && !isInCanalization) UseFastItem();
+            if (CanMakeAction()) UseFastItem();
         }
         else if (context.canceled)
         {
@@ -223,7 +224,7 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleUseSkill(InputAction.CallbackContext context)
     {
-        if (!isInventoryOpen && !isInCanalization) _ = UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
+        if (CanMakeAction()) _ = UseSkill(Mathf.RoundToInt(context.ReadValue<float>()));
     }
     public override async Awaitable UseSkill(int skillIndex)
     {
@@ -260,7 +261,7 @@ public class CharacterPlayer : CharacterBase
     }
     void OnHandleChangeFastItem(InputAction.CallbackContext context)
     {
-        if (isInventoryOpen || isInCanalization) return;
+        if (!CanMakeAction()) return;
         DesEquipSlotItem(GetFastItemItemByIndex(currentFastItemIndex), ItemsDBSO.TypeModel.FastItems, true);
         currentFastItemIndex += (int)context.ReadValue<float>();
         if (currentFastItemIndex < 0) currentFastItemIndex = characterPlayerHud.characterUI.fastItems.Count - 1;
@@ -478,6 +479,10 @@ public class CharacterPlayer : CharacterBase
                typeModel == ItemsDBSO.TypeModel.Pendant ||
                typeModel == ItemsDBSO.TypeModel.Ring ||
                typeModel == ItemsDBSO.TypeModel.Weapon;
+    }
+    public bool CanMakeAction()
+    {
+        return !isInventoryOpen && !isInCanalization && !isUsingFastItem;
     }
     public CharacterData.CharacterItem GetBagItemByIndex(int index)
     {

@@ -23,6 +23,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
         if (characterBase.isDashing)
         {
             if (characterBase.isInCanalization) characterBase.cancelCanalization = true;
+            if (characterBase.isUsingFastItem) characterBase.cancelUseFastItem = true;
             if (characterBase.directionMovement != Vector2.zero)
             {
                 directionFromCamera.x *= characterBase.characterData.statistics[CharacterData.TypeStatistic.Spd].currentValue * 4 * (characterBase.isRunning ? 1.5f : 1);

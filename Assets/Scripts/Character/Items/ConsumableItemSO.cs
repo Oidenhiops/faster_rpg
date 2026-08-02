@@ -7,6 +7,7 @@ public class ConsumableItemSO : ItemBaseSO
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
         useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), useItemInfo.characterItem.itemBaseSO.animationValue);
+        useItemInfo.character.isUsingFastItem = true;
         float elapsedTime = 0f;
         bool cancelAction = false;
         useItemInfo.character.AddStatusEffect(canalizationEffect);
@@ -21,6 +22,7 @@ public class ConsumableItemSO : ItemBaseSO
             }
             await Awaitable.NextFrameAsync();
         }
+        useItemInfo.character.isUsingFastItem = false;
         useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), 0);
         if (!cancelAction)
         {
