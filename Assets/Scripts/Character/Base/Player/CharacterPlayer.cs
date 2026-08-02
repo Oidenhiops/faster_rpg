@@ -9,7 +9,6 @@ using UnityEngine.InputSystem;
 public class CharacterPlayer : CharacterBase
 {
     public InputSystem_Actions inputActions;
-    public GameObject interactableBannerPrefab;
     private float dropLaunchForce = 4f;
     private float dropUpForce = 2f;
     public SerializedDictionary<InteractableBase, GameObject> interactables = new SerializedDictionary<InteractableBase, GameObject>();

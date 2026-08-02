@@ -12,9 +12,6 @@ public class CharacterBase : MonoBehaviour
     public CharacterData characterData;
     public int currentFastItemIndex;
     public Vector2 directionMovement = new Vector2();
-    public GameObject floatingTextPrefab;
-    public GameObject dieEffectPrefab;
-    public GameObject itempDroppedPrefab;
     public CharacterPlayerHud characterPlayerHud;
     public CharacterMovementBase characterMovement;
     public CharacterAnimator characterAnimations;
@@ -432,8 +429,6 @@ public class CharacterBase : MonoBehaviour
     {
         public SerializedDictionary<ItemsDBSO.TypeModel, List<CharacterModelData>> meshesData = new SerializedDictionary<ItemsDBSO.TypeModel, List<CharacterModelData>>();
         public Transform modelTransform;
-        public Transform leftHand;
-        public Transform rightHand;
     }
     [Serializable]
     public class CharacterModelData

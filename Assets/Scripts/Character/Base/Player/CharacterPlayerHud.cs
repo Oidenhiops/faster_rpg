@@ -297,10 +297,6 @@ public class CharacterPlayerHud : MonoBehaviour
         SetAnchorPreset(characterUI.itemDescription.descriptionTextBannerTransform, AnchorPreset.TopRight);
         SetAnchorPreset(characterUI.itemDescription.descriptionTextTransform, AnchorPreset.TopLeft);
     }
-    /// <summary>
-    /// Refresca una barra del HUD. Con animate = false se coloca en su valor sin animar
-    /// (util al inicializar el HUD o al cargar partida).
-    /// </summary>
     public void ChangeBar(CharacterData.TypeStatistic typeBar, bool animate = true)
     {
         if (!characterUI.bars.TryGetValue(typeBar, out BarsInfo bar)) return;
@@ -464,12 +460,10 @@ public class CharacterPlayerHud : MonoBehaviour
         [Tooltip("Ignorar Time.timeScale (la barra sigue animando con el juego en pausa).")]
         public bool useUnscaledTime = false;
 
-        /// <summary>Cancela las animaciones anteriores de ESTA barra: cada llamada invalida la previa.</summary>
         private int token;
 
         private float Delta => useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
 
-        /// <summary>Coloca la barra en su valor sin animar (inicializacion, cargar partida, etc).</summary>
         public void SetInstant(float ratio)
         {
             token++;
@@ -480,16 +474,11 @@ public class CharacterPlayerHud : MonoBehaviour
             if (flashBar) flashBar.color = WithAlpha(flashColor, 0f);
         }
 
-        /// <summary>
-        /// Anima la barra hasta el nuevo valor: la principal se mueve ya, la de retardo espera
-        /// un momento y luego la alcanza, y el flash destella solo si la barra baja.
-        /// </summary>
         public void Play(float ratio, CancellationToken ct)
         {
             ratio = Mathf.Clamp01(ratio);
             int myToken = ++token;
 
-            // La referencia es la barra principal ANTES de moverla.
             float current = plainBar ? plainBar.fillAmount : (delayBar ? delayBar.fillAmount : ratio);
             bool isLoss = ratio < current - 0.0001f;
 
@@ -502,7 +491,6 @@ public class CharacterPlayerHud : MonoBehaviour
             }
             else if (flashBar)
             {
-                // Apaga un flash previo que se hubiera quedado a medias.
                 flashBar.color = WithAlpha(flashColor, 0f);
             }
         }
@@ -527,7 +515,7 @@ public class CharacterPlayerHud : MonoBehaviour
                     plainBar.fillAmount = Mathf.Lerp(from, target, EaseOutCubic(Mathf.Clamp01(t)));
 
                     await Awaitable.NextFrameAsync(ct);
-                    if (myToken != token || plainBar == null) return; // llego otro cambio de valor
+                    if (myToken != token || plainBar == null) return;
                 }
 
                 plainBar.fillAmount = target;
@@ -541,8 +529,6 @@ public class CharacterPlayerHud : MonoBehaviour
 
             float from = delayBar.fillAmount;
 
-            // Al curar no hay nada que "drenar": la barra de retardo se pone ya en el valor
-            // nuevo para que no tape a la principal mientras sube.
             if (from <= target + 0.0001f)
             {
                 delayBar.fillAmount = target;
@@ -568,8 +554,6 @@ public class CharacterPlayerHud : MonoBehaviour
                 {
                     t += Delta / delayDuration;
 
-                    // Persigue el valor VIVO de la principal, no una foto: si la principal
-                    // todavia se esta moviendo las dos acaban juntas.
                     float live = plainBar ? plainBar.fillAmount : target;
                     delayBar.fillAmount = Mathf.Lerp(from, live, EaseOutCubic(Mathf.Clamp01(t)));
 
