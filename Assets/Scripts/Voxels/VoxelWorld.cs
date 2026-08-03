@@ -1,0 +1,555 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Mundo voxel acotado, estilo DRG + Minecraft:
+/// - Construcción: bloques de 1m alineados a rejilla (PlaceBlock).
+/// - Destrucción: esferas que muerden con precisión de 1/16 m (DigSphere).
+/// Cada bloque de 1m está hecho de 16³ micro-voxels, pero solo los bloques
+/// parcialmente excavados los materializan en memoria (lazy).
+/// Requiere que este transform no tenga rotación ni escala.
+/// </summary>
+public class VoxelWorld : MonoBehaviour
+{
+    public static VoxelWorld Instance { get; private set; }
+
+    [Header("Dimensiones (metros = bloques de 1m)")]
+    public Vector3Int worldSizeMeters = new Vector3Int(96, 40, 96);
+
+    [Header("Render")]
+    [Tooltip("Opcional. Si es null se crea uno con URP/Lit o Standard. La textura principal se reemplaza por el atlas de los tipos.")]
+    public Material voxelMaterial;
+
+    [Header("Tipos (assets VoxelTypeSO; índice en la lista = id. 0 = aire; el generador usa 1-8 en orden: pasto, tierra, piedra, mineral, arena, nieve, tronco, hojas)")]
+    public List<VoxelTypeSO> types = new List<VoxelTypeSO>();
+
+    [Header("Rendimiento")]
+    [Tooltip("Chunks remesheados por frame tras una edición")]
+    public int remeshBudgetPerFrame = 4;
+
+    [Header("Generación")]
+    public VoxelGenerator.Settings generation = new VoxelGenerator.Settings();
+
+    /// <summary>Coordenada del bloque (1m) editado. Útil para pathfinding, recursos, sonido.</summary>
+    public event Action<Vector3Int> OnBlockChanged;
+
+    public Vector3Int BlockDims => worldSizeMeters;
+    /// <summary>Offset local para que el centro del mapa quede en la posición del transform.</summary>
+    public Vector3 LocalOrigin => -(Vector3)BlockDims * 0.5f;
+    /// <summary>Esquina mínima del mundo en coordenadas de mundo.</summary>
+    public Vector3 Origin => transform.position + LocalOrigin;
+    public bool Ready { get; private set; }
+
+    Vector3Int chunkDims;
+    VoxelChunk[] chunks;
+    readonly Queue<VoxelChunk> dirtyQueue = new Queue<VoxelChunk>();
+    readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
+    Material runtimeMaterial;
+    Rect[] typeRects; // región de cada tipo dentro del atlas (índice = id)
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    void Start()
+    {
+        EnsureDefaultTypes();
+        BuildMaterial();
+        AllocateChunks();
+        VoxelGenerator.Generate(this);
+        for (int i = 0; i < chunks.Length; i++) RemeshImmediate(chunks[i]);
+        if (generation.waterLevelMeters > 0f) CreateWaterPlane();
+        Ready = true;
+    }
+
+    void CreateWaterPlane()
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        go.name = "Water";
+        Destroy(go.GetComponent<Collider>());
+        go.transform.SetParent(transform, false);
+        go.transform.localPosition = new Vector3(0f, LocalOrigin.y + generation.waterLevelMeters, 0f);
+        go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        go.transform.localScale = new Vector3(BlockDims.x, BlockDims.z, 1f);
+        var mat = new Material(Shader.Find("Sprites/Default")) { name = "WaterMaterial" };
+        mat.color = new Color(0.15f, 0.45f, 0.75f, 0.55f);
+        go.GetComponent<MeshRenderer>().sharedMaterial = mat;
+    }
+
+    void Update()
+    {
+        int n = Mathf.Min(remeshBudgetPerFrame, dirtyQueue.Count);
+        for (int i = 0; i < n; i++)
+        {
+            VoxelChunk c = dirtyQueue.Dequeue();
+            if (c.remeshing) { dirtyQueue.Enqueue(c); continue; } // ocupado, reintentar
+            c.dirty = false;
+            _ = RemeshAsync(c);
+        }
+    }
+
+    // ------------------------------------------------------------------ setup
+
+    /// <summary>Si no hay assets asignados, crea tipos por defecto en memoria para poder probar.</summary>
+    void EnsureDefaultTypes()
+    {
+        if (types == null) types = new List<VoxelTypeSO>();
+        if (types.Count == 0)
+        {
+            Debug.LogWarning("VoxelWorld: sin VoxelTypeSO asignados. Usando 9 tipos por defecto en memoria — crea los assets (Create > ScriptableObjects > Voxels > VoxelType) y asígnalos en orden.");
+            (string n, Color c, float h)[] defaults =
+            {
+                ("Aire",    Color.clear,                        1f),
+                ("Pasto",   new Color(0.35f, 0.62f, 0.28f),     1f),
+                ("Tierra",  new Color(0.45f, 0.32f, 0.20f),     1f),
+                ("Piedra",  new Color(0.50f, 0.50f, 0.52f),     3f),
+                ("Mineral", new Color(0.90f, 0.75f, 0.20f),     5f),
+                ("Arena",   new Color(0.83f, 0.76f, 0.50f),     1f),
+                ("Nieve",   new Color(0.93f, 0.95f, 1.00f),     1f),
+                ("Tronco",  new Color(0.40f, 0.28f, 0.16f),     2f),
+                ("Hojas",   new Color(0.25f, 0.50f, 0.20f),     0.5f),
+            };
+            foreach (var d in defaults)
+            {
+                var so = ScriptableObject.CreateInstance<VoxelTypeSO>();
+                so.name = d.n; so.displayName = d.n; so.color = d.c; so.hardness = d.h;
+                types.Add(so);
+            }
+        }
+        for (int i = 0; i < types.Count; i++)
+        {
+            if (types[i] != null) continue;
+            var so = ScriptableObject.CreateInstance<VoxelTypeSO>();
+            so.name = $"Tipo {i}"; so.color = Color.magenta;
+            types[i] = so;
+            Debug.LogWarning($"VoxelWorld: types[{i}] estaba vacío; usando magenta como aviso.");
+        }
+    }
+
+    void BuildMaterial()
+    {
+        // atlas: una textura por tipo; si el tipo no tiene, se genera una de color plano
+        var sources = new Texture2D[types.Count];
+        for (int i = 0; i < types.Count; i++)
+            sources[i] = types[i].texture != null ? types[i].texture : SolidTexture(types[i].color);
+
+        var atlas = new Texture2D(64, 64, TextureFormat.RGBA32, false)
+        {
+            name = "VoxelAtlas",
+            filterMode = FilterMode.Point
+        };
+        typeRects = atlas.PackTextures(sources, 2, 4096);
+        if (typeRects == null)
+        {
+            // alguna textura sin Read/Write: caer a colores planos para no romper
+            Debug.LogError("VoxelWorld: falló el empaque del atlas (¿texturas sin Read/Write habilitado?). Usando colores planos.");
+            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].color);
+            typeRects = atlas.PackTextures(sources, 2, 4096);
+        }
+
+        if (voxelMaterial != null)
+        {
+            runtimeMaterial = voxelMaterial;
+        }
+        else
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            runtimeMaterial = new Material(shader) { name = "VoxelMaterial" };
+        }
+        runtimeMaterial.mainTexture = atlas;
+    }
+
+    static Texture2D SolidTexture(Color c)
+    {
+        var tex = new Texture2D(4, 4, TextureFormat.RGBA32, false);
+        var pixels = new Color[16];
+        for (int i = 0; i < pixels.Length; i++) pixels[i] = c;
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return tex;
+    }
+
+    void AllocateChunks()
+    {
+        chunkDims = new Vector3Int(
+            CeilDiv(BlockDims.x, VoxelChunk.SIZE),
+            CeilDiv(BlockDims.y, VoxelChunk.SIZE),
+            CeilDiv(BlockDims.z, VoxelChunk.SIZE));
+        chunks = new VoxelChunk[chunkDims.x * chunkDims.y * chunkDims.z];
+
+        for (int cy = 0; cy < chunkDims.y; cy++)
+            for (int cz = 0; cz < chunkDims.z; cz++)
+                for (int cx = 0; cx < chunkDims.x; cx++)
+                {
+                    var c = new VoxelChunk { coord = new Vector3Int(cx, cy, cz) };
+                    c.go = new GameObject($"Chunk {cx},{cy},{cz}") { layer = LayerMask.NameToLayer("Map") };
+                    c.go.transform.SetParent(transform, false);
+                    c.go.transform.localPosition = LocalOrigin + (Vector3)(c.coord * VoxelChunk.SIZE);
+                    c.filter = c.go.AddComponent<MeshFilter>();
+                    var renderer = c.go.AddComponent<MeshRenderer>();
+                    renderer.sharedMaterial = runtimeMaterial;
+                    c.collider = c.go.AddComponent<MeshCollider>();
+                    c.mesh = new Mesh
+                    {
+                        name = c.go.name,
+                        indexFormat = UnityEngine.Rendering.IndexFormat.UInt32
+                    };
+                    chunks[ChunkIndex(cx, cy, cz)] = c;
+                }
+    }
+
+    static int CeilDiv(int a, int b) => (a + b - 1) / b;
+    int ChunkIndex(int cx, int cy, int cz) => cx + chunkDims.x * (cz + chunkDims.z * cy);
+    VoxelChunk ChunkAt(int bx, int by, int bz) => chunks[ChunkIndex(bx >> 4, by >> 4, bz >> 4)];
+
+    // ------------------------------------------------------------------ acceso a bloques
+
+    public bool InBounds(int bx, int by, int bz) =>
+        bx >= 0 && by >= 0 && bz >= 0 && bx < BlockDims.x && by < BlockDims.y && bz < BlockDims.z;
+
+    public byte GetBlockType(int bx, int by, int bz)
+    {
+        if (!InBounds(bx, by, bz)) return 0;
+        return ChunkAt(bx, by, bz).blockTypes[VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15)];
+    }
+
+    /// <summary>Micro-voxels del bloque, o null si el bloque es uniforme.</summary>
+    public byte[] GetMicroArray(int bx, int by, int bz)
+    {
+        if (!InBounds(bx, by, bz)) return null;
+        ChunkAt(bx, by, bz).microBlocks.TryGetValue(
+            VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15), out byte[] micro);
+        return micro;
+    }
+
+    /// <summary>Convierte el bloque uniforme en parcial (asigna sus 16³ voxels).</summary>
+    public byte[] AllocateMicro(int bx, int by, int bz, byte fillType)
+    {
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
+        if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
+        var micro = new byte[VoxelChunk.MICRO3];
+        if (fillType != 0)
+            for (int i = 0; i < micro.Length; i++) micro[i] = fillType;
+        c.microBlocks[idx] = micro;
+        return micro;
+    }
+
+    /// <summary>Deja el bloque uniforme con el tipo dado (borra sus micro-voxels).</summary>
+    public void SetBlockUniform(int bx, int by, int bz, byte typeId)
+    {
+        if (!InBounds(bx, by, bz)) return;
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
+        c.blockTypes[idx] = typeId;
+        c.microBlocks.Remove(idx);
+        blockDamage.Remove(new Vector3Int(bx, by, bz)); // el daño acumulado no sobrevive al bloque
+        NotifyBlockEdited(bx, by, bz);
+    }
+
+    /// <summary>Escritura sin eventos ni remesh. Solo para la generación inicial.</summary>
+    public void SetBlockSilent(int bx, int by, int bz, byte typeId)
+    {
+        if (!InBounds(bx, by, bz)) return;
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
+        c.blockTypes[idx] = typeId;
+        c.microBlocks.Remove(idx); // un bloque uniforme no debe conservar micro-voxels
+    }
+
+    /// <summary>Como AllocateMicro pero sin eventos ni remesh. Para detalle en la generación.</summary>
+    public byte[] AllocateMicroSilent(int bx, int by, int bz, byte fillType)
+    {
+        if (!InBounds(bx, by, bz)) return null;
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
+        if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
+        var micro = new byte[VoxelChunk.MICRO3];
+        if (fillType != 0)
+            for (int i = 0; i < micro.Length; i++) micro[i] = fillType;
+        c.microBlocks[idx] = micro;
+        return micro;
+    }
+
+    public void NotifyBlockEdited(int bx, int by, int bz)
+    {
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        MarkDirty(c);
+        // un bloque en el borde del chunk cambia las caras visibles del chunk vecino
+        int lx = bx & 15, ly = by & 15, lz = bz & 15;
+        if (lx == 0) MarkDirtyAt(c.coord + Vector3Int.left);
+        if (lx == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + Vector3Int.right);
+        if (ly == 0) MarkDirtyAt(c.coord + Vector3Int.down);
+        if (ly == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + Vector3Int.up);
+        if (lz == 0) MarkDirtyAt(c.coord + new Vector3Int(0, 0, -1));
+        if (lz == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + new Vector3Int(0, 0, 1));
+        OnBlockChanged?.Invoke(new Vector3Int(bx, by, bz));
+    }
+
+    void MarkDirty(VoxelChunk c)
+    {
+        if (c.dirty) return;
+        c.dirty = true;
+        dirtyQueue.Enqueue(c);
+    }
+
+    void MarkDirtyAt(Vector3Int chunkCoord)
+    {
+        if (chunkCoord.x < 0 || chunkCoord.y < 0 || chunkCoord.z < 0 ||
+            chunkCoord.x >= chunkDims.x || chunkCoord.y >= chunkDims.y || chunkCoord.z >= chunkDims.z) return;
+        MarkDirty(chunks[ChunkIndex(chunkCoord.x, chunkCoord.y, chunkCoord.z)]);
+    }
+
+    // ------------------------------------------------------------------ excavar / construir
+
+    /// <summary>
+    /// Excava una esfera estilo DRG con precisión de 1/16 m. Respeta hardness e
+    /// indestructible, y deja una cáscara de 1 bloque en suelo y paredes (techo abierto).
+    /// Devuelve micro-voxels quitados por tipo (4096 = un bloque entero) para dar recursos.
+    /// </summary>
+    public Dictionary<byte, int> DigSphere(Vector3 center, float radiusMeters, float digPower = 1f)
+    {
+        var removed = new Dictionary<byte, int>();
+        Vector3 rel = center - Origin;
+        int minBx = Mathf.FloorToInt(rel.x - radiusMeters);
+        int minBy = Mathf.FloorToInt(rel.y - radiusMeters);
+        int minBz = Mathf.FloorToInt(rel.z - radiusMeters);
+        int maxBx = Mathf.FloorToInt(rel.x + radiusMeters);
+        int maxBy = Mathf.FloorToInt(rel.y + radiusMeters);
+        int maxBz = Mathf.FloorToInt(rel.z + radiusMeters);
+        float r2 = radiusMeters * radiusMeters;
+        const int M = VoxelChunk.MICRO;
+        const float MV = 1f / M;
+
+        for (int by = minBy; by <= maxBy; by++)
+            for (int bz = minBz; bz <= maxBz; bz++)
+                for (int bx = minBx; bx <= maxBx; bx++)
+                {
+                    // cáscara indestructible: 1 bloque en suelo y paredes, techo abierto
+                    if (by < 1 || by >= BlockDims.y) continue;
+                    if (bx < 1 || bx >= BlockDims.x - 1) continue;
+                    if (bz < 1 || bz >= BlockDims.z - 1) continue;
+
+                    byte t = GetBlockType(bx, by, bz);
+                    byte[] micro = GetMicroArray(bx, by, bz);
+                    if (t == 0 && micro == null) continue;
+
+                    Vector3 bMin = new Vector3(bx, by, bz);
+                    if (AabbDist2(rel, bMin, bMin + Vector3.one) > r2) continue; // fuera de la esfera
+
+                    if (micro == null)
+                    {
+                        VoxelTypeSO vt = types[t];
+                        if (vt.indestructible || vt.hardness > digPower) continue;
+                        if (FarthestCorner2(rel, bMin) <= r2)
+                        {
+                            // bloque completamente dentro: quitarlo entero sin materializar
+                            SetBlockUniform(bx, by, bz, 0);
+                            AddCount(removed, t, VoxelChunk.MICRO3);
+                            continue;
+                        }
+                        micro = AllocateMicro(bx, by, bz, t);
+                    }
+
+                    int remaining = 0, cut = 0;
+                    for (int my = 0; my < M; my++)
+                        for (int mz = 0; mz < M; mz++)
+                            for (int mx = 0; mx < M; mx++)
+                            {
+                                int mi = VoxelChunk.MicroIndex(mx, my, mz);
+                                byte id = micro[mi];
+                                if (id == 0) continue;
+                                VoxelTypeSO vt = types[id];
+                                Vector3 p = bMin + new Vector3((mx + 0.5f) * MV, (my + 0.5f) * MV, (mz + 0.5f) * MV);
+                                if (!vt.indestructible && vt.hardness <= digPower &&
+                                    (p - rel).sqrMagnitude <= r2)
+                                {
+                                    micro[mi] = 0;
+                                    cut++;
+                                    AddCount(removed, id, 1);
+                                }
+                                else remaining++;
+                            }
+
+                    if (cut == 0) continue;
+                    if (remaining == 0) SetBlockUniform(bx, by, bz, 0); // colapsa a aire
+                    else NotifyBlockEdited(bx, by, bz);
+                }
+        return removed;
+    }
+
+    /// <summary>
+    /// Convierte una posición de mundo en coordenadas de bloque.
+    /// Con un RaycastHit usa: WorldToBlock(hit.point - hit.normal * 0.01f).
+    /// </summary>
+    public Vector3Int WorldToBlock(Vector3 worldPos)
+    {
+        Vector3 rel = worldPos - Origin;
+        return new Vector3Int(Mathf.FloorToInt(rel.x), Mathf.FloorToInt(rel.y), Mathf.FloorToInt(rel.z));
+    }
+
+    /// <summary>
+    /// Golpea un bloque entero (modo por defecto: el bloque de 1m se rompe completo,
+    /// con todos sus micro-voxels juntos). El daño se acumula entre golpes hasta
+    /// superar la hardness del tipo. Devuelve true si el bloque se rompió; en ese
+    /// caso removed trae los micro-voxels obtenidos por tipo (para recursos).
+    /// </summary>
+    public bool DamageBlock(Vector3Int blockPos, float damage, out Dictionary<byte, int> removed)
+    {
+        removed = null;
+        int bx = blockPos.x, by = blockPos.y, bz = blockPos.z;
+        if (!InBounds(bx, by, bz)) return false;
+
+        // cáscara indestructible: suelo y paredes, techo abierto
+        if (by < 1 || bx < 1 || bz < 1 || bx >= BlockDims.x - 1 || bz >= BlockDims.z - 1) return false;
+
+        byte t = GetBlockType(bx, by, bz);
+        byte[] micro = GetMicroArray(bx, by, bz);
+        if (t == 0 && micro == null) return false; // aire
+
+        // el tipo del bloque se conserva en blockTypes aunque esté parcial
+        VoxelTypeSO vt = types[t != 0 ? t : (byte)1];
+        if (vt.indestructible) return false;
+
+        blockDamage.TryGetValue(blockPos, out float total);
+        total += damage;
+        if (total < vt.hardness)
+        {
+            blockDamage[blockPos] = total;
+            return false; // dañado pero entero (aquí puedes disparar VFX de grietas)
+        }
+
+        blockDamage.Remove(blockPos);
+        removed = new Dictionary<byte, int>();
+        if (micro == null)
+        {
+            removed[t] = VoxelChunk.MICRO3;
+        }
+        else
+        {
+            foreach (byte id in micro)
+            {
+                if (id == 0) continue;
+                removed.TryGetValue(id, out int count);
+                removed[id] = count + 1;
+            }
+        }
+        SetBlockUniform(bx, by, bz, 0);
+        return true;
+    }
+
+    /// <summary>
+    /// Coloca un bloque de 1m (estilo Minecraft) en la celda que contiene worldPos.
+    /// Solo en celdas completamente vacías. Devuelve true si colocó.
+    /// </summary>
+    public bool PlaceBlock(Vector3 worldPos, byte typeId)
+    {
+        if (typeId == 0 || typeId >= types.Count) return false;
+        Vector3 rel = worldPos - Origin;
+        int bx = Mathf.FloorToInt(rel.x);
+        int by = Mathf.FloorToInt(rel.y);
+        int bz = Mathf.FloorToInt(rel.z);
+        if (!InBounds(bx, by, bz)) return false;
+        if (GetBlockType(bx, by, bz) != 0 || GetMicroArray(bx, by, bz) != null) return false;
+        SetBlockUniform(bx, by, bz, typeId);
+        return true;
+    }
+
+    static void AddCount(Dictionary<byte, int> dict, byte key, int amount)
+    {
+        dict.TryGetValue(key, out int count);
+        dict[key] = count + amount;
+    }
+
+    // distancia² de un punto al AABB
+    static float AabbDist2(Vector3 p, Vector3 min, Vector3 max)
+    {
+        float dx = Mathf.Max(min.x - p.x, 0f, p.x - max.x);
+        float dy = Mathf.Max(min.y - p.y, 0f, p.y - max.y);
+        float dz = Mathf.Max(min.z - p.z, 0f, p.z - max.z);
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    // distancia² del punto a la esquina más lejana del bloque de 1m en bMin
+    static float FarthestCorner2(Vector3 p, Vector3 bMin)
+    {
+        float dx = Mathf.Max(Mathf.Abs(p.x - bMin.x), Mathf.Abs(p.x - (bMin.x + 1f)));
+        float dy = Mathf.Max(Mathf.Abs(p.y - bMin.y), Mathf.Abs(p.y - (bMin.y + 1f)));
+        float dz = Mathf.Max(Mathf.Abs(p.z - bMin.z), Mathf.Abs(p.z - (bMin.z + 1f)));
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    // ------------------------------------------------------------------ remesh
+
+    void RemeshImmediate(VoxelChunk c)
+    {
+        Apply(c, VoxelMesher.Build(CopySnapshot(c), typeRects));
+    }
+
+    async Awaitable RemeshAsync(VoxelChunk c)
+    {
+        c.remeshing = true;
+        try
+        {
+            VoxelMesher.Snapshot snapshot = CopySnapshot(c); // en main thread
+            await Awaitable.BackgroundThreadAsync();
+            VoxelMesher.MeshData md = VoxelMesher.Build(snapshot, typeRects);
+            await Awaitable.MainThreadAsync();
+            if (this == null || c.go == null) return;
+            Apply(c, md);
+        }
+        finally
+        {
+            c.remeshing = false;
+        }
+    }
+
+    VoxelMesher.Snapshot CopySnapshot(VoxelChunk c)
+    {
+        var s = new VoxelMesher.Snapshot();
+        Vector3Int b0 = c.coord * VoxelChunk.SIZE;
+        int i = 0;
+        for (int y = -1; y <= VoxelChunk.SIZE; y++)
+            for (int z = -1; z <= VoxelChunk.SIZE; z++)
+                for (int x = -1; x <= VoxelChunk.SIZE; x++)
+                {
+                    int bx = b0.x + x, by = b0.y + y, bz = b0.z + z;
+                    s.types[i] = GetBlockType(bx, by, bz);
+                    byte[] micro = GetMicroArray(bx, by, bz);
+                    s.micro[i] = micro != null ? (byte[])micro.Clone() : null;
+                    i++;
+                }
+        return s;
+    }
+
+    void Apply(VoxelChunk c, VoxelMesher.MeshData md)
+    {
+        Mesh mesh = c.mesh;
+        mesh.Clear();
+        if (md.vertices.Count > 0)
+        {
+            mesh.SetVertices(md.vertices);
+            mesh.SetNormals(md.normals);
+            mesh.SetUVs(0, md.uvs);
+            mesh.SetTriangles(md.triangles, 0);
+            mesh.RecalculateBounds();
+            c.filter.sharedMesh = mesh;
+            c.collider.sharedMesh = null; // forzar re-cook
+            c.collider.sharedMesh = mesh;
+        }
+        else
+        {
+            c.filter.sharedMesh = mesh;
+            c.collider.sharedMesh = null;
+        }
+    }
+}
