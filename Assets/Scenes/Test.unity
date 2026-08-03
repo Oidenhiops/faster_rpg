@@ -25626,12 +25626,21 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
   - {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
   - {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+  - {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+  waterTypeId: 9
+  waterMaterial: {fileID: 2100000, guid: 648506158a270ab47aaf4612ffe9318e, type: 2}
   remeshBudgetPerFrame: 4
+  waterFlowEnabled: 1
+  waterFlowInterval: 0.1
+  waterFlowBudget: 64
   generation:
     seed: 1337
     baseHeightMeters: 14
     hillAmplitudeMeters: 6
     hillScale: 0.02
+    smoothSurface: 1
+    microDetailAmplitude: 0.1
+    microDetailScale: 0.5
     waterLevelMeters: 11
     dirtDepthMeters: 3
     caveScale: 0.09
