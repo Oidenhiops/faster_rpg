@@ -32,17 +32,6 @@ MonoBehaviour:
   useEnergy: 1
   itemStatistics:
     _serializedList:
-    - Key: 4
-      Value:
-        isPercentage: 0
-        baseValue: 10
-        aptitudeValue: 0
-        itemValue: 0
-        buffValue: 0
-        buffValuePorcent:
-          _serializedList: []
-        _currentValue: 0
-        maxValue: 0
     - Key: 13
       Value:
         isPercentage: 0

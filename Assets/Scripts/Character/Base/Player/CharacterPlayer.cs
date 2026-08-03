@@ -364,7 +364,7 @@ public class CharacterPlayer : CharacterBase
     }
     bool AppliesEquipEffects(CharacterData.CharacterItem item)
     {
-        return item != null && item.itemBaseSO is EquipableItemSO;
+        return item != null && (item.itemBaseSO is EquipableItemSO || item.itemBaseSO is ActivableItemSO);
     }
     bool IsActiveSlot(InventorySlot.ItemInfo itemInfo)
     {

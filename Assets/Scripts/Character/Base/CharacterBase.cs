@@ -21,6 +21,7 @@ public class CharacterBase : MonoBehaviour
     public SerializedDictionary<StatusEffectBaseSO, StatusEffect> statusEffects = new SerializedDictionary<StatusEffectBaseSO, StatusEffect>();
     public List<StatusEffectBaseSO> statusToRemove = new List<StatusEffectBaseSO>();
     public SerializedDictionary<int, SkillCd> skillsCd = new SerializedDictionary<int, SkillCd>();
+    public SerializedDictionary<int, ActibableItemsInfo> activableItems = new SerializedDictionary<int, ActibableItemsInfo>();
     public List<int> skillsToRemove = new List<int>();
     protected Coroutine handleStatusEffectCoroutine;
     protected Coroutine handleUseSkillCoroutine;
@@ -458,6 +459,19 @@ public class CharacterBase : MonoBehaviour
                 cd = statusEffectBaseSO.statusEffectStatistics[CharacterData.TypeStatistic.Cd].baseValue;
             }
         }
+    }
+    [Serializable]
+    public class ActibableItemsInfo
+    {
+        public ActivableItemSO activableItemSO;
+        public GameObject activableItemPrefab;
+        public ActibableItemsInfo(ActivableItemSO activableItemSO, GameObject activableItemPrefab, Coroutine handleCoroutine = null)
+        {
+            this.activableItemSO = activableItemSO;
+            this.activableItemPrefab = activableItemPrefab;
+            this.handleCoroutine = handleCoroutine;
+        }
+        public Coroutine handleCoroutine;
     }
     [Serializable]
     public class SkillCd

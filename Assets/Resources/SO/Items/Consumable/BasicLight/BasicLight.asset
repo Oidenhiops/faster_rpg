@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b23430bf251ff0419dcdac3f70e037e, type: 3}
-  m_Name: ActivableItem
+  m_Name: BasicLight
   m_EditorClassIdentifier: Assembly-CSharp::ActivableItemSO
   id: 5
   idText: 14
@@ -25,26 +25,34 @@ MonoBehaviour:
     occludedModels: 
   icon: {fileID: -1239926245, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 17
+  canalizationEffect: {fileID: 0}
   typeWeapon: 0
-  animationName: 
+  animationValueName: 0
+  costPerUse: 0
+  animationValue: 0
   useEnergy: 1
   itemStatistics:
     _serializedList:
     - Key: 16
       Value:
-        baseValue: 240
+        isPercentage: 0
+        baseValue: 300
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
-        maxValue: 1
+        _currentValue: 0
+        maxValue: 0
     - Key: 17
       Value:
+        isPercentage: 0
         baseValue: 0
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
-        maxValue: 5
+        _currentValue: 0
+        maxValue: 1
+  activableItemPrefab: {fileID: 5307182533068723672, guid: 18ba31e486befbe43a133a3a850cbffb, type: 3}

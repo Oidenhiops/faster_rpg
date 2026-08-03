@@ -3,7 +3,6 @@ using UnityEngine.InputSystem;
 
 public class CharacterPlayerMovement : CharacterMovementBase
 {
-    public CharacterPlayer characterPlayer;
     public InputSystem_Actions inputActions;
     public Rigidbody rb;
     public override void HandleInitialize()
@@ -46,7 +45,7 @@ public class CharacterPlayerMovement : CharacterMovementBase
             directionFromCamera.x = 0;
             directionFromCamera.z = 0;
         }
-        if (!characterPlayer.characterPlayerCamera.rotatePlayerWithCamera || !characterPlayer.characterPlayerCamera.isRotatingCamera) characterBase.characterDirection.ChangeDirection();
+        if (characterBase is CharacterPlayer characterPlayer && (!characterPlayer.characterPlayerCamera.rotatePlayerWithCamera || !characterPlayer.characterPlayerCamera.isRotatingCamera)) characterBase.characterDirection.ChangeDirection();
         rb.linearVelocity = directionFromCamera;
     }
     void OnHandleJump(InputAction.CallbackContext context)

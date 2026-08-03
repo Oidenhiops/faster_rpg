@@ -18,19 +18,23 @@ MonoBehaviour:
     _serializedList:
     - Key: 4
       Value:
-        baseValue: -200
+        isPercentage: 0
+        baseValue: -100
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 0
     - Key: 13
       Value:
+        isPercentage: 0
         baseValue: 10
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
-        currentValue: 0
+        _currentValue: 0
         maxValue: 0

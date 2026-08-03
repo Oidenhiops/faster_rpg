@@ -125,10 +125,10 @@ public class CharacterData
             float baseWhitItemAndBuff = baseValue + itemValue + buffValue;
             float totalBuffValuePorcent = 0;
             foreach (KeyValuePair<StatusEffectBaseSO, float> buff in buffValuePorcent) totalBuffValuePorcent += buff.Value;
+            if (totalBuffValuePorcent == 0) totalBuffValuePorcent = 100;
             float baseWhitBuff = Mathf.CeilToInt(baseWhitItemAndBuff * totalBuffValuePorcent / 100);
-            float finalValue = Mathf.CeilToInt(baseWhitItemAndBuff + baseWhitBuff);
-            float whitAptitude = Mathf.CeilToInt(finalValue * (aptitudeValue / 100f));
-            maxValue = Mathf.Clamp(whitAptitude, 1, 99999);
+            float whitAptitude = Mathf.CeilToInt(baseWhitBuff * (aptitudeValue / 100f));
+            maxValue = Mathf.Clamp(whitAptitude, 0, 99999);
             if (currentValue > maxValue) currentValue = maxValue;
             if (typeStatistic != (int)TypeStatistic.Hp && typeStatistic != (int)TypeStatistic.Sp && typeStatistic != (int)TypeStatistic.Str)
             {
@@ -158,6 +158,8 @@ public class CharacterData
         public ItemsDBSO.TypeModel typeObject;
         public ItemBaseSO itemBaseSO;
         public SerializedDictionary<TypeStatistic, Statistic> itemStatistics = new SerializedDictionary<TypeStatistic, Statistic>();
+        public bool activableItemIsActive = false;
+        public int activableItemId = 0;
         public void ResetItem()
         {
             itemId = 0;
@@ -185,6 +187,8 @@ public class CharacterData
             typeObject = characterItem.typeObject;
             itemBaseSO = characterItem.itemBaseSO;
             itemStatistics = characterItem.itemStatistics;
+            activableItemId = characterItem.activableItemId;
+            activableItemIsActive = characterItem.activableItemIsActive;
         }
     }
     [Serializable]

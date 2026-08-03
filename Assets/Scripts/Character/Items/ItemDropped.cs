@@ -41,6 +41,10 @@ public class ItemDropped : InteractableBase
         this.itemData = itemData;
         itemMeshRenderer.material.SetTexture("_MainTex", itemData.itemBaseSO.icon.texture);
         SetTextureFromAtlas(itemData.itemBaseSO.icon, itemMeshRenderer);
+        if (this.itemData.itemBaseSO is ActivableItemSO activableItemSO && activableItemSO.activableItemPrefab)
+        {
+            Instantiate(activableItemSO.activableItemPrefab, transform.position + Vector3.up, Quaternion.identity, transform);
+        }
         if (startCountToPickUp) _ = StartCountToPickUp();
     }
     private async Awaitable StartCountToPickUp()

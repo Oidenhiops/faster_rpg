@@ -647,6 +647,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &26773793
 MonoBehaviour:
@@ -3159,6 +3161,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 10
         Value:
           itemId: 0
@@ -3166,6 +3170,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 11
         Value:
           itemId: 0
@@ -3173,6 +3179,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 12
         Value:
           itemId: 0
@@ -3180,6 +3188,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 13
         Value:
           itemId: 0
@@ -3187,6 +3197,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 14
         Value:
           itemId: 0
@@ -3194,6 +3206,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 15
         Value:
           itemId: 0
@@ -3201,6 +3215,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 16
         Value:
           itemId: 0
@@ -3208,6 +3224,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
     fastItems:
       _serializedList: []
     bag:
@@ -3221,6 +3239,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 1
         Value:
           itemId: 0
@@ -3228,6 +3248,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 2
         Value:
           itemId: 0
@@ -3235,6 +3257,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
       - Key: 3
         Value:
           itemId: 0
@@ -3242,6 +3266,8 @@ MonoBehaviour:
           itemBaseSO: {fileID: 0}
           itemStatistics:
             _serializedList: []
+          activableItemIsActive: 0
+          activableItemId: 0
     skills:
       _serializedList:
       - Key: 0
@@ -3402,11 +3428,14 @@ MonoBehaviour:
   statusToRemove: []
   skillsCd:
     _serializedList: []
+  activableItems:
+    _serializedList: []
   skillsToRemove: 
   isDashing: 0
   isRunning: 0
   isInCanalization: 0
   _cancelCanalization: 0
+  isUsingFastItem: 0
   _cancelUseFastItem: 0
   interactables:
     _serializedList: []
@@ -4108,6 +4137,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!1 &278081234
 GameObject:
@@ -5967,7 +5998,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &410087040
 Light:
   m_ObjectHideFlags: 0
@@ -7863,6 +7894,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &510341182
 MonoBehaviour:
@@ -8012,6 +8045,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &512003393
 MonoBehaviour:
@@ -8588,7 +8623,7 @@ MonoBehaviour:
       - Key: DieEffect
         Value: {fileID: 0}
       - Key: ItempDropped
-        Value: {fileID: 0}
+        Value: {fileID: 5039564025520718109, guid: ef92ee4a6e7ecff41b4381680dd28c07, type: 3}
       - Key: StatusEffect
         Value: {fileID: 6917333200606152589, guid: 2e7b3ea104b67b94ab3764e775701540, type: 3}
       - Key: BagSlot
@@ -9310,6 +9345,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &624810259
 MonoBehaviour:
@@ -9409,6 +9446,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &625911179
 MonoBehaviour:
@@ -9952,6 +9991,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &647319622
 MonoBehaviour:
@@ -10332,6 +10373,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!1 &666665791
 GameObject:
@@ -11795,6 +11838,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &823545613
 MonoBehaviour:
@@ -13437,6 +13482,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!1 &1029814169
 GameObject:
@@ -15397,6 +15444,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1177914139
 MonoBehaviour:
@@ -16415,6 +16464,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1244585299
 MonoBehaviour:
@@ -17525,6 +17576,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1365449650
 MonoBehaviour:
@@ -18042,6 +18095,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1387120164
 MonoBehaviour:
@@ -21041,6 +21096,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1592614224
 MonoBehaviour:
@@ -22636,6 +22693,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1738693322
 MonoBehaviour:
@@ -23701,6 +23760,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!1001 &1805455624
 PrefabInstance:
@@ -24936,6 +24997,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1898889095
 MonoBehaviour:
@@ -25565,6 +25628,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &1954795747
 MonoBehaviour:
@@ -27801,6 +27866,8 @@ MonoBehaviour:
     itemBaseSO: {fileID: 0}
     itemStatistics:
       _serializedList: []
+    activableItemIsActive: 0
+    activableItemId: 0
   slotIndex: 0
 --- !u!114 &2131347812
 MonoBehaviour:
