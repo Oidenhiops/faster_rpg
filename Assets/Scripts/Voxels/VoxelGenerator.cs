@@ -11,7 +11,7 @@ using UnityEngine;
 /// </summary>
 public static class VoxelGenerator
 {
-    const byte GRASS = 1, DIRT = 2, STONE = 3, ORE = 4, SAND = 5, WOOD = 7, LEAVES = 8;
+    const byte GRASS = 1, DIRT = 2, STONE = 3, ORE = 4, SAND = 5, WOOD = 7, LEAVES = 8, WATER = 9;
 
     [Serializable]
     public class Settings
@@ -126,34 +126,79 @@ public static class VoxelGenerator
                     w.SetBlockSilent(x, y, z, id);
                 }
 
-                if (!s.smoothSurface) continue;
-
-                // ---- franja suavizada: bloques parciales con micro-voxels ----
-                int topBlocks = Mathf.Min(Mathf.CeilToInt(maxH), dims.y - 1);
-                for (int y = fullTop; y < topBlocks; y++)
+                if (s.smoothSurface)
                 {
-                    byte[] micro = w.AllocateMicroSilent(x, y, z, 0);
-                    if (micro == null) continue;
+                    // ---- franja suavizada: bloques parciales con micro-voxels ----
+                    int topBlocks = Mathf.Min(Mathf.CeilToInt(maxH), dims.y - 1);
+                    for (int y = fullTop; y < topBlocks; y++)
+                    {
+                        byte[] micro = w.AllocateMicroSilent(x, y, z, 0);
+                        if (micro == null) continue;
 
-                    int filled = 0;
-                    for (int mz = 0; mz < M; mz++)
-                        for (int mx = 0; mx < M; mx++)
-                        {
-                            float gm = microHeights[mx + M * mz] * M; // altura en unidades micro
-                            int gy0 = y * M;
-                            int count = Mathf.Clamp(Mathf.RoundToInt(gm) - gy0, 0, M);
-                            for (int my = 0; my < count; my++)
+                        int filled = 0;
+                        for (int mz = 0; mz < M; mz++)
+                            for (int mx = 0; mx < M; mx++)
                             {
-                                // los 2 micro-voxels superiores de la columna son superficie
-                                byte id = (gm - (gy0 + my)) <= 2.5f ? surfaceType : subType;
-                                micro[VoxelChunk.MicroIndex(mx, my, mz)] = id;
+                                float gm = microHeights[mx + M * mz] * M; // altura en unidades micro
+                                int gy0 = y * M;
+                                int count = Mathf.Clamp(Mathf.RoundToInt(gm) - gy0, 0, M);
+                                for (int my = 0; my < count; my++)
+                                {
+                                    // los 2 micro-voxels superiores de la columna son superficie
+                                    byte id = (gm - (gy0 + my)) <= 2.5f ? surfaceType : subType;
+                                    micro[VoxelChunk.MicroIndex(mx, my, mz)] = id;
+                                }
+                                filled += count;
                             }
-                            filled += count;
+
+                        // optimización: bloque totalmente lleno o vacío vuelve a ser uniforme
+                        if (filled == VoxelChunk.MICRO3) w.SetBlockSilent(x, y, z, subType);
+                        else if (filled == 0) w.SetBlockSilent(x, y, z, 0);
+                    }
+                }
+
+                // ---- agua: desde el nivel hacia abajo hasta tocar terreno ----
+                // (solo lagos/ríos abiertos; se detiene en la superficie, no inunda cuevas)
+                if (s.waterLevelMeters > 0f)
+                {
+                    int wl = Mathf.Min(Mathf.FloorToInt(s.waterLevelMeters), dims.y - 1);
+                    int surfaceMicro = wl * M - 1; // la capa micro superior queda vacía (superficie hundida)
+                    for (int y = wl - 1; y >= 1; y--)
+                    {
+                        byte t = w.GetBlockType(x, y, z);
+                        byte[] micro = w.GetMicroArray(x, y, z);
+
+                        if (t == 0 && micro == null)
+                        {
+                            w.SetBlockSilent(x, y, z, WATER);
+                            continue;
                         }
 
-                    // optimización: bloque totalmente lleno o vacío vuelve a ser uniforme
-                    if (filled == VoxelChunk.MICRO3) w.SetBlockSilent(x, y, z, subType);
-                    else if (filled == 0) w.SetBlockSilent(x, y, z, 0);
+                        if (micro == null) break; // sólido uniforme: terreno alcanzado
+
+                        // bloque parcial: el agua rellena sus huecos
+                        int gy0 = y * M;
+                        for (int my = 0; my < M && gy0 + my < surfaceMicro; my++)
+                            for (int mz = 0; mz < M; mz++)
+                                for (int mx = 0; mx < M; mx++)
+                                {
+                                    int idx = VoxelChunk.MicroIndex(mx, my, mz);
+                                    if (micro[idx] == 0) micro[idx] = WATER;
+                                }
+
+                        // si la capa inferior quedó con agua, hay paso hacia abajo:
+                        // seguir llenando (laderas con dos bloques parciales apilados);
+                        // si es todo terreno, el bloque sella la columna
+                        bool sealedBelow = true;
+                        for (int mz = 0; mz < M && sealedBelow; mz++)
+                            for (int mx = 0; mx < M; mx++)
+                                if (micro[VoxelChunk.MicroIndex(mx, 0, mz)] == WATER)
+                                {
+                                    sealedBelow = false;
+                                    break;
+                                }
+                        if (sealedBelow) break;
+                    }
                 }
             }
 

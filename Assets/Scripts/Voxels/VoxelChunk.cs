@@ -26,6 +26,11 @@ public sealed class VoxelChunk
     public MeshFilter filter;
     public MeshCollider collider;
 
+    // malla de agua (transparente, sin collider)
+    public GameObject waterGo;
+    public Mesh waterMesh;
+    public MeshFilter waterFilter;
+
     public static int BlockIndex(int x, int y, int z) => x + SIZE * (z + SIZE * y);
     public static int MicroIndex(int x, int y, int z) => x + MICRO * (z + MICRO * y);
 }

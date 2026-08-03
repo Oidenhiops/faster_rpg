@@ -21,8 +21,14 @@ public class VoxelWorld : MonoBehaviour
     [Tooltip("Opcional. Si es null se crea uno con URP/Lit o Standard. La textura principal se reemplaza por el atlas de los tipos.")]
     public Material voxelMaterial;
 
-    [Header("Tipos (assets VoxelTypeSO; índice en la lista = id. 0 = aire; el generador usa 1-8 en orden: pasto, tierra, piedra, mineral, arena, nieve, tronco, hojas)")]
+    [Header("Tipos (assets VoxelTypeSO; índice en la lista = id. 0 = aire; el generador usa 1-9 en orden: pasto, tierra, piedra, mineral, arena, nieve, tronco, hojas, agua)")]
     public List<VoxelTypeSO> types = new List<VoxelTypeSO>();
+
+    [Header("Agua")]
+    [Tooltip("Índice del tipo agua en la lista")]
+    public byte waterTypeId = 9;
+    [Tooltip("Opcional. Si es null se crea uno transparente simple")]
+    public Material waterMaterial;
 
     [Header("Rendimiento")]
     [Tooltip("Chunks remesheados por frame tras una edición")]
@@ -66,22 +72,7 @@ public class VoxelWorld : MonoBehaviour
         AllocateChunks();
         VoxelGenerator.Generate(this);
         for (int i = 0; i < chunks.Length; i++) RemeshImmediate(chunks[i]);
-        if (generation.waterLevelMeters > 0f) CreateWaterPlane();
         Ready = true;
-    }
-
-    void CreateWaterPlane()
-    {
-        var go = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        go.name = "Water";
-        Destroy(go.GetComponent<Collider>());
-        go.transform.SetParent(transform, false);
-        go.transform.localPosition = new Vector3(0f, LocalOrigin.y + generation.waterLevelMeters, 0f);
-        go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-        go.transform.localScale = new Vector3(BlockDims.x, BlockDims.z, 1f);
-        var mat = new Material(Shader.Find("Sprites/Default")) { name = "WaterMaterial" };
-        mat.color = new Color(0.15f, 0.45f, 0.75f, 0.55f);
-        go.GetComponent<MeshRenderer>().sharedMaterial = mat;
     }
 
     void Update()
@@ -116,11 +107,13 @@ public class VoxelWorld : MonoBehaviour
                 ("Nieve",   new Color(0.93f, 0.95f, 1.00f),     1f),
                 ("Tronco",  new Color(0.40f, 0.28f, 0.16f),     2f),
                 ("Hojas",   new Color(0.25f, 0.50f, 0.20f),     0.5f),
+                ("Agua",    new Color(0.20f, 0.50f, 0.80f, 0.6f), 999f),
             };
             foreach (var d in defaults)
             {
                 var so = ScriptableObject.CreateInstance<VoxelTypeSO>();
                 so.name = d.n; so.displayName = d.n; so.color = d.c; so.hardness = d.h;
+                so.indestructible = d.n == "Agua";
                 types.Add(so);
             }
         }
@@ -166,6 +159,14 @@ public class VoxelWorld : MonoBehaviour
             runtimeMaterial = new Material(shader) { name = "VoxelMaterial" };
         }
         runtimeMaterial.mainTexture = atlas;
+
+        // material del agua: transparente simple si no se asignó uno
+        if (waterMaterial == null)
+        {
+            waterMaterial = new Material(Shader.Find("Sprites/Default")) { name = "WaterMaterial" };
+            waterMaterial.color = waterTypeId < types.Count ? types[waterTypeId].color
+                                                            : new Color(0.2f, 0.5f, 0.8f, 0.6f);
+        }
     }
 
     static Texture2D SolidTexture(Color c)
@@ -203,6 +204,14 @@ public class VoxelWorld : MonoBehaviour
                         name = c.go.name,
                         indexFormat = UnityEngine.Rendering.IndexFormat.UInt32
                     };
+
+                    // malla de agua: hijo sin collider, material transparente
+                    c.waterGo = new GameObject("Water");
+                    c.waterGo.transform.SetParent(c.go.transform, false);
+                    c.waterFilter = c.waterGo.AddComponent<MeshFilter>();
+                    c.waterGo.AddComponent<MeshRenderer>().sharedMaterial = waterMaterial;
+                    c.waterMesh = new Mesh { name = c.go.name + " Water" };
+
                     chunks[ChunkIndex(cx, cy, cz)] = c;
                 }
     }
@@ -430,6 +439,7 @@ public class VoxelWorld : MonoBehaviour
 
         blockDamage.Remove(blockPos);
         removed = new Dictionary<byte, int>();
+        bool hasWater = false;
         if (micro == null)
         {
             removed[t] = VoxelChunk.MICRO3;
@@ -439,11 +449,13 @@ public class VoxelWorld : MonoBehaviour
             foreach (byte id in micro)
             {
                 if (id == 0) continue;
+                if (id == waterTypeId) { hasWater = true; continue; } // el agua no es recurso
                 removed.TryGetValue(id, out int count);
                 removed[id] = count + 1;
             }
         }
-        SetBlockUniform(bx, by, bz, 0);
+        // si el bloque contenía agua, el hueco queda inundado en vez de seco
+        SetBlockUniform(bx, by, bz, hasWater ? waterTypeId : (byte)0);
         return true;
     }
 
@@ -459,7 +471,9 @@ public class VoxelWorld : MonoBehaviour
         int by = Mathf.FloorToInt(rel.y);
         int bz = Mathf.FloorToInt(rel.z);
         if (!InBounds(bx, by, bz)) return false;
-        if (GetBlockType(bx, by, bz) != 0 || GetMicroArray(bx, by, bz) != null) return false;
+        byte current = GetBlockType(bx, by, bz);
+        // solo celdas vacías o con agua (construir desplaza el agua, estilo Minecraft)
+        if ((current != 0 && current != waterTypeId) || GetMicroArray(bx, by, bz) != null) return false;
         SetBlockUniform(bx, by, bz, typeId);
         return true;
     }
@@ -492,7 +506,7 @@ public class VoxelWorld : MonoBehaviour
 
     void RemeshImmediate(VoxelChunk c)
     {
-        Apply(c, VoxelMesher.Build(CopySnapshot(c), typeRects));
+        Apply(c, VoxelMesher.Build(CopySnapshot(c), typeRects, waterTypeId));
     }
 
     async Awaitable RemeshAsync(VoxelChunk c)
@@ -502,10 +516,10 @@ public class VoxelWorld : MonoBehaviour
         {
             VoxelMesher.Snapshot snapshot = CopySnapshot(c); // en main thread
             await Awaitable.BackgroundThreadAsync();
-            VoxelMesher.MeshData md = VoxelMesher.Build(snapshot, typeRects);
+            VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId);
             await Awaitable.MainThreadAsync();
             if (this == null || c.go == null) return;
-            Apply(c, md);
+            Apply(c, result);
         }
         finally
         {
@@ -531,8 +545,10 @@ public class VoxelWorld : MonoBehaviour
         return s;
     }
 
-    void Apply(VoxelChunk c, VoxelMesher.MeshData md)
+    void Apply(VoxelChunk c, VoxelMesher.BuildResult result)
     {
+        // terreno sólido (con collider)
+        VoxelMesher.MeshData md = result.solid;
         Mesh mesh = c.mesh;
         mesh.Clear();
         if (md.vertices.Count > 0)
@@ -551,5 +567,19 @@ public class VoxelWorld : MonoBehaviour
             c.filter.sharedMesh = mesh;
             c.collider.sharedMesh = null;
         }
+
+        // agua (sin collider)
+        VoxelMesher.MeshData wd = result.water;
+        Mesh waterMesh = c.waterMesh;
+        waterMesh.Clear();
+        if (wd.vertices.Count > 0)
+        {
+            waterMesh.SetVertices(wd.vertices);
+            waterMesh.SetNormals(wd.normals);
+            waterMesh.SetUVs(0, wd.uvs);
+            waterMesh.SetTriangles(wd.triangles, 0);
+            waterMesh.RecalculateBounds();
+        }
+        c.waterFilter.sharedMesh = waterMesh;
     }
 }
