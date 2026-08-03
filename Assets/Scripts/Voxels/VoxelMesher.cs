@@ -24,9 +24,13 @@ public static class VoxelMesher
     {
         public readonly byte[] types = new byte[P3];
         public readonly byte[][] micro = new byte[P3][]; // null = bloque uniforme
+        public readonly byte[] waterLvl = new byte[P3];  // nivel de agua 1-8 (8 = llena/fuente)
 
         public static int Idx(int x, int y, int z) => (x + 1) + P * ((z + 1) + P * (y + 1));
     }
+
+    // altura visual del agua según su nivel
+    static float WaterHeight(byte lvl) => lvl >= 8 ? WATER_TOP : Mathf.Max((int)lvl, 1) / (float)M;
 
     public class MeshData
     {
@@ -87,9 +91,13 @@ public static class VoxelMesher
                         // ---- bloque de agua ----
                         Rect wRect = typeRects[waterId];
 
-                        // ¿es agua de superficie? (encima no hay otro bloque de agua uniforme)
+                        // el agua nunca "sube" por tener algo encima: conserva su superficie.
+                        // Solo una columna continua de agua (agua sobre agua) la dibuja llena.
                         int ai = Snapshot.Idx(x, y + 1, z);
-                        bool surfaceWater = !(s.micro[ai] == null && s.types[ai] == waterId);
+                        byte[] aboveMicro = s.micro[ai];
+                        bool aboveWater = aboveMicro == null && s.types[ai] == waterId;
+                        float topH = aboveWater ? 1f : WaterHeight(s.waterLvl[bi]);
+                        int topLayer = Mathf.Clamp(Mathf.RoundToInt(topH * M), 1, M); // capas micro visibles
 
                         for (int f = 0; f < 6; f++)
                         {
@@ -98,31 +106,59 @@ public static class VoxelMesher
                             byte nt = s.types[ni];
                             byte[] nm = s.micro[ni];
 
+                            if (f == 0)
+                            {
+                                if (aboveWater) continue; // columna continua: sin tapa
+                                if (aboveMicro == null)
+                                {
+                                    // aire o sólido encima: la tapa se dibuja igual
+                                    // (bajo un bloque queda la ranura de 1/8, visible de lado)
+                                    AddWaterTop(water, blockPos, wRect, topH);
+                                }
+                                else
+                                {
+                                    // parcial encima: tapa salvo donde su agua micro continúa la columna
+                                    for (int mz2 = 0; mz2 < M; mz2++)
+                                        for (int mx2 = 0; mx2 < M; mx2++)
+                                        {
+                                            if (aboveMicro[VoxelChunk.MicroIndex(mx2, 0, mz2)] == waterId) continue;
+                                            AddWaterTopCell(water, blockPos, mx2, mz2, wRect, topH);
+                                        }
+                                }
+                                continue;
+                            }
+
+                            if (f == 1)
+                            {
+                                if (nm == null)
+                                {
+                                    if (nt == 0) AddQuad(water, blockPos, f, 1f, blockPos, wRect, d);
+                                }
+                                else EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId, true, M);
+                                continue;
+                            }
+
+                            // ---- caras laterales ----
                             if (nm == null)
                             {
-                                if (nt != 0) continue; // sólido u otra agua: oculta
-                                if (f == 0) AddWaterTop(water, blockPos, wRect);
-                                // costados del agua superficial recortados a la altura de la superficie
-                                else AddQuad(water, blockPos, f, 1f, blockPos, wRect, d,
-                                             surfaceWater ? WATER_TOP : 1f);
-                            }
-                            else if (f == 0)
-                            {
-                                // superficie contra bloque parcial encima: también hundida,
-                                // celda por celda donde la capa inferior del vecino esté vacía
-                                for (int mz2 = 0; mz2 < M; mz2++)
-                                    for (int mx2 = 0; mx2 < M; mx2++)
-                                    {
-                                        if (nm[VoxelChunk.MicroIndex(mx2, 0, mz2)] != 0) continue;
-                                        AddWaterTopCell(water, blockPos, mx2, mz2, wRect);
-                                    }
+                                if (nt == waterId)
+                                {
+                                    // vecino agua con nivel más bajo: pared del escalón
+                                    int nai = Snapshot.Idx(x + d.x, y + 1, z + d.z);
+                                    bool nAboveWater = s.micro[nai] == null && s.types[nai] == waterId;
+                                    float nH = nAboveWater ? 1f : WaterHeight(s.waterLvl[ni]);
+                                    if (nH < topH)
+                                        AddQuad(water, blockPos, f, 1f, blockPos, wRect, d, topH, nH);
+                                }
+                                else if (nt == 0)
+                                {
+                                    AddQuad(water, blockPos, f, 1f, blockPos, wRect, d, topH);
+                                }
                             }
                             else
                             {
                                 // vecino parcial: agua visible donde sus micro-celdas están vacías
-                                // (sin la capa micro superior si es agua de superficie)
-                                EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId,
-                                    waterOnlyAir: true, skipTopLayer: surfaceWater);
+                                EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId, true, topLayer);
                             }
                         }
                         continue;
@@ -139,9 +175,9 @@ public static class VoxelMesher
                             byte nt = s.types[ni];
                             byte[] nm = s.micro[ni];
 
-                            if (nm == null && IsSolid(nt, waterId)) continue;                              // vecino sólido: oculta
-                            if (nm == null) AddQuad(solid, blockPos, f, 1f, blockPos, rect, d);             // aire o agua: quad de 1m
-                            else EmitFaceAgainstPartial(solid, s, x, y, z, f, rect, waterId, false, false); // parcial: por micro-celda
+                            if (nm == null && IsSolid(nt, waterId)) continue;                          // vecino sólido: oculta
+                            if (nm == null) AddQuad(solid, blockPos, f, 1f, blockPos, rect, d);         // aire o agua: quad de 1m
+                            else EmitFaceAgainstPartial(solid, s, x, y, z, f, rect, waterId, false, M); // parcial: por micro-celda
                         }
                     }
                     else
@@ -158,11 +194,13 @@ public static class VoxelMesher
 
                                     if (id == waterId)
                                     {
-                                        // agua micro: solo caras contra aire, a la malla de agua
+                                        // agua micro: caras contra aire, incluida la franja de aire
+                                        // que queda sobre agua vecina de nivel más bajo
                                         for (int f = 0; f < 6; f++)
                                         {
                                             Vector3Int d = Dirs[f];
-                                            if (MicroAt(s, x, y, z, mx + d.x, my + d.y, mz + d.z) != 0) continue;
+                                            if (!WaterMicroNeighborOpen(s, x, y, z, mx + d.x, my + d.y, mz + d.z, waterId))
+                                                continue;
                                             AddQuad(water, microPos, f, MV, blockPos, rect, d);
                                         }
                                         continue;
@@ -184,7 +222,7 @@ public static class VoxelMesher
     // cara de un bloque uniforme contra un vecino parcial: emitir solo las
     // micro-celdas cuya celda opuesta en el vecino está vacía
     static void EmitFaceAgainstPartial(MeshData md, Snapshot s, int x, int y, int z, int f,
-        Rect rect, byte waterId, bool waterOnlyAir, bool skipTopLayer)
+        Rect rect, byte waterId, bool waterOnlyAir, int maxLayer)
     {
         Vector3Int d = Dirs[f];
         var blockPos = new Vector3(x, y, z);
@@ -196,12 +234,36 @@ public static class VoxelMesher
                 else if (d.y != 0) { my = d.y > 0 ? M - 1 : 0; mx = u; mz = v; }
                 else { mz = d.z > 0 ? M - 1 : 0; mx = u; my = v; }
 
-                if (skipTopLayer && my == M - 1) continue; // sobre la superficie del agua no hay nada
+                if (my >= maxLayer) continue; // por encima de la superficie del agua no hay nada
                 byte nb = MicroAt(s, x, y, z, mx + d.x, my + d.y, mz + d.z);
                 bool hidden = waterOnlyAir ? nb != 0 : IsSolid(nb, waterId);
                 if (hidden) continue;
                 AddQuad(md, blockPos + new Vector3(mx, my, mz) * MV, f, MV, blockPos, rect, d);
             }
+    }
+
+    // ¿está abierta (aire) la celda vecina para una cara de agua micro?
+    // A diferencia de MicroAt, si el vecino es un bloque de agua uniforme con nivel
+    // bajo, la franja por encima de su superficie cuenta como aire (cara visible)
+    static bool WaterMicroNeighborOpen(Snapshot s, int bx, int by, int bz, int mx, int my, int mz, byte waterId)
+    {
+        if (mx < 0) { bx--; mx += M; } else if (mx >= M) { bx++; mx -= M; }
+        if (my < 0) { by--; my += M; } else if (my >= M) { by++; my -= M; }
+        if (mz < 0) { bz--; mz += M; } else if (mz >= M) { bz++; mz -= M; }
+
+        int bi = Snapshot.Idx(bx, by, bz);
+        byte[] micro = s.micro[bi];
+        if (micro != null) return micro[VoxelChunk.MicroIndex(mx, my, mz)] == 0;
+
+        byte t = s.types[bi];
+        if (t == 0) return true;
+        if (t != waterId) return false; // sólido
+
+        // vecino agua uniforme: abierto solo por encima de su superficie
+        int ai = Snapshot.Idx(bx, by + 1, bz);
+        if (s.micro[ai] == null && s.types[ai] == waterId) return false; // columna continua de agua
+        int layers = Mathf.Clamp(Mathf.RoundToInt(WaterHeight(s.waterLvl[bi]) * M), 1, M);
+        return my >= layers;
     }
 
     // micro-voxel en coordenadas que pueden salirse del bloque (se normalizan al vecino)
@@ -220,14 +282,15 @@ public static class VoxelMesher
     // blockBase = esquina del bloque de 1m: los UVs se proyectan según la posición
     // dentro del bloque, así los micro-voxels muestrean su porción del atlas
     static void AddQuad(MeshData md, Vector3 origin, int f, float size, Vector3 blockBase, Rect rect, Vector3Int normal,
-        float clipTopY = float.PositiveInfinity)
+        float clipTopY = float.PositiveInfinity, float clipBottomY = float.NegativeInfinity)
     {
         int vi = md.vertices.Count;
         Vector3[] corners = Corners[f];
         for (int i = 0; i < 4; i++)
         {
             Vector3 p = origin + corners[i] * size;
-            if (p.y - origin.y > clipTopY) p.y = origin.y + clipTopY; // recorte para agua superficial
+            if (p.y - origin.y > clipTopY) p.y = origin.y + clipTopY;       // recorte superior (agua)
+            if (p.y - origin.y < clipBottomY) p.y = origin.y + clipBottomY; // recorte inferior (escalones)
             md.vertices.Add(p);
             md.normals.Add(normal);
 
@@ -246,8 +309,8 @@ public static class VoxelMesher
         md.triangles.Add(vi + 3);
     }
 
-    // celda micro de superficie de agua hundida (contra bloques parciales encima)
-    static void AddWaterTopCell(MeshData md, Vector3 blockPos, int mx, int mz, Rect rect)
+    // celda micro de superficie de agua (contra bloques parciales encima)
+    static void AddWaterTopCell(MeshData md, Vector3 blockPos, int mx, int mz, Rect rect, float height)
     {
         int vi = md.vertices.Count;
         Vector3[] corners = Corners[0];
@@ -255,7 +318,7 @@ public static class VoxelMesher
         {
             Vector3 c = corners[i];
             float lx = (mx + c.x) * MV, lz = (mz + c.z) * MV;
-            md.vertices.Add(blockPos + new Vector3(lx, WATER_TOP, lz));
+            md.vertices.Add(blockPos + new Vector3(lx, height, lz));
             md.normals.Add(Vector3.up);
             md.uvs.Add(new Vector2(rect.xMin + lx * rect.width, rect.yMin + lz * rect.height));
         }
@@ -267,15 +330,15 @@ public static class VoxelMesher
         md.triangles.Add(vi + 3);
     }
 
-    // superficie del agua: cara superior hundida
-    static void AddWaterTop(MeshData md, Vector3 blockPos, Rect rect)
+    // superficie del agua a la altura de su nivel
+    static void AddWaterTop(MeshData md, Vector3 blockPos, Rect rect, float height)
     {
         int vi = md.vertices.Count;
         Vector3[] corners = Corners[0];
         for (int i = 0; i < 4; i++)
         {
             Vector3 c = corners[i];
-            md.vertices.Add(blockPos + new Vector3(c.x, WATER_TOP, c.z));
+            md.vertices.Add(blockPos + new Vector3(c.x, height, c.z));
             md.normals.Add(Vector3.up);
             md.uvs.Add(new Vector2(rect.xMin + c.x * rect.width, rect.yMin + c.z * rect.height));
         }

@@ -34,6 +34,13 @@ public class VoxelWorld : MonoBehaviour
     [Tooltip("Chunks remesheados por frame tras una edición")]
     public int remeshBudgetPerFrame = 4;
 
+    [Header("Flujo de agua")]
+    public bool waterFlowEnabled = true;
+    [Tooltip("Segundos entre ticks de flujo")]
+    public float waterFlowInterval = 0.1f;
+    [Tooltip("Celdas procesadas por tick")]
+    public int waterFlowBudget = 64;
+
     [Header("Generación")]
     public VoxelGenerator.Settings generation = new VoxelGenerator.Settings();
 
@@ -53,6 +60,12 @@ public class VoxelWorld : MonoBehaviour
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
     Material runtimeMaterial;
     Rect[] typeRects; // región de cada tipo dentro del atlas (índice = id)
+
+    // flujo de agua (niveles 1-8; las celdas del lago original son fuentes = sin entrada en el dict)
+    readonly Queue<Vector3Int> flowQueue = new Queue<Vector3Int>();
+    readonly HashSet<Vector3Int> flowQueued = new HashSet<Vector3Int>();
+    readonly Dictionary<Vector3Int, byte> waterLevels = new Dictionary<Vector3Int, byte>(); // solo celdas en flujo
+    float nextFlowTime;
 
     void Awake()
     {
@@ -84,6 +97,19 @@ public class VoxelWorld : MonoBehaviour
             if (c.remeshing) { dirtyQueue.Enqueue(c); continue; } // ocupado, reintentar
             c.dirty = false;
             _ = RemeshAsync(c);
+        }
+
+        // tick de flujo de agua
+        if (waterFlowEnabled && Ready && flowQueue.Count > 0 && Time.time >= nextFlowTime)
+        {
+            nextFlowTime = Time.time + waterFlowInterval;
+            int f = Mathf.Min(waterFlowBudget, flowQueue.Count);
+            for (int i = 0; i < f; i++)
+            {
+                Vector3Int p = flowQueue.Dequeue();
+                flowQueued.Remove(p);
+                ProcessFlow(p);
+            }
         }
     }
 
@@ -261,7 +287,9 @@ public class VoxelWorld : MonoBehaviour
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         c.blockTypes[idx] = typeId;
         c.microBlocks.Remove(idx);
-        blockDamage.Remove(new Vector3Int(bx, by, bz)); // el daño acumulado no sobrevive al bloque
+        var pos = new Vector3Int(bx, by, bz);
+        blockDamage.Remove(pos); // el daño acumulado no sobrevive al bloque
+        if (typeId != waterTypeId) waterLevels.Remove(pos); // el nivel de flujo tampoco
         NotifyBlockEdited(bx, by, bz);
     }
 
@@ -302,6 +330,159 @@ public class VoxelWorld : MonoBehaviour
         if (lz == 0) MarkDirtyAt(c.coord + new Vector3Int(0, 0, -1));
         if (lz == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + new Vector3Int(0, 0, 1));
         OnBlockChanged?.Invoke(new Vector3Int(bx, by, bz));
+
+        // cualquier edición despierta la simulación de agua en la vecindad
+        if (waterFlowEnabled && Ready) EnqueueFlowAround(new Vector3Int(bx, by, bz));
+    }
+
+    // ------------------------------------------------------------------ flujo de agua
+
+    void EnqueueFlowAround(Vector3Int p)
+    {
+        EnqueueFlow(p);
+        EnqueueFlow(p + Vector3Int.up);
+        EnqueueFlow(p + Vector3Int.down);
+        EnqueueFlow(p + Vector3Int.left);
+        EnqueueFlow(p + Vector3Int.right);
+        EnqueueFlow(p + new Vector3Int(0, 0, 1));
+        EnqueueFlow(p + new Vector3Int(0, 0, -1));
+    }
+
+    void EnqueueFlow(Vector3Int p)
+    {
+        if (!InBounds(p.x, p.y, p.z)) return;
+        if (flowQueued.Add(p)) flowQueue.Enqueue(p);
+    }
+
+    public bool IsWaterCell(int bx, int by, int bz)
+    {
+        byte[] micro = GetMicroArray(bx, by, bz);
+        if (micro == null) return GetBlockType(bx, by, bz) == waterTypeId;
+        foreach (byte id in micro)
+            if (id == waterTypeId) return true;
+        return false;
+    }
+
+    /// <summary>0 = sin agua. Bloques parciales con agua y fuentes = 8; celdas en flujo, su nivel.</summary>
+    int EffectiveWaterLevel(Vector3Int p)
+    {
+        if (!IsWaterCell(p.x, p.y, p.z)) return 0;
+        if (GetMicroArray(p.x, p.y, p.z) != null) return 8; // agua micro (orillas): estática, cuenta llena
+        return waterLevels.TryGetValue(p, out byte l) ? l : 8; // sin entrada = fuente
+    }
+
+    static readonly Vector3Int[] FlowSides =
+    {
+        Vector3Int.left, Vector3Int.right, new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)
+    };
+
+    void ProcessFlow(Vector3Int p)
+    {
+        int lvl = EffectiveWaterLevel(p);
+        if (lvl == 0) return;
+
+        byte[] microP = GetMicroArray(p.x, p.y, p.z);
+        bool waterAbove = EffectiveWaterLevel(p + Vector3Int.up) > 0;
+
+        // ---- celdas en flujo: recomputar nivel según su alimentación ----
+        if (microP == null && waterLevels.ContainsKey(p))
+        {
+            int support;
+            if (waterAbove) support = 8; // alimentada desde arriba (columna de caída)
+            else
+            {
+                int maxSide = 0;
+                foreach (Vector3Int d in FlowSides)
+                {
+                    int nl = EffectiveWaterLevel(p + d);
+                    if (nl > maxSide) maxSide = nl;
+                }
+                support = maxSide - 1;
+            }
+
+            // consolidarse como fuente: 2+ fuentes vecinas y piso firme (estilo Minecraft)
+            int sourceNeighbors = 0;
+            foreach (Vector3Int d in FlowSides)
+            {
+                Vector3Int n = p + d;
+                if (GetMicroArray(n.x, n.y, n.z) == null &&
+                    GetBlockType(n.x, n.y, n.z) == waterTypeId &&
+                    !waterLevels.ContainsKey(n)) sourceNeighbors++;
+            }
+            Vector3Int below = p + Vector3Int.down;
+            bool firmFloor = !InBounds(below.x, below.y, below.z) ||
+                             GetBlockType(below.x, below.y, below.z) != 0 ||
+                             GetMicroArray(below.x, below.y, below.z) != null;
+
+            if (sourceNeighbors >= 2 && firmFloor)
+            {
+                waterLevels.Remove(p); // ahora es fuente
+                lvl = 8;
+                NotifyBlockEdited(p.x, p.y, p.z);
+            }
+            else if (support <= 0)
+            {
+                waterLevels.Remove(p);
+                SetBlockUniform(p.x, p.y, p.z, 0); // se seca (notifica y despierta vecinos)
+                return;
+            }
+            else if (support != lvl)
+            {
+                waterLevels[p] = (byte)support;
+                lvl = support;
+                NotifyBlockEdited(p.x, p.y, p.z);
+            }
+        }
+
+        // ---- bloque parcial con agua: rellenar sus propios huecos ----
+        if (microP != null) TryFlow(p, waterAbove ? 8 : 7, waterAbove);
+
+        // ---- caer; si está bloqueado abajo, expandirse a los lados ----
+        if (!TryFlow(p + Vector3Int.down, 8, true) && lvl > 1)
+        {
+            foreach (Vector3Int d in FlowSides)
+                TryFlow(p + d, lvl - 1, false);
+        }
+    }
+
+    // intenta meter agua en la celda; devuelve true si fluyó algo
+    bool TryFlow(Vector3Int t, int newLvl, bool falling)
+    {
+        if (!InBounds(t.x, t.y, t.z) || t.y < 1) return false;
+
+        byte bt = GetBlockType(t.x, t.y, t.z);
+        byte[] micro = GetMicroArray(t.x, t.y, t.z);
+
+        if (micro == null)
+        {
+            if (bt == waterTypeId)
+            {
+                // ya hay agua: si es de menor nivel, su recomputo la subirá (vecinos en cola)
+                return false;
+            }
+            if (bt != 0) return false; // sólido
+
+            SetBlockUniform(t.x, t.y, t.z, waterTypeId); // notifica → remesh + vecinos a la cola
+            waterLevels[t] = (byte)Mathf.Clamp(newLvl, 1, 8); // toda agua nueva nace en flujo
+            return true;
+        }
+
+        // bloque parcial: se llena hasta la superficie estándar (7/8), porque para la
+        // simulación y el render un parcial con agua cuenta como celda llena; llenarlo
+        // a medias según el nivel entrante producía alturas inconsistentes en la orilla
+        int maxMy = falling ? VoxelChunk.MICRO : VoxelChunk.MICRO - 1;
+        bool changed = false;
+        for (int my = 0; my < maxMy; my++)
+            for (int mz = 0; mz < VoxelChunk.MICRO; mz++)
+                for (int mx = 0; mx < VoxelChunk.MICRO; mx++)
+                {
+                    int idx = VoxelChunk.MicroIndex(mx, my, mz);
+                    if (micro[idx] != 0) continue;
+                    micro[idx] = waterTypeId;
+                    changed = true;
+                }
+        if (changed) NotifyBlockEdited(t.x, t.y, t.z); // remesh + re-despertar vecinos
+        return changed;
     }
 
     void MarkDirty(VoxelChunk c)
@@ -540,6 +721,10 @@ public class VoxelWorld : MonoBehaviour
                     s.types[i] = GetBlockType(bx, by, bz);
                     byte[] micro = GetMicroArray(bx, by, bz);
                     s.micro[i] = micro != null ? (byte[])micro.Clone() : null;
+                    s.waterLvl[i] = 8;
+                    if (micro == null && s.types[i] == waterTypeId &&
+                        waterLevels.TryGetValue(new Vector3Int(bx, by, bz), out byte lvl))
+                        s.waterLvl[i] = lvl;
                     i++;
                 }
         return s;
