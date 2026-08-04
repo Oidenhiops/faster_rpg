@@ -20,6 +20,7 @@ public sealed class VoxelChunk
     public Vector3Int coord;
     public bool dirty;
     public bool remeshing;
+    public bool edited; // tiene cambios del jugador: sus datos se conservan al descargar
 
     public GameObject go;
     public Mesh mesh;

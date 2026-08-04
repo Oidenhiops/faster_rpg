@@ -20,6 +20,7 @@ public class VoxelWorld : MonoBehaviour
         Medium,     // 160 x 96 x 160
         Large,      // 256 x 96 x 256
         ExtraLarge, // 384 x 96 x 384
+        Infinite,   // ±131 km: en la práctica, sin borde
         Custom,     // usa World Size Meters
     }
 
@@ -69,6 +70,16 @@ public class VoxelWorld : MonoBehaviour
     [Tooltip("Chunks remesheados por frame tras una edición")]
     public int remeshBudgetPerFrame = 4;
 
+    [Header("Streaming de chunks")]
+    [Tooltip("Objetivo alrededor del cual se carga el mundo (el player). Vacío = cámara principal")]
+    public Transform streamTarget;
+    [Tooltip("Radio de carga en columnas de chunk (16 m cada una)")]
+    public int viewDistanceColumns = 8;
+    [Tooltip("Columnas generadas por frame")]
+    public int columnsPerFrame = 2;
+    [Tooltip("Radio cargado de golpe al arrancar (para que haya piso bajo el player)")]
+    public int warmupRadius = 3;
+
     [Header("Flujo de agua")]
     public bool waterFlowEnabled = true;
     [Tooltip("Segundos entre ticks de flujo")]
@@ -88,6 +99,7 @@ public class VoxelWorld : MonoBehaviour
         WorldSize.Medium     => new Vector3Int(160, WORLD_HEIGHT, 160),
         WorldSize.Large      => new Vector3Int(256, WORLD_HEIGHT, 256),
         WorldSize.ExtraLarge => new Vector3Int(384, WORLD_HEIGHT, 384),
+        WorldSize.Infinite   => new Vector3Int(1 << 18, WORLD_HEIGHT, 1 << 18),
         _                    => worldSizeMeters,
     };
     /// <summary>Offset local para que el centro del mapa quede en la posición del transform.</summary>
@@ -96,9 +108,19 @@ public class VoxelWorld : MonoBehaviour
     public Vector3 Origin => transform.position + LocalOrigin;
     public bool Ready { get; private set; }
 
-    Vector3Int chunkDims;
-    VoxelChunk[] chunks;
+    readonly Dictionary<Vector3Int, VoxelChunk> chunks = new Dictionary<Vector3Int, VoxelChunk>();
     readonly Queue<VoxelChunk> dirtyQueue = new Queue<VoxelChunk>();
+
+    // streaming
+    VoxelGenerator.GenContext genContext;
+    readonly Dictionary<Vector2Int, byte> columnState = new Dictionary<Vector2Int, byte>(); // 1=generada 2=decorada
+    readonly HashSet<Vector2Int> loadedColumns = new HashSet<Vector2Int>();
+    static readonly List<Vector2Int> tmpUnload = new List<Vector2Int>();
+    List<Vector2Int> ringOffsets;
+    int ringPointer;
+    Vector2Int lastTargetCol = new Vector2Int(int.MinValue, int.MinValue);
+    int unloadTimer;
+    int rescanTimer;
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
     Material runtimeMaterial;
     Rect[] typeRects;  // región de cada tipo dentro del atlas (índice = id)
@@ -149,14 +171,19 @@ public class VoxelWorld : MonoBehaviour
         }
 
         BuildMaterial();
-        AllocateChunks();
-        VoxelGenerator.Generate(this);
-        for (int i = 0; i < chunks.Length; i++) RemeshImmediate(chunks[i]);
+
+        // streaming: el mundo se carga por columnas alrededor del objetivo
+        genContext = VoxelGenerator.Prepare(this);
+        BuildRingOffsets();
+        if (streamTarget == null && Camera.main != null) streamTarget = Camera.main.transform;
+        WarmupStreaming();
         Ready = true;
     }
 
     void Update()
     {
+        if (Ready && genContext != null) UpdateStreaming();
+
         int n = Mathf.Min(remeshBudgetPerFrame, dirtyQueue.Count);
         for (int i = 0; i < n; i++)
         {
@@ -298,53 +325,52 @@ public class VoxelWorld : MonoBehaviour
         return tex;
     }
 
-    void AllocateChunks()
+    VoxelChunk GetOrCreateChunk(Vector3Int cc)
     {
-        chunkDims = new Vector3Int(
-            CeilDiv(BlockDims.x, VoxelChunk.SIZE),
-            CeilDiv(BlockDims.y, VoxelChunk.SIZE),
-            CeilDiv(BlockDims.z, VoxelChunk.SIZE));
-        chunks = new VoxelChunk[chunkDims.x * chunkDims.y * chunkDims.z];
-
-        for (int cy = 0; cy < chunkDims.y; cy++)
-            for (int cz = 0; cz < chunkDims.z; cz++)
-                for (int cx = 0; cx < chunkDims.x; cx++)
-                {
-                    var c = new VoxelChunk { coord = new Vector3Int(cx, cy, cz) };
-                    c.go = new GameObject($"Chunk {cx},{cy},{cz}") { layer = LayerMask.NameToLayer("Map") };
-                    c.go.transform.SetParent(transform, false);
-                    c.go.transform.localPosition = LocalOrigin + (Vector3)(c.coord * VoxelChunk.SIZE);
-                    c.filter = c.go.AddComponent<MeshFilter>();
-                    var renderer = c.go.AddComponent<MeshRenderer>();
-                    renderer.sharedMaterial = runtimeMaterial;
-                    c.collider = c.go.AddComponent<MeshCollider>();
-                    c.mesh = new Mesh
-                    {
-                        name = c.go.name,
-                        indexFormat = UnityEngine.Rendering.IndexFormat.UInt32
-                    };
-
-                    // malla de agua: hijo sin collider, material transparente
-                    c.waterGo = new GameObject("Water");
-                    c.waterGo.transform.SetParent(c.go.transform, false);
-                    c.waterFilter = c.waterGo.AddComponent<MeshFilter>();
-                    c.waterGo.AddComponent<MeshRenderer>().sharedMaterial = waterMaterial;
-                    c.waterMesh = new Mesh { name = c.go.name + " Water" };
-
-                    // malla de plantas: hijo sin collider, material cutout
-                    c.plantGo = new GameObject("Plants");
-                    c.plantGo.transform.SetParent(c.go.transform, false);
-                    c.plantFilter = c.plantGo.AddComponent<MeshFilter>();
-                    c.plantGo.AddComponent<MeshRenderer>().sharedMaterial = plantMaterial;
-                    c.plantMesh = new Mesh { name = c.go.name + " Plants" };
-
-                    chunks[ChunkIndex(cx, cy, cz)] = c;
-                }
+        if (!chunks.TryGetValue(cc, out VoxelChunk c))
+        {
+            c = new VoxelChunk { coord = cc };
+            chunks[cc] = c;
+        }
+        if (c.go == null) BuildChunkObjects(c);
+        return c;
     }
 
-    static int CeilDiv(int a, int b) => (a + b - 1) / b;
-    int ChunkIndex(int cx, int cy, int cz) => cx + chunkDims.x * (cz + chunkDims.z * cy);
-    VoxelChunk ChunkAt(int bx, int by, int bz) => chunks[ChunkIndex(bx >> 4, by >> 4, bz >> 4)];
+    void BuildChunkObjects(VoxelChunk c)
+    {
+        c.go = new GameObject($"Chunk {c.coord.x},{c.coord.y},{c.coord.z}") { layer = LayerMask.NameToLayer("Map") };
+        c.go.transform.SetParent(transform, false);
+        c.go.transform.localPosition = LocalOrigin + (Vector3)(c.coord * VoxelChunk.SIZE);
+        c.filter = c.go.AddComponent<MeshFilter>();
+        var renderer = c.go.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial = runtimeMaterial;
+        c.collider = c.go.AddComponent<MeshCollider>();
+        c.mesh = new Mesh
+        {
+            name = c.go.name,
+            indexFormat = UnityEngine.Rendering.IndexFormat.UInt32
+        };
+
+        // malla de agua: hijo sin collider, material transparente
+        c.waterGo = new GameObject("Water");
+        c.waterGo.transform.SetParent(c.go.transform, false);
+        c.waterFilter = c.waterGo.AddComponent<MeshFilter>();
+        c.waterGo.AddComponent<MeshRenderer>().sharedMaterial = waterMaterial;
+        c.waterMesh = new Mesh { name = c.go.name + " Water" };
+
+        // malla de plantas: hijo sin collider, material cutout
+        c.plantGo = new GameObject("Plants");
+        c.plantGo.transform.SetParent(c.go.transform, false);
+        c.plantFilter = c.plantGo.AddComponent<MeshFilter>();
+        c.plantGo.AddComponent<MeshRenderer>().sharedMaterial = plantMaterial;
+        c.plantMesh = new Mesh { name = c.go.name + " Plants" };
+    }
+
+    VoxelChunk ChunkAt(int bx, int by, int bz)
+    {
+        chunks.TryGetValue(new Vector3Int(bx >> 4, by >> 4, bz >> 4), out VoxelChunk c);
+        return c;
+    }
 
     // ------------------------------------------------------------------ acceso a bloques
 
@@ -354,15 +380,18 @@ public class VoxelWorld : MonoBehaviour
     public byte GetBlockType(int bx, int by, int bz)
     {
         if (!InBounds(bx, by, bz)) return 0;
-        return ChunkAt(bx, by, bz).blockTypes[VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15)];
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null) return 0; // chunk no cargado = aire
+        return c.blockTypes[VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15)];
     }
 
     /// <summary>Micro-voxels del bloque, o null si el bloque es uniforme.</summary>
     public byte[] GetMicroArray(int bx, int by, int bz)
     {
         if (!InBounds(bx, by, bz)) return null;
-        ChunkAt(bx, by, bz).microBlocks.TryGetValue(
-            VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15), out byte[] micro);
+        VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null) return null;
+        c.microBlocks.TryGetValue(VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15), out byte[] micro);
         return micro;
     }
 
@@ -370,6 +399,7 @@ public class VoxelWorld : MonoBehaviour
     public byte[] AllocateMicro(int bx, int by, int bz, byte fillType)
     {
         VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null) return null;
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
         var micro = new byte[VoxelChunk.MICRO3];
@@ -384,6 +414,7 @@ public class VoxelWorld : MonoBehaviour
     {
         if (!InBounds(bx, by, bz)) return;
         VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null) return; // fuera del área cargada
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         c.blockTypes[idx] = typeId;
         c.microBlocks.Remove(idx);
@@ -400,11 +431,13 @@ public class VoxelWorld : MonoBehaviour
         }
     }
 
-    /// <summary>Escritura sin eventos ni remesh. Solo para la generación inicial.</summary>
+    /// <summary>Escritura sin eventos ni remesh. Solo para la generación.
+    /// No toca chunks descargados ni chunks con ediciones del jugador.</summary>
     public void SetBlockSilent(int bx, int by, int bz, byte typeId)
     {
         if (!InBounds(bx, by, bz)) return;
         VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null || c.edited) return;
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         c.blockTypes[idx] = typeId;
         c.microBlocks.Remove(idx); // un bloque uniforme no debe conservar micro-voxels
@@ -415,6 +448,7 @@ public class VoxelWorld : MonoBehaviour
     {
         if (!InBounds(bx, by, bz)) return null;
         VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null || c.edited) return null;
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
         var micro = new byte[VoxelChunk.MICRO3];
@@ -427,6 +461,8 @@ public class VoxelWorld : MonoBehaviour
     public void NotifyBlockEdited(int bx, int by, int bz)
     {
         VoxelChunk c = ChunkAt(bx, by, bz);
+        if (c == null) return;
+        c.edited = true; // sus datos se conservarán al descargar la columna
         MarkDirty(c);
         // un bloque en el borde del chunk cambia las caras visibles del chunk vecino
         int lx = bx & 15, ly = by & 15, lz = bz & 15;
@@ -594,16 +630,220 @@ public class VoxelWorld : MonoBehaviour
 
     void MarkDirty(VoxelChunk c)
     {
-        if (c.dirty) return;
+        if (c == null || c.dirty || c.go == null) return; // descargado: se mesheará al recargar
         c.dirty = true;
         dirtyQueue.Enqueue(c);
     }
 
     void MarkDirtyAt(Vector3Int chunkCoord)
     {
-        if (chunkCoord.x < 0 || chunkCoord.y < 0 || chunkCoord.z < 0 ||
-            chunkCoord.x >= chunkDims.x || chunkCoord.y >= chunkDims.y || chunkCoord.z >= chunkDims.z) return;
-        MarkDirty(chunks[ChunkIndex(chunkCoord.x, chunkCoord.y, chunkCoord.z)]);
+        chunks.TryGetValue(chunkCoord, out VoxelChunk c);
+        MarkDirty(c);
+    }
+
+    // ------------------------------------------------------------------ streaming
+
+    int ColumnsX => BlockDims.x >> 4;
+    int ColumnsZ => BlockDims.z >> 4;
+    int ChunksY => BlockDims.y >> 4;
+
+    Vector2Int TargetColumn()
+    {
+        Vector3 pos = streamTarget != null ? streamTarget.position : transform.position;
+        Vector3 rel = pos - Origin;
+        int bx = Mathf.Clamp(Mathf.FloorToInt(rel.x), 0, BlockDims.x - 1);
+        int bz = Mathf.Clamp(Mathf.FloorToInt(rel.z), 0, BlockDims.z - 1);
+        return new Vector2Int(bx >> 4, bz >> 4);
+    }
+
+    void BuildRingOffsets()
+    {
+        ringOffsets = new List<Vector2Int>();
+        int r = Mathf.Max(2, viewDistanceColumns);
+        for (int dx = -r; dx <= r; dx++)
+            for (int dz = -r; dz <= r; dz++)
+                ringOffsets.Add(new Vector2Int(dx, dz));
+        ringOffsets.Sort((a, b) => (a.x * a.x + a.y * a.y).CompareTo(b.x * b.x + b.y * b.y));
+    }
+
+    bool ColumnInWorld(Vector2Int c2) =>
+        c2.x >= 0 && c2.y >= 0 && c2.x < ColumnsX && c2.y < ColumnsZ;
+
+    void UpdateStreaming()
+    {
+        Vector2Int col = TargetColumn();
+        if (col != lastTargetCol) { lastTargetCol = col; ringPointer = 0; }
+
+        int budget = columnsPerFrame;
+        while (budget > 0 && ringPointer < ringOffsets.Count)
+        {
+            Vector2Int c2 = col + ringOffsets[ringPointer];
+            if (!ColumnInWorld(c2)) { ringPointer++; continue; }
+            if (StreamColumn(c2)) budget--; // hizo trabajo este frame
+            else ringPointer++;             // esa columna ya está lista
+        }
+
+        // re-escanear de vez en cuando: algunas columnas quedan pendientes de
+        // decorar hasta que sus vecinas terminan de generarse
+        if (ringPointer >= ringOffsets.Count && ++rescanTimer >= 30)
+        {
+            rescanTimer = 0;
+            ringPointer = 0;
+        }
+
+        // descarga periódica de columnas lejanas
+        if (++unloadTimer >= 60)
+        {
+            unloadTimer = 0;
+            int limit = viewDistanceColumns + 2;
+            tmpUnload.Clear();
+            foreach (Vector2Int lc in loadedColumns)
+                if (Mathf.Max(Mathf.Abs(lc.x - col.x), Mathf.Abs(lc.y - col.y)) > limit)
+                    tmpUnload.Add(lc);
+            foreach (Vector2Int lc in tmpUnload) UnloadColumn(lc);
+        }
+    }
+
+    // devuelve true si generó o decoró algo (consumió presupuesto)
+    bool StreamColumn(Vector2Int c2)
+    {
+        columnState.TryGetValue(c2, out byte st);
+        if (!loadedColumns.Contains(c2))
+        {
+            LoadColumn(c2, st);
+            return true;
+        }
+        if (st < 2 && NeighborsGenerated(c2))
+        {
+            DecorateColumn(c2);
+            return true;
+        }
+        return false;
+    }
+
+    void LoadColumn(Vector2Int c2, byte state)
+    {
+        for (int cy = 0; cy < ChunksY; cy++)
+            GetOrCreateChunk(new Vector3Int(c2.x, cy, c2.y));
+
+        // generar terreno (idempotente: los chunks editados conservados se saltan)
+        VoxelGenerator.GenerateColumn(genContext, this, c2.x, c2.y);
+        if (state == 0) columnState[c2] = 1;
+
+        // recarga de una columna ya decorada: reaplicar la decoración propia y la
+        // de las vecinas decoradas (sus árboles cruzan el borde hacia esta columna)
+        if (state >= 2) RedecorateAround(c2);
+
+        loadedColumns.Add(c2);
+        MarkColumnDirty(c2, alsoNeighbors: true);
+    }
+
+    void RedecorateAround(Vector2Int c2)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++)
+            {
+                var n = new Vector2Int(c2.x + dx, c2.y + dz);
+                if (columnState.TryGetValue(n, out byte st) && st >= 2)
+                    VoxelGenerator.DecorateColumn(genContext, this, n.x, n.y);
+            }
+    }
+
+    bool NeighborsGenerated(Vector2Int c2)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++)
+            {
+                var n = new Vector2Int(c2.x + dx, c2.y + dz);
+                if (!ColumnInWorld(n)) continue; // el borde del mundo cuenta como listo
+                if (!loadedColumns.Contains(n)) return false;
+            }
+        return true;
+    }
+
+    void DecorateColumn(Vector2Int c2)
+    {
+        VoxelGenerator.DecorateColumn(genContext, this, c2.x, c2.y);
+        columnState[c2] = 2;
+        MarkColumnDirty(c2, alsoNeighbors: true);
+    }
+
+    void MarkColumnDirty(Vector2Int c2, bool alsoNeighbors)
+    {
+        for (int cy = 0; cy < ChunksY; cy++)
+        {
+            MarkDirtyAt(new Vector3Int(c2.x, cy, c2.y));
+            if (!alsoNeighbors) continue;
+            MarkDirtyAt(new Vector3Int(c2.x + 1, cy, c2.y));
+            MarkDirtyAt(new Vector3Int(c2.x - 1, cy, c2.y));
+            MarkDirtyAt(new Vector3Int(c2.x, cy, c2.y + 1));
+            MarkDirtyAt(new Vector3Int(c2.x, cy, c2.y - 1));
+        }
+    }
+
+    void UnloadColumn(Vector2Int c2)
+    {
+        for (int cy = 0; cy < ChunksY; cy++)
+        {
+            var cc = new Vector3Int(c2.x, cy, c2.y);
+            if (!chunks.TryGetValue(cc, out VoxelChunk c)) continue;
+
+            if (c.go != null)
+            {
+                Destroy(c.go); // destruye también los hijos (agua, plantas)
+                Destroy(c.mesh);
+                Destroy(c.waterMesh);
+                Destroy(c.plantMesh);
+                c.go = null; c.mesh = null; c.filter = null; c.collider = null;
+                c.waterGo = null; c.waterMesh = null; c.waterFilter = null;
+                c.plantGo = null; c.plantMesh = null; c.plantFilter = null;
+                c.dirty = false;
+            }
+
+            // sin ediciones del jugador: los datos se regeneran al volver
+            if (!c.edited) chunks.Remove(cc);
+        }
+        loadedColumns.Remove(c2);
+    }
+
+    void WarmupStreaming()
+    {
+        Vector2Int col = TargetColumn();
+        int r = Mathf.Clamp(warmupRadius, 1, viewDistanceColumns);
+
+        for (int dx = -r; dx <= r; dx++)
+            for (int dz = -r; dz <= r; dz++)
+            {
+                var c2 = new Vector2Int(col.x + dx, col.y + dz);
+                if (!ColumnInWorld(c2)) continue;
+                columnState.TryGetValue(c2, out byte st);
+                LoadColumn(c2, st);
+            }
+
+        for (int dx = -(r - 1); dx <= r - 1; dx++)
+            for (int dz = -(r - 1); dz <= r - 1; dz++)
+            {
+                var c2 = new Vector2Int(col.x + dx, col.y + dz);
+                if (!ColumnInWorld(c2)) continue;
+                if (columnState.TryGetValue(c2, out byte st) && st < 2 && NeighborsGenerated(c2))
+                    DecorateColumn(c2);
+            }
+
+        // mesheado inmediato del área inicial: piso garantizado bajo el player
+        while (dirtyQueue.Count > 0)
+        {
+            VoxelChunk c = dirtyQueue.Dequeue();
+            c.dirty = false;
+            if (c.go != null) RemeshImmediate(c);
+        }
+    }
+
+    /// <summary>¿La columna bajo esta posición ya tiene terreno decorado y mesheado?</summary>
+    public bool IsAreaReady(Vector3 worldPos)
+    {
+        Vector3 rel = worldPos - Origin;
+        var c2 = new Vector2Int(Mathf.FloorToInt(rel.x) >> 4, Mathf.FloorToInt(rel.z) >> 4);
+        return columnState.TryGetValue(c2, out byte st) && st >= 2 && loadedColumns.Contains(c2);
     }
 
     // ------------------------------------------------------------------ excavar / construir

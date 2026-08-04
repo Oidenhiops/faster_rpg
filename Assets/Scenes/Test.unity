@@ -3680,7 +3680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2622751316b3b5749a852ccff4a3b741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoxelInteractor
-  cam: {fileID: 0}
+  cam: {fileID: 330585545}
   maxDistance: 8
   hitMask:
     serializedVersion: 2
@@ -25627,6 +25627,10 @@ MonoBehaviour:
   waterMaterial: {fileID: 2100000, guid: 648506158a270ab47aaf4612ffe9318e, type: 2}
   plantMaterial: {fileID: 0}
   remeshBudgetPerFrame: 4
+  streamTarget: {fileID: 211714502}
+  viewDistanceColumns: 8
+  columnsPerFrame: 2
+  warmupRadius: 3
   waterFlowEnabled: 1
   waterFlowInterval: 0.1
   waterFlowBudget: 64
