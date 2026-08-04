@@ -65,6 +65,8 @@ public static class VoxelGenerator
         public List<(byte trunk, byte leaves, int min, int max, float weight)> trees =
             new List<(byte, byte, int, int, float)>();
         public float treeTotal;
+        public List<(byte ore, byte host, float veins, int minH, int maxH, int minSize, int maxSize)> ores =
+            new List<(byte, byte, float, int, int, int, int)>();
     }
 
     public static void Generate(VoxelWorld w)
@@ -162,7 +164,8 @@ public static class VoxelGenerator
                     else if (depth <= 1 + zs.dirtDepthMeters) id = subType;
                     else id = zd.stone;
 
-                    if (id == zd.stone &&
+                    // minerales por ruido: solo como respaldo si la zona no define vetas
+                    if (id == zd.stone && zd.ores.Count == 0 &&
                         Noise3(oOre + x * zs.oreScale, oOre + y * zs.oreScale, oOre + z * zs.oreScale) > zs.oreThreshold)
                         id = zd.ore;
 
@@ -244,6 +247,9 @@ public static class VoxelGenerator
                 }
             }
 
+        // ---- pasada 2.5: vetas de mineral ----
+        PlaceOres(w, seed, dims, zoneList, zoneIdx);
+
         // ---- pasada 3: árboles ----
         PlaceTrees(w, seed, heights, surface, dims, zoneList, zoneIdx);
 
@@ -267,6 +273,17 @@ public static class VoxelGenerator
 
         if (info != null)
         {
+            foreach (var o in info.ores)
+            {
+                if (o == null || o.ore == null) continue;
+                byte oreId = w.IdOf(o.ore);
+                if (oreId == 0) continue;
+                byte hostId = o.host != null ? w.IdOf(o.host) : zd.stone;
+                if (hostId == 0) hostId = zd.stone;
+                zd.ores.Add((oreId, hostId, o.veinsPerChunk,
+                    Mathf.Min(o.minHeight, o.maxHeight), Mathf.Max(o.minHeight, o.maxHeight),
+                    Mathf.Min(o.minVeinSize, o.maxVeinSize), Mathf.Max(o.minVeinSize, o.maxVeinSize)));
+            }
             foreach (var sp in info.plants)
             {
                 if (sp == null || sp.plant == null || !sp.plant.isPlant) continue;
@@ -360,6 +377,58 @@ public static class VoxelGenerator
         if (type == null) return fallback;
         byte id = w.IdOf(type);
         return id != 0 ? id : fallback;
+    }
+
+    // ------------------------------------------------------------------ minerales
+
+    static readonly Vector3Int[] VeinSteps =
+    {
+        Vector3Int.right, Vector3Int.left, Vector3Int.up,
+        Vector3Int.down, new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)
+    };
+
+    static void PlaceOres(VoxelWorld w, int seed, Vector3Int dims, List<ZoneData> zones, byte[,] zoneIdx)
+    {
+        var rnd = new System.Random(seed ^ 0x00BE5EED);
+        int chunkCols = Mathf.Max(1, (dims.x * dims.z) / 256); // áreas de 16x16 columnas
+
+        for (int zi = 0; zi < zones.Count; zi++)
+        {
+            ZoneData zd = zones[zi];
+            foreach (var ore in zd.ores)
+            {
+                // intentos sobre todo el mapa; los que caen fuera del bioma se descartan,
+                // así la densidad queda proporcional al área que ocupa la zona
+                int attempts = Mathf.RoundToInt(ore.veins * chunkCols);
+                for (int a = 0; a < attempts; a++)
+                {
+                    int x = rnd.Next(1, dims.x - 1);
+                    int z = rnd.Next(1, dims.z - 1);
+                    if (zones.Count > 1 && zoneIdx[x, z] != zi) continue;
+
+                    int minY = Mathf.Clamp(ore.minH, 1, dims.y - 2);
+                    int maxY = Mathf.Clamp(ore.maxH, minY, dims.y - 2);
+                    int y = rnd.Next(minY, maxY + 1);
+
+                    // la veta crece con un paseo aleatorio desde el bloque inicial,
+                    // reemplazando solo la roca anfitriona
+                    int size = rnd.Next(ore.minSize, ore.maxSize + 1);
+                    int placed = 0, guard = size * 6;
+                    var p = new Vector3Int(x, y, z);
+                    while (placed < size && guard-- > 0)
+                    {
+                        if (w.InBounds(p.x, p.y, p.z) &&
+                            w.GetMicroArray(p.x, p.y, p.z) == null &&
+                            w.GetBlockType(p.x, p.y, p.z) == ore.host)
+                        {
+                            w.SetBlockSilent(p.x, p.y, p.z, ore.ore);
+                            placed++;
+                        }
+                        p += VeinSteps[rnd.Next(6)];
+                    }
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------ árboles

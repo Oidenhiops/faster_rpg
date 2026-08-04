@@ -70,6 +70,14 @@ MonoBehaviour:
           weight: 1
           minTrunk: 3
           maxTrunk: 5
+        ores:
+        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+          host: {fileID: 0}
+          veinsPerChunk: 5
+          minHeight: 2
+          maxHeight: 40
+          minVeinSize: 4
+          maxVeinSize: 9
         buildings: []
         entities: []
     - Key: 2
@@ -113,6 +121,14 @@ MonoBehaviour:
           weight: 3
           minTrunk: 3
           maxTrunk: 5
+        ores:
+        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+          host: {fileID: 0}
+          veinsPerChunk: 5
+          minHeight: 2
+          maxHeight: 40
+          minVeinSize: 4
+          maxVeinSize: 9
         buildings: []
         entities: []
     - Key: 3
@@ -144,6 +160,14 @@ MonoBehaviour:
         - plant: {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
           weight: 1
         trees: []
+        ores:
+        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+          host: {fileID: 0}
+          veinsPerChunk: 8
+          minHeight: 2
+          maxHeight: 42
+          minVeinSize: 5
+          maxVeinSize: 12
         buildings: []
         entities: []
     - Key: 4
@@ -180,6 +204,14 @@ MonoBehaviour:
           weight: 1
           minTrunk: 4
           maxTrunk: 6
+        ores:
+        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+          host: {fileID: 0}
+          veinsPerChunk: 7
+          minHeight: 2
+          maxHeight: 45
+          minVeinSize: 4
+          maxVeinSize: 10
         buildings: []
         entities: []
     - Key: 5
@@ -218,5 +250,13 @@ MonoBehaviour:
           weight: 1
           minTrunk: 3
           maxTrunk: 4
+        ores:
+        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+          host: {fileID: 0}
+          veinsPerChunk: 4
+          minHeight: 2
+          maxHeight: 35
+          minVeinSize: 3
+          maxVeinSize: 8
         buildings: []
         entities: []

@@ -48,6 +48,9 @@ public class VoxelTypesDBSO : ScriptableObject
         [Header("Árboles de la zona")]
         public List<TreeSpawn> trees = new List<TreeSpawn>();
 
+        [Header("Minerales de la zona (vetas)")]
+        public List<OreSpawn> ores = new List<OreSpawn>();
+
         [Header("Futuro: estructuras y entidades de la zona")]
         public List<GameObject> buildings = new List<GameObject>();
         public List<GameObject> entities = new List<GameObject>();
@@ -69,6 +72,11 @@ public class VoxelTypesDBSO : ScriptableObject
                 if (t == null) continue;
                 Register(t.trunk); Register(t.leaves);
             }
+            foreach (var o in zone.ores)
+            {
+                if (o == null) continue;
+                Register(o.ore); Register(o.host);
+            }
         }
 #if UNITY_EDITOR
         UnityEditor.EditorUtility.SetDirty(this);
@@ -85,6 +93,23 @@ public class VoxelTypesDBSO : ScriptableObject
     {
         public VoxelTypeSO plant;
         [Min(0.01f)] public float weight = 1f;
+    }
+
+    [Serializable]
+    public class OreSpawn
+    {
+        public VoxelTypeSO ore;
+        [Tooltip("Bloque que la veta reemplaza (vacío = la roca de la zona)")]
+        public VoxelTypeSO host;
+        [Tooltip("Vetas por área de 16x16 columnas (como 'veins per chunk' de Minecraft)")]
+        [Min(0f)] public float veinsPerChunk = 4f;
+        [Tooltip("Altura mínima en bloques (0 = fondo del mapa)")]
+        public int minHeight = 2;
+        [Tooltip("Altura máxima en bloques")]
+        public int maxHeight = 48;
+        [Tooltip("Bloques de mineral que crecen desde el bloque inicial de la veta")]
+        [Min(1)] public int minVeinSize = 3;
+        [Min(1)] public int maxVeinSize = 8;
     }
 
     [Serializable]
