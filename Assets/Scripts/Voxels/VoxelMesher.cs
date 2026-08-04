@@ -44,6 +44,7 @@ public static class VoxelMesher
     {
         public MeshData solid = new MeshData();
         public MeshData water = new MeshData();
+        public MeshData plants = new MeshData();
     }
 
     static readonly Vector3Int[] Dirs =
@@ -67,9 +68,12 @@ public static class VoxelMesher
         new[] { new Vector3(0, 1, 1), new Vector3(0, 1, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 1) }, // oeste
     };
 
-    static bool IsSolid(byte id, byte waterId) => id != 0 && id != waterId;
+    static bool IsSolid(byte id, byte waterId, bool[] plants) =>
+        id != 0 && id != waterId && !plants[id];
 
-    public static BuildResult Build(Snapshot s, Rect[] typeRects, byte waterId)
+    static bool AirLike(byte id, bool[] plants) => id == 0 || plants[id];
+
+    public static BuildResult Build(Snapshot s, Rect[] typeRects, byte waterId, bool[] plants)
     {
         var result = new BuildResult();
         MeshData solid = result.solid;
@@ -85,6 +89,13 @@ public static class VoxelMesher
                     if (micro == null && t == 0) continue; // aire
 
                     var blockPos = new Vector3(x, y, z);
+
+                    if (micro == null && plants[t])
+                    {
+                        // planta: dos quads cruzados, a la malla de plantas
+                        AddPlantCross(result.plants, blockPos, typeRects[t]);
+                        continue;
+                    }
 
                     if (micro == null && t == waterId)
                     {
@@ -111,7 +122,7 @@ public static class VoxelMesher
                                 if (aboveWater) continue; // columna continua: sin tapa
                                 if (aboveMicro == null)
                                 {
-                                    // aire o sólido encima: la tapa se dibuja igual
+                                    // aire, planta o sólido encima: la tapa se dibuja igual
                                     // (bajo un bloque queda la ranura de 1/8, visible de lado)
                                     AddWaterTop(water, blockPos, wRect, topH);
                                 }
@@ -132,9 +143,9 @@ public static class VoxelMesher
                             {
                                 if (nm == null)
                                 {
-                                    if (nt == 0) AddQuad(water, blockPos, f, 1f, blockPos, wRect, d);
+                                    if (AirLike(nt, plants)) AddQuad(water, blockPos, f, 1f, blockPos, wRect, d);
                                 }
-                                else EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId, true, M);
+                                else EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId, plants, true, M);
                                 continue;
                             }
 
@@ -150,7 +161,7 @@ public static class VoxelMesher
                                     if (nH < topH)
                                         AddQuad(water, blockPos, f, 1f, blockPos, wRect, d, topH, nH);
                                 }
-                                else if (nt == 0)
+                                else if (AirLike(nt, plants))
                                 {
                                     AddQuad(water, blockPos, f, 1f, blockPos, wRect, d, topH);
                                 }
@@ -158,7 +169,7 @@ public static class VoxelMesher
                             else
                             {
                                 // vecino parcial: agua visible donde sus micro-celdas están vacías
-                                EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId, true, topLayer);
+                                EmitFaceAgainstPartial(water, s, x, y, z, f, wRect, waterId, plants, true, topLayer);
                             }
                         }
                         continue;
@@ -175,9 +186,9 @@ public static class VoxelMesher
                             byte nt = s.types[ni];
                             byte[] nm = s.micro[ni];
 
-                            if (nm == null && IsSolid(nt, waterId)) continue;                          // vecino sólido: oculta
-                            if (nm == null) AddQuad(solid, blockPos, f, 1f, blockPos, rect, d);         // aire o agua: quad de 1m
-                            else EmitFaceAgainstPartial(solid, s, x, y, z, f, rect, waterId, false, M); // parcial: por micro-celda
+                            if (nm == null && IsSolid(nt, waterId, plants)) continue;                           // vecino sólido: oculta
+                            if (nm == null) AddQuad(solid, blockPos, f, 1f, blockPos, rect, d);                  // aire/agua/planta: quad de 1m
+                            else EmitFaceAgainstPartial(solid, s, x, y, z, f, rect, waterId, plants, false, M);  // parcial: por micro-celda
                         }
                     }
                     else
@@ -199,7 +210,7 @@ public static class VoxelMesher
                                         for (int f = 0; f < 6; f++)
                                         {
                                             Vector3Int d = Dirs[f];
-                                            if (!WaterMicroNeighborOpen(s, x, y, z, mx + d.x, my + d.y, mz + d.z, waterId))
+                                            if (!WaterMicroNeighborOpen(s, x, y, z, mx + d.x, my + d.y, mz + d.z, waterId, plants))
                                                 continue;
                                             AddQuad(water, microPos, f, MV, blockPos, rect, d);
                                         }
@@ -210,7 +221,7 @@ public static class VoxelMesher
                                     {
                                         Vector3Int d = Dirs[f];
                                         byte nb = MicroAt(s, x, y, z, mx + d.x, my + d.y, mz + d.z);
-                                        if (IsSolid(nb, waterId)) continue; // aire o agua: cara visible
+                                        if (IsSolid(nb, waterId, plants)) continue; // aire, agua o planta: cara visible
                                         AddQuad(solid, microPos, f, MV, blockPos, rect, d);
                                     }
                                 }
@@ -222,7 +233,7 @@ public static class VoxelMesher
     // cara de un bloque uniforme contra un vecino parcial: emitir solo las
     // micro-celdas cuya celda opuesta en el vecino está vacía
     static void EmitFaceAgainstPartial(MeshData md, Snapshot s, int x, int y, int z, int f,
-        Rect rect, byte waterId, bool waterOnlyAir, int maxLayer)
+        Rect rect, byte waterId, bool[] plants, bool waterOnlyAir, int maxLayer)
     {
         Vector3Int d = Dirs[f];
         var blockPos = new Vector3(x, y, z);
@@ -236,7 +247,7 @@ public static class VoxelMesher
 
                 if (my >= maxLayer) continue; // por encima de la superficie del agua no hay nada
                 byte nb = MicroAt(s, x, y, z, mx + d.x, my + d.y, mz + d.z);
-                bool hidden = waterOnlyAir ? nb != 0 : IsSolid(nb, waterId);
+                bool hidden = waterOnlyAir ? !AirLike(nb, plants) : IsSolid(nb, waterId, plants);
                 if (hidden) continue;
                 AddQuad(md, blockPos + new Vector3(mx, my, mz) * MV, f, MV, blockPos, rect, d);
             }
@@ -245,7 +256,7 @@ public static class VoxelMesher
     // ¿está abierta (aire) la celda vecina para una cara de agua micro?
     // A diferencia de MicroAt, si el vecino es un bloque de agua uniforme con nivel
     // bajo, la franja por encima de su superficie cuenta como aire (cara visible)
-    static bool WaterMicroNeighborOpen(Snapshot s, int bx, int by, int bz, int mx, int my, int mz, byte waterId)
+    static bool WaterMicroNeighborOpen(Snapshot s, int bx, int by, int bz, int mx, int my, int mz, byte waterId, bool[] plants)
     {
         if (mx < 0) { bx--; mx += M; } else if (mx >= M) { bx++; mx -= M; }
         if (my < 0) { by--; my += M; } else if (my >= M) { by++; my -= M; }
@@ -256,7 +267,7 @@ public static class VoxelMesher
         if (micro != null) return micro[VoxelChunk.MicroIndex(mx, my, mz)] == 0;
 
         byte t = s.types[bi];
-        if (t == 0) return true;
+        if (AirLike(t, plants)) return true;
         if (t != waterId) return false; // sólido
 
         // vecino agua uniforme: abierto solo por encima de su superficie
@@ -301,6 +312,42 @@ public static class VoxelMesher
             else { u = l.z; v = l.y; }
             md.uvs.Add(new Vector2(rect.xMin + u * rect.width, rect.yMin + v * rect.height));
         }
+        md.triangles.Add(vi);
+        md.triangles.Add(vi + 1);
+        md.triangles.Add(vi + 2);
+        md.triangles.Add(vi);
+        md.triangles.Add(vi + 2);
+        md.triangles.Add(vi + 3);
+    }
+
+    // planta: dos quads cruzados en X, hundidos en el suelo para que la maleza
+    // "nazca" del terreno aunque el bloque de abajo sea parcial (micro-relieve)
+    static void AddPlantCross(MeshData md, Vector3 blockPos, Rect rect)
+    {
+        const float INSET = 0.15f;  // margen lateral
+        const float SINK = 0.9f;    // cuánto se hunde bajo la celda
+        const float TOP = 0.85f;    // altura de las puntas
+
+        // quad 1: diagonal \  |  quad 2: diagonal /
+        AddPlantQuad(md, blockPos,
+            new Vector3(INSET, -SINK, INSET), new Vector3(1f - INSET, -SINK, 1f - INSET), TOP + SINK, rect);
+        AddPlantQuad(md, blockPos,
+            new Vector3(1f - INSET, -SINK, INSET), new Vector3(INSET, -SINK, 1f - INSET), TOP + SINK, rect);
+    }
+
+    static void AddPlantQuad(MeshData md, Vector3 blockPos, Vector3 a, Vector3 b, float height, Rect rect)
+    {
+        int vi = md.vertices.Count;
+        Vector3 up = new Vector3(0f, height, 0f);
+        md.vertices.Add(blockPos + a + up);
+        md.vertices.Add(blockPos + b + up);
+        md.vertices.Add(blockPos + b);
+        md.vertices.Add(blockPos + a);
+        for (int i = 0; i < 4; i++) md.normals.Add(Vector3.up); // iluminación suave
+        md.uvs.Add(new Vector2(rect.xMin, rect.yMax));
+        md.uvs.Add(new Vector2(rect.xMax, rect.yMax));
+        md.uvs.Add(new Vector2(rect.xMax, rect.yMin));
+        md.uvs.Add(new Vector2(rect.xMin, rect.yMin));
         md.triangles.Add(vi);
         md.triangles.Add(vi + 1);
         md.triangles.Add(vi + 2);

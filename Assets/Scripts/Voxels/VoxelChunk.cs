@@ -31,6 +31,11 @@ public sealed class VoxelChunk
     public Mesh waterMesh;
     public MeshFilter waterFilter;
 
+    // malla de plantas (cutout, sin collider)
+    public GameObject plantGo;
+    public Mesh plantMesh;
+    public MeshFilter plantFilter;
+
     public static int BlockIndex(int x, int y, int z) => x + SIZE * (z + SIZE * y);
     public static int MicroIndex(int x, int y, int z) => x + MICRO * (z + MICRO * y);
 }

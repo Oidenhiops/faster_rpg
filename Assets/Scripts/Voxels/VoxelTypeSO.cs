@@ -15,5 +15,9 @@ public class VoxelTypeSO : ScriptableObject
     public float hardness = 1f;
     public bool indestructible;
 
+    [Header("Planta (maleza, flores...)")]
+    [Tooltip("Se renderiza como quads en X (sin cubo), no colisiona, se rompe entera de un toque y no bloquea caras vecinas")]
+    public bool isPlant;
+
     // futuro: ItemBaseSO dropItem; AudioClip breakSound; GameObject breakVfx;
 }

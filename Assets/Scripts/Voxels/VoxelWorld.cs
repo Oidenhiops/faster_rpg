@@ -14,21 +14,56 @@ public class VoxelWorld : MonoBehaviour
 {
     public static VoxelWorld Instance { get; private set; }
 
-    [Header("Dimensiones (metros = bloques de 1m)")]
+    public enum WorldSize
+    {
+        Small,      // 96 x 96 x 96
+        Medium,     // 160 x 96 x 160
+        Large,      // 256 x 96 x 256
+        ExtraLarge, // 384 x 96 x 384
+        Custom,     // usa World Size Meters
+    }
+
+    // altura fija del mundo: centrado queda de -48 a +48 (subsuelo ~46m, cielo ~50m)
+    public const int WORLD_HEIGHT = 96;
+
+    [Header("Dimensiones")]
+    public WorldSize worldSize = WorldSize.Medium;
+    [Tooltip("Solo se usa con Custom (metros = bloques de 1m)")]
     public Vector3Int worldSizeMeters = new Vector3Int(96, 40, 96);
+
+    [Header("Semilla del mundo")]
+    [Tooltip("Con esto activo, cada Play genera un mundo distinto (la semilla usada se registra en consola)")]
+    public bool randomSeed = true;
+    [Tooltip("Semilla fija (usada solo si Random Seed está apagado)")]
+    public int worldSeed = 1337;
 
     [Header("Render")]
     [Tooltip("Opcional. Si es null se crea uno con URP/Lit o Standard. La textura principal se reemplaza por el atlas de los tipos.")]
     public Material voxelMaterial;
 
-    [Header("Tipos (assets VoxelTypeSO; índice en la lista = id. 0 = aire; el generador usa 1-9 en orden: pasto, tierra, piedra, mineral, arena, nieve, tronco, hojas, agua)")]
-    public List<VoxelTypeSO> types = new List<VoxelTypeSO>();
+    [Header("Tipos y zonas")]
+    [Tooltip("DB con los tipos de voxel y las zonas (generación + spawns)")]
+    public VoxelTypesDBSO typesDB;
+    [Tooltip("Zona principal: define nivel y tipo de agua globales; si Multi Biome está apagado, todo el mundo es esta zona")]
+    public VoxelTypesDBSO.TypeZone zone = VoxelTypesDBSO.TypeZone.Pradera;
+    [Tooltip("Repartir todas las zonas del DB por el mapa en regiones (Voronoi)")]
+    public bool multiBiome = true;
+    [Tooltip("Tamaño aproximado de cada región de bioma, en metros")]
+    public float biomeCellSizeMeters = 48f;
+
+    // paleta activa (viene del DB; si falta, se crean defaults en memoria)
+    List<VoxelTypeSO> types = new List<VoxelTypeSO>();
+    public VoxelTypesDBSO.ZoneInfo ZoneInfo { get; private set; }
 
     [Header("Agua")]
     [Tooltip("Índice del tipo agua en la lista")]
     public byte waterTypeId = 9;
     [Tooltip("Opcional. Si es null se crea uno transparente simple")]
     public Material waterMaterial;
+
+    [Header("Plantas")]
+    [Tooltip("Opcional. Si es null se crea uno cutout a partir del material del terreno")]
+    public Material plantMaterial;
 
     [Header("Rendimiento")]
     [Tooltip("Chunks remesheados por frame tras una edición")]
@@ -41,13 +76,20 @@ public class VoxelWorld : MonoBehaviour
     [Tooltip("Celdas procesadas por tick")]
     public int waterFlowBudget = 64;
 
-    [Header("Generación")]
+    [Header("Generación (respaldo si el DB no define la zona)")]
     public VoxelGenerator.Settings generation = new VoxelGenerator.Settings();
 
     /// <summary>Coordenada del bloque (1m) editado. Útil para pathfinding, recursos, sonido.</summary>
     public event Action<Vector3Int> OnBlockChanged;
 
-    public Vector3Int BlockDims => worldSizeMeters;
+    public Vector3Int BlockDims => worldSize switch
+    {
+        WorldSize.Small      => new Vector3Int(96, WORLD_HEIGHT, 96),
+        WorldSize.Medium     => new Vector3Int(160, WORLD_HEIGHT, 160),
+        WorldSize.Large      => new Vector3Int(256, WORLD_HEIGHT, 256),
+        WorldSize.ExtraLarge => new Vector3Int(384, WORLD_HEIGHT, 384),
+        _                    => worldSizeMeters,
+    };
     /// <summary>Offset local para que el centro del mapa quede en la posición del transform.</summary>
     public Vector3 LocalOrigin => -(Vector3)BlockDims * 0.5f;
     /// <summary>Esquina mínima del mundo en coordenadas de mundo.</summary>
@@ -59,7 +101,8 @@ public class VoxelWorld : MonoBehaviour
     readonly Queue<VoxelChunk> dirtyQueue = new Queue<VoxelChunk>();
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
     Material runtimeMaterial;
-    Rect[] typeRects; // región de cada tipo dentro del atlas (índice = id)
+    Rect[] typeRects;  // región de cada tipo dentro del atlas (índice = id)
+    bool[] plantFlags; // qué ids son plantas (índice = id)
 
     // flujo de agua (niveles 1-8; las celdas del lago original son fuentes = sin entrada en el dict)
     readonly Queue<Vector3Int> flowQueue = new Queue<Vector3Int>();
@@ -80,7 +123,31 @@ public class VoxelWorld : MonoBehaviour
 
     void Start()
     {
+        // cargar tipos y zona desde el DB (con respaldos si falta algo)
+        if (typesDB != null && typesDB.types != null && typesDB.types.Count > 0)
+            types = new List<VoxelTypeSO>(typesDB.types);
+        if (typesDB != null && typesDB.zones != null &&
+            typesDB.zones.TryGetValue(zone, out VoxelTypesDBSO.ZoneInfo zi) && zi != null)
+        {
+            ZoneInfo = zi;
+            if (zi.generation != null) generation = zi.generation;
+        }
+
         EnsureDefaultTypes();
+
+        // el agua de la zona reemplaza el id de agua global (mesher y flujo lo usan)
+        if (ZoneInfo != null && ZoneInfo.water != null)
+        {
+            int wid = types.IndexOf(ZoneInfo.water);
+            if (wid > 0) waterTypeId = (byte)wid;
+        }
+
+        if (randomSeed)
+        {
+            worldSeed = UnityEngine.Random.Range(int.MinValue / 2, int.MaxValue / 2);
+            Debug.Log($"VoxelWorld: semilla del mundo = {worldSeed}");
+        }
+
         BuildMaterial();
         AllocateChunks();
         VoxelGenerator.Generate(this);
@@ -134,12 +201,14 @@ public class VoxelWorld : MonoBehaviour
                 ("Tronco",  new Color(0.40f, 0.28f, 0.16f),     2f),
                 ("Hojas",   new Color(0.25f, 0.50f, 0.20f),     0.5f),
                 ("Agua",    new Color(0.20f, 0.50f, 0.80f, 0.6f), 999f),
+                ("Maleza",  new Color(0.30f, 0.58f, 0.24f),       0.5f),
             };
             foreach (var d in defaults)
             {
                 var so = ScriptableObject.CreateInstance<VoxelTypeSO>();
                 so.name = d.n; so.displayName = d.n; so.color = d.c; so.hardness = d.h;
                 so.indestructible = d.n == "Agua";
+                so.isPlant = d.n == "Maleza";
                 types.Add(so);
             }
         }
@@ -193,6 +262,30 @@ public class VoxelWorld : MonoBehaviour
             waterMaterial.color = waterTypeId < types.Count ? types[waterTypeId].color
                                                             : new Color(0.2f, 0.5f, 0.8f, 0.6f);
         }
+
+        // material de plantas: cutout con el mismo atlas, doble cara
+        if (plantMaterial == null)
+        {
+            plantMaterial = new Material(runtimeMaterial) { name = "PlantMaterial" };
+            plantMaterial.SetFloat("_AlphaClip", 1f);
+            plantMaterial.SetFloat("_Cutoff", 0.5f);
+            plantMaterial.EnableKeyword("_ALPHATEST_ON");
+            plantMaterial.SetFloat("_Cull", 0f); // doble cara
+        }
+        plantMaterial.mainTexture = runtimeMaterial.mainTexture;
+
+        // flags de planta por id
+        plantFlags = new bool[types.Count];
+        for (int i = 0; i < types.Count; i++) plantFlags[i] = types[i] != null && types[i].isPlant;
+    }
+
+    public bool IsPlantId(byte id) => plantFlags != null && id < plantFlags.Length && plantFlags[id];
+
+    /// <summary>Id (índice en la paleta) de un VoxelTypeSO; 0 si no está.</summary>
+    public byte IdOf(VoxelTypeSO type)
+    {
+        int i = types.IndexOf(type);
+        return (byte)Mathf.Max(i, 0);
     }
 
     static Texture2D SolidTexture(Color c)
@@ -237,6 +330,13 @@ public class VoxelWorld : MonoBehaviour
                     c.waterFilter = c.waterGo.AddComponent<MeshFilter>();
                     c.waterGo.AddComponent<MeshRenderer>().sharedMaterial = waterMaterial;
                     c.waterMesh = new Mesh { name = c.go.name + " Water" };
+
+                    // malla de plantas: hijo sin collider, material cutout
+                    c.plantGo = new GameObject("Plants");
+                    c.plantGo.transform.SetParent(c.go.transform, false);
+                    c.plantFilter = c.plantGo.AddComponent<MeshFilter>();
+                    c.plantGo.AddComponent<MeshRenderer>().sharedMaterial = plantMaterial;
+                    c.plantMesh = new Mesh { name = c.go.name + " Plants" };
 
                     chunks[ChunkIndex(cx, cy, cz)] = c;
                 }
@@ -291,6 +391,13 @@ public class VoxelWorld : MonoBehaviour
         blockDamage.Remove(pos); // el daño acumulado no sobrevive al bloque
         if (typeId != waterTypeId) waterLevels.Remove(pos); // el nivel de flujo tampoco
         NotifyBlockEdited(bx, by, bz);
+
+        // las plantas no flotan: si el soporte desaparece, la maleza de arriba se rompe
+        if (typeId == 0 && InBounds(bx, by + 1, bz) &&
+            GetMicroArray(bx, by + 1, bz) == null && IsPlantId(GetBlockType(bx, by + 1, bz)))
+        {
+            SetBlockUniform(bx, by + 1, bz, 0);
+        }
     }
 
     /// <summary>Escritura sin eventos ni remesh. Solo para la generación inicial.</summary>
@@ -538,6 +645,13 @@ public class VoxelWorld : MonoBehaviour
 
                     if (micro == null)
                     {
+                        if (IsPlantId(t))
+                        {
+                            // la maleza se rompe entera con solo rozarla
+                            SetBlockUniform(bx, by, bz, 0);
+                            AddCount(removed, t, 1);
+                            continue;
+                        }
                         VoxelTypeSO vt = types[t];
                         if (vt.indestructible || vt.hardness > digPower) continue;
                         if (FarthestCorner2(rel, bMin) <= r2)
@@ -653,8 +767,9 @@ public class VoxelWorld : MonoBehaviour
         int bz = Mathf.FloorToInt(rel.z);
         if (!InBounds(bx, by, bz)) return false;
         byte current = GetBlockType(bx, by, bz);
-        // solo celdas vacías o con agua (construir desplaza el agua, estilo Minecraft)
-        if ((current != 0 && current != waterTypeId) || GetMicroArray(bx, by, bz) != null) return false;
+        // solo celdas vacías, con agua o con maleza (construir las desplaza)
+        if ((current != 0 && current != waterTypeId && !IsPlantId(current)) ||
+            GetMicroArray(bx, by, bz) != null) return false;
         SetBlockUniform(bx, by, bz, typeId);
         return true;
     }
@@ -687,7 +802,7 @@ public class VoxelWorld : MonoBehaviour
 
     void RemeshImmediate(VoxelChunk c)
     {
-        Apply(c, VoxelMesher.Build(CopySnapshot(c), typeRects, waterTypeId));
+        Apply(c, VoxelMesher.Build(CopySnapshot(c), typeRects, waterTypeId, plantFlags));
     }
 
     async Awaitable RemeshAsync(VoxelChunk c)
@@ -697,7 +812,7 @@ public class VoxelWorld : MonoBehaviour
         {
             VoxelMesher.Snapshot snapshot = CopySnapshot(c); // en main thread
             await Awaitable.BackgroundThreadAsync();
-            VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId);
+            VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId, plantFlags);
             await Awaitable.MainThreadAsync();
             if (this == null || c.go == null) return;
             Apply(c, result);
@@ -766,5 +881,19 @@ public class VoxelWorld : MonoBehaviour
             waterMesh.RecalculateBounds();
         }
         c.waterFilter.sharedMesh = waterMesh;
+
+        // plantas (sin collider)
+        VoxelMesher.MeshData pd = result.plants;
+        Mesh plantMesh = c.plantMesh;
+        plantMesh.Clear();
+        if (pd.vertices.Count > 0)
+        {
+            plantMesh.SetVertices(pd.vertices);
+            plantMesh.SetNormals(pd.normals);
+            plantMesh.SetUVs(0, pd.uvs);
+            plantMesh.SetTriangles(pd.triangles, 0);
+            plantMesh.RecalculateBounds();
+        }
+        c.plantFilter.sharedMesh = plantMesh;
     }
 }

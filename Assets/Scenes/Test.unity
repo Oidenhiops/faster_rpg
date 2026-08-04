@@ -25614,27 +25614,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31a8dd5749983e94ba789d1edad71fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoxelWorld
+  worldSize: 3
   worldSizeMeters: {x: 96, y: 40, z: 96}
+  randomSeed: 1
+  worldSeed: 1337
   voxelMaterial: {fileID: 0}
-  types:
-  - {fileID: 11400000, guid: 948c42442b9784544b7803d3b09c5f60, type: 2}
-  - {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
-  - {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
-  - {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-  - {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-  - {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
-  - {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
-  - {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
-  - {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
-  - {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+  typesDB: {fileID: 11400000, guid: f5e6e79b3d9c95b4fabc31c65cffff5f, type: 2}
+  zone: 1
+  multiBiome: 1
+  biomeCellSizeMeters: 48
   waterTypeId: 9
   waterMaterial: {fileID: 2100000, guid: 648506158a270ab47aaf4612ffe9318e, type: 2}
+  plantMaterial: {fileID: 0}
   remeshBudgetPerFrame: 4
   waterFlowEnabled: 1
   waterFlowInterval: 0.1
   waterFlowBudget: 64
   generation:
-    seed: 1337
     baseHeightMeters: 14
     hillAmplitudeMeters: 6
     hillScale: 0.02
@@ -25649,8 +25645,7 @@ MonoBehaviour:
     oreScale: 0.2
     oreThreshold: 0.74
     treeDensity: 0.02
-    minTrunk: 3
-    maxTrunk: 5
+    grassDensity: 0.14
 --- !u!4 &1955831484
 Transform:
   m_ObjectHideFlags: 0

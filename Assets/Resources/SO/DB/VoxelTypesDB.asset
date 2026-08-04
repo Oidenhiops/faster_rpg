@@ -1,0 +1,222 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9d8e7f6a5b4321098765432dcba0912, type: 3}
+  m_Name: VoxelTypesDB
+  m_EditorClassIdentifier: 
+  types:
+  - {fileID: 11400000, guid: 948c42442b9784544b7803d3b09c5f60, type: 2}
+  - {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
+  - {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
+  - {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
+  - {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+  - {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
+  - {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
+  - {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
+  - {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+  - {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+  - {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000012, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000013, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000014, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000015, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000017, type: 2}
+  - {fileID: 11400000, guid: b2000000000000000000000000000018, type: 2}
+  zones:
+    _serializedList:
+    - Key: 1
+      Value:
+        generation:
+          seed: 1337
+          baseHeightMeters: 46
+          hillAmplitudeMeters: 6
+          hillScale: 0.02
+          smoothSurface: 1
+          microDetailAmplitude: 0.1
+          microDetailScale: 0.5
+          waterLevelMeters: 43
+          dirtDepthMeters: 3
+          caveScale: 0.09
+          caveThreshold: 0.62
+          minCaveDepthMeters: 4
+          oreScale: 0.2
+          oreThreshold: 0.74
+          treeDensity: 0.015
+          grassDensity: 0.18
+        surface: {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
+        subsoil: {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
+        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
+        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        beach: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
+        water: {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+        plants:
+        - plant: {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+          weight: 8
+        - plant: {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+          weight: 2
+        trees:
+        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
+          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+          weight: 1
+          minTrunk: 3
+          maxTrunk: 5
+        buildings: []
+        entities: []
+    - Key: 2
+      Value:
+        generation:
+          seed: 2024
+          baseHeightMeters: 47
+          hillAmplitudeMeters: 7
+          hillScale: 0.022
+          smoothSurface: 1
+          microDetailAmplitude: 0.12
+          microDetailScale: 0.5
+          waterLevelMeters: 42.5
+          dirtDepthMeters: 3
+          caveScale: 0.09
+          caveThreshold: 0.62
+          minCaveDepthMeters: 4
+          oreScale: 0.2
+          oreThreshold: 0.74
+          treeDensity: 0.06
+          grassDensity: 0.12
+        surface: {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
+        subsoil: {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
+        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
+        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        beach: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
+        water: {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+        plants:
+        - plant: {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+          weight: 6
+        - plant: {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+          weight: 1
+        trees:
+        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
+          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+          weight: 7
+          minTrunk: 4
+          maxTrunk: 6
+        - trunk: {fileID: 11400000, guid: b2000000000000000000000000000017, type: 2}
+          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+          weight: 3
+          minTrunk: 3
+          maxTrunk: 5
+        buildings: []
+        entities: []
+    - Key: 3
+      Value:
+        generation:
+          seed: 777
+          baseHeightMeters: 45
+          hillAmplitudeMeters: 4
+          hillScale: 0.03
+          smoothSurface: 1
+          microDetailAmplitude: 0.15
+          microDetailScale: 0.4
+          waterLevelMeters: 0
+          dirtDepthMeters: 4
+          caveScale: 0.09
+          caveThreshold: 0.6
+          minCaveDepthMeters: 4
+          oreScale: 0.2
+          oreThreshold: 0.72
+          treeDensity: 0
+          grassDensity: 0.05
+        surface: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
+        subsoil: {fileID: 11400000, guid: b2000000000000000000000000000015, type: 2}
+        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
+        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        beach: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
+        water: {fileID: 0}
+        plants:
+        - plant: {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
+          weight: 1
+        trees: []
+        buildings: []
+        entities: []
+    - Key: 4
+      Value:
+        generation:
+          seed: 4444
+          baseHeightMeters: 50
+          hillAmplitudeMeters: 9
+          hillScale: 0.025
+          smoothSurface: 1
+          microDetailAmplitude: 0.12
+          microDetailScale: 0.5
+          waterLevelMeters: 42
+          dirtDepthMeters: 2
+          caveScale: 0.09
+          caveThreshold: 0.62
+          minCaveDepthMeters: 4
+          oreScale: 0.2
+          oreThreshold: 0.73
+          treeDensity: 0.03
+          grassDensity: 0.04
+        surface: {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
+        subsoil: {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
+        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
+        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        beach: {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
+        water: {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+        plants:
+        - plant: {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
+          weight: 1
+        trees:
+        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
+          leaves: {fileID: 11400000, guid: b2000000000000000000000000000018, type: 2}
+          weight: 1
+          minTrunk: 4
+          maxTrunk: 6
+        buildings: []
+        entities: []
+    - Key: 5
+      Value:
+        generation:
+          seed: 5555
+          baseHeightMeters: 43.6
+          hillAmplitudeMeters: 2
+          hillScale: 0.035
+          smoothSurface: 1
+          microDetailAmplitude: 0.15
+          microDetailScale: 0.6
+          waterLevelMeters: 43
+          dirtDepthMeters: 3
+          caveScale: 0.09
+          caveThreshold: 0.68
+          minCaveDepthMeters: 4
+          oreScale: 0.2
+          oreThreshold: 0.76
+          treeDensity: 0.025
+          grassDensity: 0.3
+        surface: {fileID: 11400000, guid: b2000000000000000000000000000012, type: 2}
+        subsoil: {fileID: 11400000, guid: b2000000000000000000000000000013, type: 2}
+        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
+        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        beach: {fileID: 11400000, guid: b2000000000000000000000000000013, type: 2}
+        water: {fileID: 11400000, guid: b2000000000000000000000000000014, type: 2}
+        plants:
+        - plant: {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+          weight: 5
+        - plant: {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+          weight: 2
+        trees:
+        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
+          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+          weight: 1
+          minTrunk: 3
+          maxTrunk: 4
+        buildings: []
+        entities: []
