@@ -6022,7 +6022,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &410087040
 Light:
   m_ObjectHideFlags: 0
@@ -25614,7 +25614,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31a8dd5749983e94ba789d1edad71fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoxelWorld
-  worldSize: 3
+  worldSize: 4
   worldSizeMeters: {x: 96, y: 40, z: 96}
   randomSeed: 1
   worldSeed: 1337
