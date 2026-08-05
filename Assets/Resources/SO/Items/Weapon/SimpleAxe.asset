@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 277fea691be463341a7f71a22c600ae9, type: 3}
+  m_Script: {fileID: 11500000, guid: d5911b35f6be4e74bbabadcda8606525, type: 3}
   m_Name: SimpleAxe
-  m_EditorClassIdentifier: Assembly-CSharp::EquipableItemSO
+  m_EditorClassIdentifier: Assembly-CSharp::ToolItemSO
   id: 2
   idText: 13
   modelInfo:
@@ -34,37 +34,45 @@ MonoBehaviour:
     _serializedList:
     - Key: 1
       Value:
+        isPercentage: 0
         baseValue: 10
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
         _currentValue: 0
         maxValue: 0
     - Key: 3
       Value:
+        isPercentage: 0
         baseValue: 15
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
         _currentValue: 0
         maxValue: 0
     - Key: 16
       Value:
-        baseValue: 15
+        isPercentage: 0
+        baseValue: 25
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
         _currentValue: 0
         maxValue: 0
     - Key: 17
       Value:
+        isPercentage: 0
         baseValue: 0
         aptitudeValue: 0
         itemValue: 0
-        buffValue:
+        buffValue: 0
+        buffValuePorcent:
           _serializedList: []
         _currentValue: 0
         maxValue: 1

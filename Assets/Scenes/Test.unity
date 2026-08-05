@@ -3051,8 +3051,8 @@ MonoBehaviour:
   pivot: {fileID: 1894498719}
   speed: 0.1
   flipYAxis: 0
-  minPitch: -40
-  maxPitch: 70
+  minPitch: -90
+  maxPitch: 90
   player: {fileID: 2123386579}
   rotatePlayerWithCamera: 1
   playerRotationSpeed: 12
@@ -5049,6 +5049,8 @@ GameObject:
   - component: {fileID: 330585547}
   - component: {fileID: 330585549}
   - component: {fileID: 330585550}
+  - component: {fileID: 330585552}
+  - component: {fileID: 330585553}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -5096,7 +5098,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 200
   field of view: 60
   orthographic: 0
   orthographic size: 5.4
@@ -5242,6 +5244,48 @@ MonoBehaviour:
   m_CropFrameX: 0
   m_CropFrameY: 0
   m_StretchFill: 0
+--- !u!114 &330585552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02ea2126c762c6949a482af73a10ce81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraOcclusionBubble
+  player: {fileID: 211714502}
+  centerOffset: {x: 0, y: 0.9, z: 0}
+  radius: 16
+  cameraClearance: 0.75
+  bubbleMaterial: {fileID: 0}
+  fadeTime: 0.15
+  holdTime: 0.1
+  samples: 10
+  playerSkin: 0.35
+  forceOn: 0
+--- !u!114 &330585553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb2aab730081724b97127a0d0c34a67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSphereCutout
+  player: {fileID: 211714502}
+  centerOffset: {x: 0, y: 0.9, z: 0}
+  radius: 4
+  depthBias: 0.6
+  depthFeather: 0.35
+  minAlpha: 0.12
+  active: 1
+  rampSpeed: 8
 --- !u!1 &332010200
 GameObject:
   m_ObjectHideFlags: 0
@@ -16180,7 +16224,6 @@ GameObject:
   - component: {fileID: 1242420447}
   - component: {fileID: 1242420446}
   - component: {fileID: 1242420449}
-  - component: {fileID: 1242420448}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -16215,7 +16258,7 @@ MonoBehaviour:
     FieldOfView: 60
     OrthographicSize: 5
     NearClipPlane: 0.3
-    FarClipPlane: 1000
+    FarClipPlane: 200
     Dutch: 0
     ModeOverride: 0
     PhysicalProperties:
@@ -16240,43 +16283,13 @@ Transform:
   m_GameObject: {fileID: 1242420443}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 1.05, z: -2}
+  m_LocalPosition: {x: 0.63, y: 1.0499992, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 330585546}
   m_Father: {fileID: 211714502}
   m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
---- !u!114 &1242420448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1242420443}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
-  CameraRadius: 0.4
-  Decollision:
-    Enabled: 1
-    ObstacleLayers:
-      serializedVersion: 2
-      m_Bits: 65
-    UseFollowTarget:
-      Enabled: 0
-      YOffset: 0
-    Damping: 0
-    SmoothingTime: 0
-  TerrainResolution:
-    Enabled: 1
-    TerrainLayers:
-      serializedVersion: 2
-      m_Bits: 65
-    MaximumRaycast: 10
-    Damping: 0
 --- !u!114 &1242420449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16290,15 +16303,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonFollow
   Damping: {x: 0, y: 0, z: 0}
-  ShoulderOffset: {x: 1, y: -0.35, z: 0}
+  ShoulderOffset: {x: 0.63, y: -0.35, z: 0}
   VerticalArmLength: 0.4
   CameraSide: 1
-  CameraDistance: 2
+  CameraDistance: 1.5
   AvoidObstacles:
     Enabled: 0
     CollisionFilter:
       serializedVersion: 2
-      m_Bits: 1
+      m_Bits: 65
     IgnoreTag: 
     CameraRadius: 0.2
     DampingIntoCollision: 0
@@ -25618,14 +25631,14 @@ MonoBehaviour:
   worldSizeMeters: {x: 96, y: 40, z: 96}
   randomSeed: 1
   worldSeed: 1337
-  voxelMaterial: {fileID: 0}
+  voxelMaterial: {fileID: 2100000, guid: a3ee41b6a4a53d14ca25e0f6be368430, type: 2}
   typesDB: {fileID: 11400000, guid: f5e6e79b3d9c95b4fabc31c65cffff5f, type: 2}
   zone: 1
   multiBiome: 1
   biomeCellSizeMeters: 48
   waterTypeId: 9
   waterMaterial: {fileID: 2100000, guid: 648506158a270ab47aaf4612ffe9318e, type: 2}
-  plantMaterial: {fileID: 0}
+  plantMaterial: {fileID: 2100000, guid: a3ee41b6a4a53d14ca25e0f6be368430, type: 2}
   remeshBudgetPerFrame: 4
   streamTarget: {fileID: 211714502}
   viewDistanceColumns: 8

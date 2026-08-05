@@ -125,9 +125,8 @@ public class CharacterData
             float baseWhitItemAndBuff = baseValue + itemValue + buffValue;
             float totalBuffValuePorcent = 0;
             foreach (KeyValuePair<StatusEffectBaseSO, float> buff in buffValuePorcent) totalBuffValuePorcent += buff.Value;
-            if (totalBuffValuePorcent == 0) totalBuffValuePorcent = 100;
             float baseWhitBuff = Mathf.CeilToInt(baseWhitItemAndBuff * totalBuffValuePorcent / 100);
-            float whitAptitude = Mathf.CeilToInt(baseWhitBuff * (aptitudeValue / 100f));
+            float whitAptitude = Mathf.CeilToInt((baseWhitItemAndBuff + baseWhitBuff) * (aptitudeValue / 100f));
             maxValue = Mathf.Clamp(whitAptitude, 0, 99999);
             if (currentValue > maxValue) currentValue = maxValue;
             if (typeStatistic != (int)TypeStatistic.Hp && typeStatistic != (int)TypeStatistic.Sp && typeStatistic != (int)TypeStatistic.Str)
@@ -247,5 +246,7 @@ public class CharacterData
         DropDistance = 15,
         Durability = 16,
         Amount = 17,
+        ItemRange = 18,
+        PicaxePower = 19,
     }
 }
