@@ -932,6 +932,393 @@ public class VoxelWorld : MonoBehaviour
     }
 
     /// <summary>
+    /// Modo Perfect: mina un único micro-voxel (de voxel en voxel), la máxima precisión
+    /// posible. Usa el punto de impacto empujado ligeramente hacia dentro del bloque
+    /// (worldPos = hit.point - hit.normal * 0.01f, igual que DamageBlock) para ubicar
+    /// el micro-voxel exacto bajo la mira. Respeta hardness e indestructible.
+    /// Devuelve true si quitó algo; removedType trae el tipo obtenido (para recursos).
+    /// </summary>
+    public bool MineVoxel(Vector3 worldPos, float power, out byte removedType)
+    {
+        removedType = 0;
+        Vector3 rel = worldPos - Origin;
+        int bx = Mathf.FloorToInt(rel.x);
+        int by = Mathf.FloorToInt(rel.y);
+        int bz = Mathf.FloorToInt(rel.z);
+        if (!InBounds(bx, by, bz)) return false;
+
+        // cáscara indestructible: suelo y paredes, techo abierto
+        if (by < 1 || bx < 1 || bz < 1 || bx >= BlockDims.x - 1 || bz >= BlockDims.z - 1) return false;
+
+        byte t = GetBlockType(bx, by, bz);
+        byte[] micro = GetMicroArray(bx, by, bz);
+        if (t == 0 && micro == null) return false; // aire
+
+        if (micro == null && IsPlantId(t))
+        {
+            // la maleza se rompe entera con solo rozarla
+            SetBlockUniform(bx, by, bz, 0);
+            removedType = t;
+            return true;
+        }
+
+        const int M = VoxelChunk.MICRO;
+        if (micro == null)
+        {
+            VoxelTypeSO blockVt = types[t];
+            if (blockVt.indestructible || blockVt.hardness > power) return false;
+            micro = AllocateMicro(bx, by, bz, t);
+        }
+
+        // micro-voxel exacto bajo la mira, dentro del bloque (0..M-1 por eje)
+        Vector3 local = rel - new Vector3(bx, by, bz); // 0..1
+        int mx = Mathf.Clamp(Mathf.FloorToInt(local.x * M), 0, M - 1);
+        int my = Mathf.Clamp(Mathf.FloorToInt(local.y * M), 0, M - 1);
+        int mz = Mathf.Clamp(Mathf.FloorToInt(local.z * M), 0, M - 1);
+
+        int mi = VoxelChunk.MicroIndex(mx, my, mz);
+        byte id = micro[mi];
+        if (id == 0) return false; // ya estaba vacío (hueco previo)
+
+        VoxelTypeSO vt = types[id];
+        if (vt.indestructible || vt.hardness > power) return false;
+
+        micro[mi] = 0;
+        removedType = id;
+
+        bool anyLeft = false;
+        for (int i = 0; i < micro.Length; i++)
+            if (micro[i] != 0) { anyLeft = true; break; }
+
+        if (!anyLeft) SetBlockUniform(bx, by, bz, 0); // colapsa a aire
+        else NotifyBlockEdited(bx, by, bz);
+        return true;
+    }
+    /// <summary>
+    /// Parámetros de un golpe de minado. Cada MiningType solo lee los campos
+    /// que necesita (los demás se ignoran), así una sola llamada a Mine()
+    /// sirve para los tres modos sin ramificar en quien la llama:
+    /// - Pickaxe: damage.
+    /// - Drill: radius y power.
+    /// - Perfect: power.
+    /// </summary>
+    [Serializable]
+    public struct MiningParams
+    {
+        [Tooltip("Pickaxe: daño por golpe (se acumula hasta superar la hardness)")]
+        public float damage;
+        [Tooltip("Drill: radio de la esfera en metros")]
+        public float radius;
+        [Tooltip("Drill/Perfect: mina materiales con hardness <= power")]
+        public float power;
+    }
+
+    /// <summary>Resultado uniforme de Mine(), sin importar el MiningType usado.</summary>
+    public struct MiningResult
+    {
+        /// <summary>True si el golpe rompió/talló/minó algo.</summary>
+        public bool changed;
+        /// <summary>Recursos obtenidos por tipo. Null si changed es false.</summary>
+        public Dictionary<byte, int> removed;
+    }
+
+    /// <summary>
+    /// Una celda cúbica en coordenadas de mundo: o un bloque de 1m entero, o un
+    /// único micro-voxel. La usa PreviewPerfect para describir la celda exacta
+    /// que un golpe se llevaría, sin modificar el mundo.
+    /// </summary>
+    public struct MiningCell
+    {
+        public Vector3 min;
+        public float size;
+    }
+
+    /// <summary>
+    /// Una cara rectangular del contorno externo, en coordenadas de mundo. Los
+    /// 4 puntos forman el borde en orden (a→b→c→d→a); solo hace falta para
+    /// dibujar un outline, no para renderizar (no importa el winding).
+    /// </summary>
+    public struct MiningQuad
+    {
+        public Vector3 a, b, c, d;
+    }
+
+    /// <summary>
+    /// Punto de entrada único para minar: dado el tipo de herramienta y los
+    /// parámetros que ese tipo necesita, hace el trabajo correspondiente
+    /// (DamageBlock/DigSphere/MineVoxel) y devuelve un resultado uniforme.
+    /// Pasa hitPoint/hitNormal tal cual salen del RaycastHit; esta función ya
+    /// aplica el pequeño empuje hacia dentro del bloque donde hace falta.
+    /// </summary>
+    public MiningResult Mine(ToolItemSO.MiningType type, Vector3 hitPoint, Vector3 hitNormal, MiningParams p)
+    {
+        switch (type)
+        {
+            case ToolItemSO.MiningType.Sphere:
+            {
+                Dictionary<byte, int> removed = DigSphere(hitPoint, p.radius, p.power);
+                return new MiningResult { changed = removed.Count > 0, removed = removed };
+            }
+            case ToolItemSO.MiningType.Perfect:
+            {
+                Vector3 worldPos = hitPoint - hitNormal * 0.01f;
+                bool mined = MineVoxel(worldPos, p.power, out byte removedType);
+                Dictionary<byte, int> removed = mined ? new Dictionary<byte, int> { [removedType] = 1 } : null;
+                return new MiningResult { changed = mined, removed = removed };
+            }
+            default: // Pickaxe
+            {
+                Vector3Int block = WorldToBlock(hitPoint - hitNormal * 0.01f);
+                bool broken = DamageBlock(block, p.damage, out var removed);
+                return new MiningResult { changed = broken, removed = removed };
+            }
+        }
+    }
+
+    // scratch reutilizado por PreviewPickaxeContour para no generar basura cada frame
+    bool[,] contourMask;
+    bool[,] contourVisited;
+    readonly List<(int u0, int v0, int u1, int v1)> contourRects = new List<(int, int, int, int)>(32);
+    readonly MiningQuad[] cubeQuadBuf = new MiningQuad[6];
+
+    /// <summary>
+    /// Sin modificar el mundo: el contorno externo exacto de lo que el pico se
+    /// llevaría de este bloque. Si el bloque está intacto (uniforme, o
+    /// materializado pero relleno de punta a punta) devuelve las 6 caras del
+    /// cubo de 1m completo. Si ya fue minado a medias por el taladro o el modo
+    /// Perfect, fusiona las caras expuestas coplanares en rectángulos (greedy
+    /// meshing, igual que hace VoxelMesher para la malla real) en vez de dar
+    /// un cubito por cada micro-voxel suelto — así el outline dibuja solo el
+    /// borde de la forma real, no una rejilla. Rellena <paramref name="results"/>
+    /// (se limpia primero) para no generar basura llamándola cada frame.
+    /// </summary>
+    public void PreviewPickaxeContour(Vector3Int blockPos, List<MiningQuad> results)
+    {
+        results.Clear();
+        int bx = blockPos.x, by = blockPos.y, bz = blockPos.z;
+        if (!InBounds(bx, by, bz)) return;
+
+        // cáscara indestructible: suelo y paredes, techo abierto
+        if (by < 1 || bx < 1 || bz < 1 || bx >= BlockDims.x - 1 || bz >= BlockDims.z - 1) return;
+
+        byte t = GetBlockType(bx, by, bz);
+        byte[] micro = GetMicroArray(bx, by, bz);
+        if (t == 0 && micro == null) return; // aire
+
+        VoxelTypeSO vt = types[t != 0 ? t : (byte)1];
+        if (vt.indestructible) return;
+
+        Vector3 bMin = Origin + new Vector3(bx, by, bz);
+        const int M = VoxelChunk.MICRO;
+        const float MV = 1f / M;
+
+        // bloque uniforme, o materializado pero relleno de punta a punta (p.ej. terreno
+        // suavizado que no llegó a colapsar a uniforme): sus 6 caras son las del cubo entero.
+        if (micro == null || IsFullyFilled(micro))
+        {
+            CubeQuads(bMin, 1f, cubeQuadBuf);
+            results.AddRange(cubeQuadBuf);
+            return;
+        }
+
+        contourMask ??= new bool[M, M];
+        contourVisited ??= new bool[M, M];
+
+        // +X / -X: capas a lo largo de X; máscara indexada (u = mz, v = my)
+        for (int mx = 0; mx < M; mx++)
+        {
+            BuildFaceMaskX(micro, M, mx, +1, contourMask);
+            GreedyMerge(contourMask, contourVisited, M, contourRects);
+            foreach (var r in contourRects) results.Add(QuadX(bMin, mx + 1, r, MV));
+
+            BuildFaceMaskX(micro, M, mx, -1, contourMask);
+            GreedyMerge(contourMask, contourVisited, M, contourRects);
+            foreach (var r in contourRects) results.Add(QuadX(bMin, mx, r, MV));
+        }
+
+        // +Y / -Y: capas a lo largo de Y; máscara indexada (u = mx, v = mz)
+        for (int my = 0; my < M; my++)
+        {
+            BuildFaceMaskY(micro, M, my, +1, contourMask);
+            GreedyMerge(contourMask, contourVisited, M, contourRects);
+            foreach (var r in contourRects) results.Add(QuadY(bMin, my + 1, r, MV));
+
+            BuildFaceMaskY(micro, M, my, -1, contourMask);
+            GreedyMerge(contourMask, contourVisited, M, contourRects);
+            foreach (var r in contourRects) results.Add(QuadY(bMin, my, r, MV));
+        }
+
+        // +Z / -Z: capas a lo largo de Z; máscara indexada (u = mx, v = my)
+        for (int mz = 0; mz < M; mz++)
+        {
+            BuildFaceMaskZ(micro, M, mz, +1, contourMask);
+            GreedyMerge(contourMask, contourVisited, M, contourRects);
+            foreach (var r in contourRects) results.Add(QuadZ(bMin, mz + 1, r, MV));
+
+            BuildFaceMaskZ(micro, M, mz, -1, contourMask);
+            GreedyMerge(contourMask, contourVisited, M, contourRects);
+            foreach (var r in contourRects) results.Add(QuadZ(bMin, mz, r, MV));
+        }
+    }
+
+    static bool IsFullyFilled(byte[] micro)
+    {
+        for (int i = 0; i < micro.Length; i++)
+            if (micro[i] == 0) return false;
+        return true;
+    }
+
+    static bool MicroFilled(byte[] micro, int M, int mx, int my, int mz) =>
+        mx >= 0 && mx < M && my >= 0 && my < M && mz >= 0 && mz < M &&
+        micro[VoxelChunk.MicroIndex(mx, my, mz)] != 0;
+
+    // marca expuesta (ocupada Y sin vecino en la dirección dir) en mask[u=mz, v=my]
+    static void BuildFaceMaskX(byte[] micro, int M, int mx, int dir, bool[,] mask)
+    {
+        int nx = mx + dir;
+        for (int my = 0; my < M; my++)
+            for (int mz = 0; mz < M; mz++)
+                mask[mz, my] = MicroFilled(micro, M, mx, my, mz) && !MicroFilled(micro, M, nx, my, mz);
+    }
+
+    // mask[u=mx, v=mz]
+    static void BuildFaceMaskY(byte[] micro, int M, int my, int dir, bool[,] mask)
+    {
+        int ny = my + dir;
+        for (int mx = 0; mx < M; mx++)
+            for (int mz = 0; mz < M; mz++)
+                mask[mx, mz] = MicroFilled(micro, M, mx, my, mz) && !MicroFilled(micro, M, mx, ny, mz);
+    }
+
+    // mask[u=mx, v=my]
+    static void BuildFaceMaskZ(byte[] micro, int M, int mz, int dir, bool[,] mask)
+    {
+        int nz = mz + dir;
+        for (int mx = 0; mx < M; mx++)
+            for (int my = 0; my < M; my++)
+                mask[mx, my] = MicroFilled(micro, M, mx, my, mz) && !MicroFilled(micro, M, mx, my, nz);
+    }
+
+    /// <summary>Fusiona una máscara 2D de celdas expuestas en el mínimo de rectángulos
+    /// (greedy meshing estándar). Rellena outRects (se limpia primero).</summary>
+    static void GreedyMerge(bool[,] mask, bool[,] visited, int size, List<(int u0, int v0, int u1, int v1)> outRects)
+    {
+        outRects.Clear();
+        for (int v = 0; v < size; v++)
+            for (int u = 0; u < size; u++)
+                visited[u, v] = false;
+
+        for (int v = 0; v < size; v++)
+            for (int u = 0; u < size; u++)
+            {
+                if (visited[u, v] || !mask[u, v]) continue;
+
+                int w = 1;
+                while (u + w < size && !visited[u + w, v] && mask[u + w, v]) w++;
+
+                int h = 1;
+                bool canGrow = true;
+                while (v + h < size && canGrow)
+                {
+                    for (int k = 0; k < w; k++)
+                        if (visited[u + k, v + h] || !mask[u + k, v + h]) { canGrow = false; break; }
+                    if (canGrow) h++;
+                }
+
+                for (int dv = 0; dv < h; dv++)
+                    for (int du = 0; du < w; du++)
+                        visited[u + du, v + dv] = true;
+
+                outRects.Add((u, v, u + w, v + h));
+            }
+    }
+
+    static MiningQuad QuadX(Vector3 bMin, int layer, (int u0, int v0, int u1, int v1) r, float cell)
+    {
+        float x = bMin.x + layer * cell;
+        float z0 = bMin.z + r.u0 * cell, z1 = bMin.z + r.u1 * cell;
+        float y0 = bMin.y + r.v0 * cell, y1 = bMin.y + r.v1 * cell;
+        return new MiningQuad
+        {
+            a = new Vector3(x, y0, z0), b = new Vector3(x, y0, z1),
+            c = new Vector3(x, y1, z1), d = new Vector3(x, y1, z0)
+        };
+    }
+
+    static MiningQuad QuadY(Vector3 bMin, int layer, (int u0, int v0, int u1, int v1) r, float cell)
+    {
+        float y = bMin.y + layer * cell;
+        float x0 = bMin.x + r.u0 * cell, x1 = bMin.x + r.u1 * cell;
+        float z0 = bMin.z + r.v0 * cell, z1 = bMin.z + r.v1 * cell;
+        return new MiningQuad
+        {
+            a = new Vector3(x0, y, z0), b = new Vector3(x1, y, z0),
+            c = new Vector3(x1, y, z1), d = new Vector3(x0, y, z1)
+        };
+    }
+
+    static MiningQuad QuadZ(Vector3 bMin, int layer, (int u0, int v0, int u1, int v1) r, float cell)
+    {
+        float z = bMin.z + layer * cell;
+        float x0 = bMin.x + r.u0 * cell, x1 = bMin.x + r.u1 * cell;
+        float y0 = bMin.y + r.v0 * cell, y1 = bMin.y + r.v1 * cell;
+        return new MiningQuad
+        {
+            a = new Vector3(x0, y0, z), b = new Vector3(x1, y0, z),
+            c = new Vector3(x1, y1, z), d = new Vector3(x0, y1, z)
+        };
+    }
+
+    /// <summary>Las 6 caras de un cubo de arista size en min, como loops de 4 esquinas.</summary>
+    public static void CubeQuads(Vector3 min, float size, MiningQuad[] into6)
+    {
+        Vector3 max = min + Vector3.one * size;
+        into6[0] = new MiningQuad { a = new Vector3(min.x, min.y, min.z), b = new Vector3(min.x, max.y, min.z), c = new Vector3(min.x, max.y, max.z), d = new Vector3(min.x, min.y, max.z) }; // -X
+        into6[1] = new MiningQuad { a = new Vector3(max.x, min.y, min.z), b = new Vector3(max.x, min.y, max.z), c = new Vector3(max.x, max.y, max.z), d = new Vector3(max.x, max.y, min.z) }; // +X
+        into6[2] = new MiningQuad { a = new Vector3(min.x, min.y, min.z), b = new Vector3(min.x, min.y, max.z), c = new Vector3(max.x, min.y, max.z), d = new Vector3(max.x, min.y, min.z) }; // -Y
+        into6[3] = new MiningQuad { a = new Vector3(min.x, max.y, min.z), b = new Vector3(max.x, max.y, min.z), c = new Vector3(max.x, max.y, max.z), d = new Vector3(min.x, max.y, max.z) }; // +Y
+        into6[4] = new MiningQuad { a = new Vector3(min.x, min.y, min.z), b = new Vector3(max.x, min.y, min.z), c = new Vector3(max.x, max.y, min.z), d = new Vector3(min.x, max.y, min.z) }; // -Z
+        into6[5] = new MiningQuad { a = new Vector3(min.x, min.y, max.z), b = new Vector3(min.x, max.y, max.z), c = new Vector3(max.x, max.y, max.z), d = new Vector3(max.x, min.y, max.z) }; // +Z
+    }
+
+    /// <summary>
+    /// Sin modificar el mundo: si el modo Perfect pudiera minar el micro-voxel
+    /// bajo worldPos con esta power (respeta hardness/indestructible igual que
+    /// MineVoxel), devuelve true y la celda exacta de ese micro-voxel.
+    /// </summary>
+    public bool PreviewPerfect(Vector3 worldPos, float power, out MiningCell cell)
+    {
+        cell = default;
+        Vector3 rel = worldPos - Origin;
+        int bx = Mathf.FloorToInt(rel.x);
+        int by = Mathf.FloorToInt(rel.y);
+        int bz = Mathf.FloorToInt(rel.z);
+        if (!InBounds(bx, by, bz)) return false;
+
+        if (by < 1 || bx < 1 || bz < 1 || bx >= BlockDims.x - 1 || bz >= BlockDims.z - 1) return false;
+
+        byte t = GetBlockType(bx, by, bz);
+        byte[] micro = GetMicroArray(bx, by, bz);
+        if (t == 0 && micro == null) return false; // aire
+
+        const int M = VoxelChunk.MICRO;
+        Vector3 local = rel - new Vector3(bx, by, bz);
+        int mx = Mathf.Clamp(Mathf.FloorToInt(local.x * M), 0, M - 1);
+        int my = Mathf.Clamp(Mathf.FloorToInt(local.y * M), 0, M - 1);
+        int mz = Mathf.Clamp(Mathf.FloorToInt(local.z * M), 0, M - 1);
+
+        byte id = micro != null ? micro[VoxelChunk.MicroIndex(mx, my, mz)] : t;
+        if (id == 0) return false;
+
+        VoxelTypeSO vt = types[id];
+        if (vt.indestructible || vt.hardness > power) return false;
+
+        Vector3 min = Origin + new Vector3(bx, by, bz) + new Vector3(mx, my, mz) / M;
+        cell = new MiningCell { min = min, size = 1f / M };
+        return true;
+    }
+
+    /// <summary>
     /// Convierte una posición de mundo en coordenadas de bloque.
     /// Con un RaycastHit usa: WorldToBlock(hit.point - hit.normal * 0.01f).
     /// </summary>

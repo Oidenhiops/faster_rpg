@@ -147,7 +147,13 @@ public class ItemBaseSO : ScriptableObject
         Bow = 4,
         Axe = 5,
         Staff = 6,
-        Monster = 7
+        Monster = 7,
+        Pickaxe = 8,
+        Drill = 9,
+        Shovel = 10,
+        Hammer = 12,
+        Hoe = 11,
+        FishingRod = 13
     }
     public enum TypeAnimationLayer
     {

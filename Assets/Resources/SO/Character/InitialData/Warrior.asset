@@ -146,6 +146,50 @@ MonoBehaviour:
           _serializedList: []
         _currentValue: 0
         maxValue: 0
+    - Key: 18
+      Value:
+        isPercentage: 0
+        baseValue: 5
+        aptitudeValue: 100
+        itemValue: 0
+        buffValue: 0
+        buffValuePorcent:
+          _serializedList: []
+        _currentValue: 0
+        maxValue: 0
+    - Key: 19
+      Value:
+        isPercentage: 0
+        baseValue: 5
+        aptitudeValue: 100
+        itemValue: 0
+        buffValue: 0
+        buffValuePorcent:
+          _serializedList: []
+        _currentValue: 0
+        maxValue: 0
+    - Key: 20
+      Value:
+        isPercentage: 0
+        baseValue: 5
+        aptitudeValue: 100
+        itemValue: 0
+        buffValue: 0
+        buffValuePorcent:
+          _serializedList: []
+        _currentValue: 0
+        maxValue: 0
+    - Key: 21
+      Value:
+        isPercentage: 0
+        baseValue: 5
+        aptitudeValue: 100
+        itemValue: 0
+        buffValue: 0
+        buffValuePorcent:
+          _serializedList: []
+        _currentValue: 0
+        maxValue: 0
   initialSkills:
     _serializedList:
     - Key: 0

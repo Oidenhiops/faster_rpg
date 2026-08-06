@@ -247,6 +247,13 @@ public class CharacterData
         Durability = 16,
         Amount = 17,
         ItemRange = 18,
+        ItemRadius = 21,
         PicaxePower = 19,
+        AxePower = 20,
+        DrillPower = 22,
+        ShovelPower = 23,
+        HammerPower = 24,
+        HoePower = 24,
+        FishingRodPower = 25
     }
 }

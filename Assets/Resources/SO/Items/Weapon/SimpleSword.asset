@@ -76,3 +76,5 @@ MonoBehaviour:
           _serializedList: []
         _currentValue: 0
         maxValue: 1
+  miningType: 0
+  cantRepeatUse: 1

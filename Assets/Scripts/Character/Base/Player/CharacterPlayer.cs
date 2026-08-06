@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR;
 
 public class CharacterPlayer : CharacterBase
 {
@@ -19,6 +20,10 @@ public class CharacterPlayer : CharacterBase
     public Coroutine recoverStrCoroutine;
     [Tooltip("Segundos que tarda la barra de Str en pasar de 0 a maxValue.")]
     public float strFullRecoverTime = 2f;
+    public VoxelOutlineIndicator outline;
+    public RaycastHit currentHit;
+    public bool isSeeingBlock;
+    readonly List<VoxelWorld.MiningQuad> pickaxePreviewBuf = new List<VoxelWorld.MiningQuad>(64);
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
@@ -32,6 +37,7 @@ public class CharacterPlayer : CharacterBase
         inputActions.Player.MoveCamera.canceled += OnHandleMoveCamera;
         inputActions.Player.SetFreeCamera.performed += OnHandleSetFreeCamera;
         inputActions.Player.Attack.performed += OnHandleAttack;
+        inputActions.Player.Attack.canceled += OnHandleAttack;
         OnShowItemsToPickUp += OnHandleShowItemsToPickUp;
     }
     public async override Awaitable InitializeCharacter()
@@ -145,6 +151,96 @@ public class CharacterPlayer : CharacterBase
             characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str, false);
         }
     }
+    public override void SetHitPoint()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f));
+        bool hasHit = Physics.Raycast(ray, out RaycastHit hit, GetItemStatistic(CharacterData.TypeStatistic.ItemRange)?.currentValue ?? 0f, ~0) &&
+                      hit.collider.GetComponentInParent<VoxelWorld>() != null;
+        isSeeingBlock = hasHit && LayerMask.LayerToName(hit.collider.gameObject.layer) == "Map";
+        currentHit = hit;
+        UpdateOutline(VoxelWorld.Instance, hasHit, hit, GetCurrentMiningType(), GetItemStatistic(CharacterData.TypeStatistic.ItemRadius)?.currentValue ?? 0f);
+    }
+    public ToolItemSO.MiningType GetCurrentMiningType()
+    {
+        if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO is ToolItemSO toolItem)
+        {
+            return toolItem.toolMode;
+        }
+        return ToolItemSO.MiningType.Block;
+    }
+    public CharacterData.Statistic GetItemStatistic(CharacterData.TypeStatistic statistic)
+    {
+        CharacterData.Statistic itemStatistic = characterData.statistics[statistic];
+        if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO)
+        {
+            if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemStatistics.ContainsKey(statistic))
+            {
+                itemStatistic.baseValue = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemStatistics[statistic].baseValue;
+                itemStatistic.itemValue = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemStatistics[statistic].itemValue;
+                itemStatistic.buffValue = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemStatistics[statistic].buffValue;
+                itemStatistic.maxValue = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemStatistics[statistic].maxValue;
+                itemStatistic.currentValue = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemStatistics[statistic]._currentValue;
+                return itemStatistic;
+            }
+            return itemStatistic;
+        }
+        return itemStatistic;
+    }
+    public CharacterData.Statistic GetItemPower(ItemBaseSO.TypeWeapon typeItem)
+    {
+        switch (typeItem)
+        {
+            case ItemBaseSO.TypeWeapon.Pickaxe:
+                return GetItemStatistic(CharacterData.TypeStatistic.PicaxePower);
+            case ItemBaseSO.TypeWeapon.Axe:
+                return GetItemStatistic(CharacterData.TypeStatistic.AxePower);
+            case ItemBaseSO.TypeWeapon.Drill:
+                return GetItemStatistic(CharacterData.TypeStatistic.DrillPower);
+            case ItemBaseSO.TypeWeapon.Shovel:
+                return GetItemStatistic(CharacterData.TypeStatistic.ShovelPower);
+            case ItemBaseSO.TypeWeapon.Hammer:
+                return GetItemStatistic(CharacterData.TypeStatistic.HammerPower);
+            case ItemBaseSO.TypeWeapon.Hoe:
+                return GetItemStatistic(CharacterData.TypeStatistic.HoePower);
+            case ItemBaseSO.TypeWeapon.FishingRod:
+                return GetItemStatistic(CharacterData.TypeStatistic.FishingRodPower);
+            default:
+                return new CharacterData.Statistic();
+        }
+    }
+    void UpdateOutline(VoxelWorld world, bool hasHit, RaycastHit hit, ToolItemSO.MiningType toolMode, float radius)
+    {
+        if (outline == null) return;
+        if (!hasHit) { outline.Hide(); return; }
+
+        switch (toolMode)
+        {
+            case ToolItemSO.MiningType.Sphere:
+                outline.ShowSphere(hit.point, radius);
+                break;
+
+            case ToolItemSO.MiningType.Perfect:
+                {
+                    Vector3 worldPos = hit.point - hit.normal * 0.01f;
+                    if (world.PreviewPerfect(worldPos, characterData.statistics[CharacterData.TypeStatistic.PicaxePower].currentValue, out VoxelWorld.MiningCell cell))
+                        outline.ShowVoxel(cell.min, cell.size);
+                    else
+                        outline.Hide(); // material demasiado duro para perfectPower: sin highlight
+                    break;
+                }
+
+            default: // Pickaxe
+                {
+                    Vector3Int block = world.WorldToBlock(hit.point - hit.normal * 0.01f);
+                    world.PreviewPickaxeContour(block, pickaxePreviewBuf);
+                    if (pickaxePreviewBuf.Count > 0)
+                        outline.ShowContour(pickaxePreviewBuf); // contorno externo: el bloque entero, o solo el borde de lo que le queda si ya fue minado a medias
+                    else
+                        outline.Hide();
+                    break;
+                }
+        }
+    }
     public void OnHandleMoveCamera(InputAction.CallbackContext context)
     {
         if (isInventoryOpen) return;
@@ -156,19 +252,44 @@ public class CharacterPlayer : CharacterBase
     }
     public void OnHandleAttack(InputAction.CallbackContext context)
     {
-        if (isInitialize && !isInventoryOpen && !isInCanalization && characterAnimator.GetFloat("RightHand") == 0)
+        if (context.performed)
+        {
+            if (isInitialize && !isInventoryOpen && !isInCanalization && characterAnimator.GetFloat("RightHand") == 0)
+            {
+                isUsingItem = true;
+                StartCoroutine(HanldeAttack());
+            }
+        }
+        else if (context.canceled)
+        {
+            isUsingItem = false;
+        }
+    }
+    public async Awaitable HanldeAttack()
+    {
+        while (isUsingItem)
         {
             if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO)
             {
                 if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse >= 0)
                 {
-                    _ = characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
+                    await characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.UseItem(new ItemBaseSO.UseItemInfo(this, characterData.equipments[ItemsDBSO.TypeModel.Weapon], false));
+                    if (!isSeeingBlock)
+                    {
+                        isUsingItem = false;
+                    }
+                    else
+                    {
+                        print("Repetir ataque");
+                    }
                 }
             }
             else if (characterData.statistics[CharacterData.TypeStatistic.Str].currentValue - 1 >= 0)
             {
                 _ = AwaitForHandAttack();
             }
+
+            await Awaitable.NextFrameAsync();
         }
     }
     async Awaitable AwaitForHandAttack()

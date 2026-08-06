@@ -2931,7 +2931,7 @@ GameObject:
   - component: {fileID: 211714516}
   - component: {fileID: 211714515}
   - component: {fileID: 211714517}
-  - component: {fileID: 211714518}
+  - component: {fileID: 211714519}
   m_Layer: 3
   m_Name: CharacterPlayer
   m_TagString: Player
@@ -3437,12 +3437,16 @@ MonoBehaviour:
   _cancelCanalization: 0
   isUsingFastItem: 0
   _cancelUseFastItem: 0
+  isUsingItem: 0
+  _cancelUseItem: 0
   interactables:
     _serializedList: []
   isChangingCharacter: 0
   isInventoryOpen: 0
   characterPlayerCamera: {fileID: 211714509}
   strFullRecoverTime: 1
+  outline: {fileID: 211714519}
+  isSeeingBlock: 0
 --- !u!114 &211714511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3668,7 +3672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTest
   characterPlayer: {fileID: 211714510}
---- !u!114 &211714518
+--- !u!114 &211714519
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3677,21 +3681,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 211714501}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2622751316b3b5749a852ccff4a3b741, type: 3}
+  m_Script: {fileID: 11500000, guid: fe328368df334d0418daa77bdc18edaa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VoxelInteractor
-  cam: {fileID: 330585545}
-  maxDistance: 8
-  hitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  toolMode: 0
-  hitDamage: 1
-  hitInterval: 0.3
-  drillRadius: 1.1
-  drillPower: 5
-  drillInterval: 0.12
-  buildType: 3
+  m_EditorClassIdentifier: Assembly-CSharp::VoxelOutlineIndicator
+  color: {r: 1, g: 1, b: 1, a: 0.9}
+  lineWidth: 0.015
+  sphereSegments: 24
+  maxContourFaces: 512
 --- !u!1 &219281684
 GameObject:
   m_ObjectHideFlags: 0

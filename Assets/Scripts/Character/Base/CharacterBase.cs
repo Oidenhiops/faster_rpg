@@ -56,6 +56,20 @@ public class CharacterBase : MonoBehaviour
             }
         }
     }
+    public bool isUsingItem;
+    public bool _cancelUseItem;
+    public bool cancelUseItem
+    {
+        get => _cancelUseItem;
+        set
+        {
+            _cancelUseItem = value;
+            if (value)
+            {
+                StartCoroutine(ResetCancelUseItem());
+            }
+        }
+    }
     public void OnEnable()
     {
         OnEnableHandle();
@@ -70,8 +84,10 @@ public class CharacterBase : MonoBehaviour
         {
             MoveCharacter();
             AnimateCharacter();
+            SetHitPoint();
         }
     }
+    public virtual void SetHitPoint() { }
     public virtual void OnEnableHandle() { }
     public async virtual Awaitable InitializeCharacter() { }
     protected async Awaitable InitializeModels()
@@ -425,6 +441,11 @@ public class CharacterBase : MonoBehaviour
     {
         yield return null;
         cancelUseFastItem = false;
+    }
+    IEnumerator ResetCancelUseItem()
+    {
+        yield return null;
+        cancelUseItem = false;
     }
     [Serializable]
     public class CharacterModel
