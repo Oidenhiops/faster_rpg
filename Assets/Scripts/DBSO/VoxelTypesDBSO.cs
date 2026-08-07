@@ -7,7 +7,7 @@ using UnityEngine;
 public class VoxelTypesDBSO : ScriptableObject
 {
     [Tooltip("Índice en la lista = id del voxel (0 = aire). El generador usa 1-10 en orden: pasto, tierra, piedra, mineral, arena, nieve, tronco, hojas, agua, maleza")]
-    public List<VoxelTypeSO> types = new List<VoxelTypeSO>();
+    public List<BlockItemSO> types = new List<BlockItemSO>();
 
     [Tooltip("Qué se genera y qué puede aparecer en cada zona")]
     public SerializedDictionary<TypeZone, ZoneInfo> zones = new SerializedDictionary<TypeZone, ZoneInfo>();
@@ -30,17 +30,17 @@ public class VoxelTypesDBSO : ScriptableObject
 
         [Header("Bloques de la zona (roles del terreno; vacío = tipo por defecto)")]
         [Tooltip("Bloque superior del terreno (pasto, arena roja, musgo...)")]
-        public VoxelTypeSO surface;
+        public BlockItemSO surface;
         [Tooltip("Capa bajo la superficie (tierra...)")]
-        public VoxelTypeSO subsoil;
+        public BlockItemSO subsoil;
         [Tooltip("Roca profunda")]
-        public VoxelTypeSO stone;
+        public BlockItemSO stone;
         [Tooltip("Vetas de mineral en la roca")]
-        public VoxelTypeSO ore;
+        public BlockItemSO ore;
         [Tooltip("Orillas y lecho del agua (arena, lodo...)")]
-        public VoxelTypeSO beach;
+        public BlockItemSO beach;
         [Tooltip("El agua de la zona (azul, verde pantano, lava...)")]
-        public VoxelTypeSO water;
+        public BlockItemSO water;
 
         [Header("Vegetación (tipos con isPlant y su probabilidad relativa)")]
         public List<PlantSpawn> plants = new List<PlantSpawn>();
@@ -83,7 +83,7 @@ public class VoxelTypesDBSO : ScriptableObject
 #endif
     }
 
-    void Register(VoxelTypeSO type)
+    void Register(BlockItemSO type)
     {
         if (type != null && !types.Contains(type)) types.Add(type);
     }
@@ -91,16 +91,16 @@ public class VoxelTypesDBSO : ScriptableObject
     [Serializable]
     public class PlantSpawn
     {
-        public VoxelTypeSO plant;
+        public BlockItemSO plant;
         [Min(0.01f)] public float weight = 1f;
     }
 
     [Serializable]
     public class OreSpawn
     {
-        public VoxelTypeSO ore;
+        public BlockItemSO ore;
         [Tooltip("Bloque que la veta reemplaza (vacío = la roca de la zona)")]
-        public VoxelTypeSO host;
+        public BlockItemSO host;
         [Tooltip("Vetas por área de 16x16 columnas (como 'veins per chunk' de Minecraft)")]
         [Min(0f)] public float veinsPerChunk = 4f;
         [Tooltip("Altura mínima en bloques (0 = fondo del mapa)")]
@@ -115,8 +115,8 @@ public class VoxelTypesDBSO : ScriptableObject
     [Serializable]
     public class TreeSpawn
     {
-        public VoxelTypeSO trunk;
-        public VoxelTypeSO leaves;
+        public BlockItemSO trunk;
+        public BlockItemSO leaves;
         [Min(0.01f)] public float weight = 1f;
         [Min(1)] public int minTrunk = 3;
         [Min(1)] public int maxTrunk = 5;

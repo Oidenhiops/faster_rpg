@@ -53,7 +53,7 @@ public class VoxelWorld : MonoBehaviour
     public float biomeCellSizeMeters = 48f;
 
     // paleta activa (viene del DB; si falta, se crean defaults en memoria)
-    List<VoxelTypeSO> types = new List<VoxelTypeSO>();
+    List<BlockItemSO> types = new List<BlockItemSO>();
     public VoxelTypesDBSO.ZoneInfo ZoneInfo { get; private set; }
 
     [Header("Agua")]
@@ -147,7 +147,7 @@ public class VoxelWorld : MonoBehaviour
     {
         // cargar tipos y zona desde el DB (con respaldos si falta algo)
         if (typesDB != null && typesDB.types != null && typesDB.types.Count > 0)
-            types = new List<VoxelTypeSO>(typesDB.types);
+            types = new List<BlockItemSO>(typesDB.types);
         if (typesDB != null && typesDB.zones != null &&
             typesDB.zones.TryGetValue(zone, out VoxelTypesDBSO.ZoneInfo zi) && zi != null)
         {
@@ -212,10 +212,10 @@ public class VoxelWorld : MonoBehaviour
     /// <summary>Si no hay assets asignados, crea tipos por defecto en memoria para poder probar.</summary>
     void EnsureDefaultTypes()
     {
-        if (types == null) types = new List<VoxelTypeSO>();
+        if (types == null) types = new List<BlockItemSO>();
         if (types.Count == 0)
         {
-            Debug.LogWarning("VoxelWorld: sin VoxelTypeSO asignados. Usando 9 tipos por defecto en memoria — crea los assets (Create > ScriptableObjects > Voxels > VoxelType) y asígnalos en orden.");
+            Debug.LogWarning("VoxelWorld: sin BlockItemSO asignados. Usando 9 tipos por defecto en memoria — crea los assets (Create > ScriptableObjects > Items > BlockItem) y asígnalos en orden.");
             (string n, Color c, float h)[] defaults =
             {
                 ("Aire",    Color.clear,                        1f),
@@ -232,8 +232,8 @@ public class VoxelWorld : MonoBehaviour
             };
             foreach (var d in defaults)
             {
-                var so = ScriptableObject.CreateInstance<VoxelTypeSO>();
-                so.name = d.n; so.displayName = d.n; so.color = d.c; so.hardness = d.h;
+                var so = ScriptableObject.CreateInstance<BlockItemSO>();
+                so.name = d.n; so.modelInfo.colors[0] = d.c; so.hardness = d.h;
                 so.indestructible = d.n == "Agua";
                 so.isPlant = d.n == "Maleza";
                 types.Add(so);
@@ -242,8 +242,8 @@ public class VoxelWorld : MonoBehaviour
         for (int i = 0; i < types.Count; i++)
         {
             if (types[i] != null) continue;
-            var so = ScriptableObject.CreateInstance<VoxelTypeSO>();
-            so.name = $"Tipo {i}"; so.color = Color.magenta;
+            var so = ScriptableObject.CreateInstance<BlockItemSO>();
+            so.name = $"Tipo {i}"; so.modelInfo.colors[0] = Color.magenta;
             types[i] = so;
             Debug.LogWarning($"VoxelWorld: types[{i}] estaba vacío; usando magenta como aviso.");
         }
@@ -254,7 +254,7 @@ public class VoxelWorld : MonoBehaviour
         // atlas: una textura por tipo; si el tipo no tiene, se genera una de color plano
         var sources = new Texture2D[types.Count];
         for (int i = 0; i < types.Count; i++)
-            sources[i] = types[i].texture != null ? types[i].texture : SolidTexture(types[i].color);
+            sources[i] = types[i].modelInfo.textures.Count > 0 ? types[i].modelInfo.textures[0].texture : SolidTexture(types[i].modelInfo.colors[0]);
 
         var atlas = new Texture2D(64, 64, TextureFormat.RGBA32, false)
         {
@@ -266,7 +266,7 @@ public class VoxelWorld : MonoBehaviour
         {
             // alguna textura sin Read/Write: caer a colores planos para no romper
             Debug.LogError("VoxelWorld: falló el empaque del atlas (¿texturas sin Read/Write habilitado?). Usando colores planos.");
-            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].color);
+            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].modelInfo.colors[0]);
             typeRects = atlas.PackTextures(sources, 2, 4096);
         }
 
@@ -286,7 +286,7 @@ public class VoxelWorld : MonoBehaviour
         if (waterMaterial == null)
         {
             waterMaterial = new Material(Shader.Find("Sprites/Default")) { name = "WaterMaterial" };
-            waterMaterial.color = waterTypeId < types.Count ? types[waterTypeId].color
+            waterMaterial.color = waterTypeId < types.Count ? types[waterTypeId].modelInfo.colors[0]
                                                             : new Color(0.2f, 0.5f, 0.8f, 0.6f);
         }
 
@@ -308,8 +308,8 @@ public class VoxelWorld : MonoBehaviour
 
     public bool IsPlantId(byte id) => plantFlags != null && id < plantFlags.Length && plantFlags[id];
 
-    /// <summary>Id (índice en la paleta) de un VoxelTypeSO; 0 si no está.</summary>
-    public byte IdOf(VoxelTypeSO type)
+    /// <summary>Id (índice en la paleta) de un BlockItemSO; 0 si no está.</summary>
+    public byte IdOf(BlockItemSO type)
     {
         int i = types.IndexOf(type);
         return (byte)Mathf.Max(i, 0);
@@ -892,7 +892,7 @@ public class VoxelWorld : MonoBehaviour
                             AddCount(removed, t, 1);
                             continue;
                         }
-                        VoxelTypeSO vt = types[t];
+                        BlockItemSO vt = types[t];
                         if (vt.indestructible || vt.hardness > digPower) continue;
                         if (FarthestCorner2(rel, bMin) <= r2)
                         {
@@ -912,7 +912,7 @@ public class VoxelWorld : MonoBehaviour
                                 int mi = VoxelChunk.MicroIndex(mx, my, mz);
                                 byte id = micro[mi];
                                 if (id == 0) continue;
-                                VoxelTypeSO vt = types[id];
+                                BlockItemSO vt = types[id];
                                 Vector3 p = bMin + new Vector3((mx + 0.5f) * MV, (my + 0.5f) * MV, (mz + 0.5f) * MV);
                                 if (!vt.indestructible && vt.hardness <= digPower &&
                                     (p - rel).sqrMagnitude <= r2)
@@ -965,7 +965,7 @@ public class VoxelWorld : MonoBehaviour
         const int M = VoxelChunk.MICRO;
         if (micro == null)
         {
-            VoxelTypeSO blockVt = types[t];
+            BlockItemSO blockVt = types[t];
             if (blockVt.indestructible || blockVt.hardness > power) return false;
             micro = AllocateMicro(bx, by, bz, t);
         }
@@ -980,7 +980,7 @@ public class VoxelWorld : MonoBehaviour
         byte id = micro[mi];
         if (id == 0) return false; // ya estaba vacío (hueco previo)
 
-        VoxelTypeSO vt = types[id];
+        BlockItemSO vt = types[id];
         if (vt.indestructible || vt.hardness > power) return false;
 
         micro[mi] = 0;
@@ -1105,7 +1105,7 @@ public class VoxelWorld : MonoBehaviour
         byte[] micro = GetMicroArray(bx, by, bz);
         if (t == 0 && micro == null) return; // aire
 
-        VoxelTypeSO vt = types[t != 0 ? t : (byte)1];
+        BlockItemSO vt = types[t != 0 ? t : (byte)1];
         if (vt.indestructible) return;
 
         Vector3 bMin = Origin + new Vector3(bx, by, bz);
@@ -1310,7 +1310,7 @@ public class VoxelWorld : MonoBehaviour
         byte id = micro != null ? micro[VoxelChunk.MicroIndex(mx, my, mz)] : t;
         if (id == 0) return false;
 
-        VoxelTypeSO vt = types[id];
+        BlockItemSO vt = types[id];
         if (vt.indestructible || vt.hardness > power) return false;
 
         Vector3 min = Origin + new Vector3(bx, by, bz) + new Vector3(mx, my, mz) / M;
@@ -1348,7 +1348,7 @@ public class VoxelWorld : MonoBehaviour
         if (t == 0 && micro == null) return false; // aire
 
         // el tipo del bloque se conserva en blockTypes aunque esté parcial
-        VoxelTypeSO vt = types[t != 0 ? t : (byte)1];
+        BlockItemSO vt = types[t != 0 ? t : (byte)1];
         if (vt.indestructible) return false;
 
         blockDamage.TryGetValue(blockPos, out float total);
@@ -1385,8 +1385,10 @@ public class VoxelWorld : MonoBehaviour
     /// Coloca un bloque de 1m (estilo Minecraft) en la celda que contiene worldPos.
     /// Solo en celdas completamente vacías. Devuelve true si colocó.
     /// </summary>
-    public bool PlaceBlock(Vector3 worldPos, byte typeId)
+    public bool PlaceBlock(Vector3 worldPos, BlockItemSO voxelType)
     {
+        if (voxelType == null) return false;
+        byte typeId = IdOf(voxelType);
         if (typeId == 0 || typeId >= types.Count) return false;
         Vector3 rel = worldPos - Origin;
         int bx = Mathf.FloorToInt(rel.x);

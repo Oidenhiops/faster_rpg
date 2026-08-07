@@ -3,10 +3,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ToolItem", menuName = "ScriptableObjects/Items/EquipableItem/ToolItem", order = 1)]
 public class ToolItemSO : EquipableItemSO
 {
+    public TypeWeapon typeWeapon;
     public MiningType toolMode;
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
-        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
+        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
         useItemInfo.character.characterData.statistics[CharacterData.TypeStatistic.Str].currentValue -= useItemInfo.character.characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO.costPerUse;
         useItemInfo.character.characterPlayerHud.ChangeBar(CharacterData.TypeStatistic.Str);
         while (true)
@@ -36,7 +37,7 @@ public class ToolItemSO : EquipableItemSO
                 // result.removed trae los recursos obtenidos por tipo → inventario
             }
         }
-        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.characterItem.itemBaseSO.animationValueName, useItemInfo.isFastItem), 0);
+        useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.isFastItem), 0);
     }
     public enum MiningType
     {

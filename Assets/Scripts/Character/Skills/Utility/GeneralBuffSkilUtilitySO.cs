@@ -4,9 +4,11 @@ using UnityEngine;
 public class GeneralBuffSkilUtilitySO : SkillsBaseSO
 {
     public StatusEffectBaseSO statusEffectBaseSO;
+    public string animationLayerName;
+    public int animationvalue;
     public override async Awaitable UseSkill(CharacterBase character, CharacterData.CharacterItem characterItem)
     {
-        character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), characterItem.itemBaseSO.animationValue);
+        character.characterAnimator.SetFloat(animationLayerName, animationvalue);
         float elapsedTime = 0f;
         bool cancelAction = false;
         character.isInCanalization = true;
@@ -23,7 +25,7 @@ public class GeneralBuffSkilUtilitySO : SkillsBaseSO
             await Awaitable.NextFrameAsync();
         }
         character.isInCanalization = false;
-        character.characterAnimator.SetFloat(characterItem.itemBaseSO.animationValueName.ToString(), 0);
+        character.characterAnimator.SetFloat(animationLayerName, 0);
         if (!cancelAction)
         {
             if (characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))

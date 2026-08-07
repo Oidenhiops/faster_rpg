@@ -192,6 +192,7 @@ public class ItemsDBSO : ScriptableObject
         Weapon = 16,
         FastItems = 17,
         Bag = 18,
-        Ammo = 19
+        Ammo = 19,
+        Voxel = 20,
     }
 }

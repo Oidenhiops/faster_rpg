@@ -13,25 +13,25 @@ MonoBehaviour:
   m_Name: VoxelTypesDB
   m_EditorClassIdentifier: 
   types:
-  - {fileID: 11400000, guid: 948c42442b9784544b7803d3b09c5f60, type: 2}
-  - {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
-  - {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
-  - {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-  - {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-  - {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
-  - {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
-  - {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
-  - {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
-  - {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
-  - {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000012, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000013, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000014, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000015, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000017, type: 2}
-  - {fileID: 11400000, guid: b2000000000000000000000000000018, type: 2}
+  - {fileID: 11400000, guid: 0d17b86323bc428aa477a1cebac03143, type: 2}
+  - {fileID: 11400000, guid: 079d1e00af5f423f811c4cf9cf2f41f3, type: 2}
+  - {fileID: 11400000, guid: 9cb5e29038d442bd8f14ae82ffc9ec5f, type: 2}
+  - {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+  - {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
+  - {fileID: 11400000, guid: fd4681eef2f6469b87d82d662fbd9635, type: 2}
+  - {fileID: 11400000, guid: b7dfaa99fdcc4d83814f42203a9e0b84, type: 2}
+  - {fileID: 11400000, guid: ec7373a2229642859dabfed8e0441b4e, type: 2}
+  - {fileID: 11400000, guid: 2d299bb7374a485b8698ef675c6ecc67, type: 2}
+  - {fileID: 11400000, guid: ae58f48d49af494092ee134c713acc1c, type: 2}
+  - {fileID: 11400000, guid: 6b333d2be5d44802b77b3d14ac240bd5, type: 2}
+  - {fileID: 11400000, guid: 60117da67b4a4f58a4ba33d48308ec34, type: 2}
+  - {fileID: 11400000, guid: 62ae9117529e4b7b8e811248eba35dd4, type: 2}
+  - {fileID: 11400000, guid: e161049d249f4d6b9534ccf87ff2a900, type: 2}
+  - {fileID: 11400000, guid: da6d3b45f93c4f76a609c1871441dc09, type: 2}
+  - {fileID: 11400000, guid: 3ac97b52d4304bdaa85761b26101a51d, type: 2}
+  - {fileID: 11400000, guid: a5ae96736390421581aa850eca8f6467, type: 2}
+  - {fileID: 11400000, guid: 366336dba25c422482b352a50874acf7, type: 2}
+  - {fileID: 11400000, guid: 14864e4cc9d143d09acc3c41ca7bf00f, type: 2}
   zones:
     _serializedList:
     - Key: 1
@@ -53,25 +53,25 @@ MonoBehaviour:
           oreThreshold: 0.74
           treeDensity: 0.015
           grassDensity: 0.18
-        surface: {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
-        subsoil: {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
-        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-        beach: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
-        water: {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+        surface: {fileID: 11400000, guid: 079d1e00af5f423f811c4cf9cf2f41f3, type: 2}
+        subsoil: {fileID: 11400000, guid: 9cb5e29038d442bd8f14ae82ffc9ec5f, type: 2}
+        stone: {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+        ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
+        beach: {fileID: 11400000, guid: fd4681eef2f6469b87d82d662fbd9635, type: 2}
+        water: {fileID: 11400000, guid: ae58f48d49af494092ee134c713acc1c, type: 2}
         plants:
-        - plant: {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+        - plant: {fileID: 11400000, guid: 6b333d2be5d44802b77b3d14ac240bd5, type: 2}
           weight: 8
-        - plant: {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+        - plant: {fileID: 11400000, guid: 60117da67b4a4f58a4ba33d48308ec34, type: 2}
           weight: 2
         trees:
-        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
-          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+        - trunk: {fileID: 11400000, guid: ec7373a2229642859dabfed8e0441b4e, type: 2}
+          leaves: {fileID: 11400000, guid: 2d299bb7374a485b8698ef675c6ecc67, type: 2}
           weight: 1
           minTrunk: 3
           maxTrunk: 5
         ores:
-        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        - ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
           host: {fileID: 0}
           veinsPerChunk: 5
           minHeight: 2
@@ -99,30 +99,30 @@ MonoBehaviour:
           oreThreshold: 0.74
           treeDensity: 0.06
           grassDensity: 0.12
-        surface: {fileID: 11400000, guid: 9e5c7e4d90e0ebd4c9070b4e692b4c90, type: 2}
-        subsoil: {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
-        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-        beach: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
-        water: {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+        surface: {fileID: 11400000, guid: 079d1e00af5f423f811c4cf9cf2f41f3, type: 2}
+        subsoil: {fileID: 11400000, guid: 9cb5e29038d442bd8f14ae82ffc9ec5f, type: 2}
+        stone: {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+        ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
+        beach: {fileID: 11400000, guid: fd4681eef2f6469b87d82d662fbd9635, type: 2}
+        water: {fileID: 11400000, guid: ae58f48d49af494092ee134c713acc1c, type: 2}
         plants:
-        - plant: {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+        - plant: {fileID: 11400000, guid: 6b333d2be5d44802b77b3d14ac240bd5, type: 2}
           weight: 6
-        - plant: {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+        - plant: {fileID: 11400000, guid: 60117da67b4a4f58a4ba33d48308ec34, type: 2}
           weight: 1
         trees:
-        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
-          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+        - trunk: {fileID: 11400000, guid: ec7373a2229642859dabfed8e0441b4e, type: 2}
+          leaves: {fileID: 11400000, guid: 2d299bb7374a485b8698ef675c6ecc67, type: 2}
           weight: 7
           minTrunk: 4
           maxTrunk: 6
-        - trunk: {fileID: 11400000, guid: b2000000000000000000000000000017, type: 2}
-          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+        - trunk: {fileID: 11400000, guid: 366336dba25c422482b352a50874acf7, type: 2}
+          leaves: {fileID: 11400000, guid: 2d299bb7374a485b8698ef675c6ecc67, type: 2}
           weight: 3
           minTrunk: 3
           maxTrunk: 5
         ores:
-        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        - ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
           host: {fileID: 0}
           veinsPerChunk: 5
           minHeight: 2
@@ -150,18 +150,18 @@ MonoBehaviour:
           oreThreshold: 0.72
           treeDensity: 0
           grassDensity: 0.05
-        surface: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
-        subsoil: {fileID: 11400000, guid: b2000000000000000000000000000015, type: 2}
-        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-        beach: {fileID: 11400000, guid: 8477be6587b32d04690190cb413ff69c, type: 2}
+        surface: {fileID: 11400000, guid: fd4681eef2f6469b87d82d662fbd9635, type: 2}
+        subsoil: {fileID: 11400000, guid: 3ac97b52d4304bdaa85761b26101a51d, type: 2}
+        stone: {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+        ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
+        beach: {fileID: 11400000, guid: fd4681eef2f6469b87d82d662fbd9635, type: 2}
         water: {fileID: 0}
         plants:
-        - plant: {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
+        - plant: {fileID: 11400000, guid: a5ae96736390421581aa850eca8f6467, type: 2}
           weight: 1
         trees: []
         ores:
-        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        - ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
           host: {fileID: 0}
           veinsPerChunk: 8
           minHeight: 2
@@ -189,23 +189,23 @@ MonoBehaviour:
           oreThreshold: 0.73
           treeDensity: 0.03
           grassDensity: 0.04
-        surface: {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
-        subsoil: {fileID: 11400000, guid: 9fa1d6fed149a8f479ce122cf0a6a7b7, type: 2}
-        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-        beach: {fileID: 11400000, guid: 5b94059888067cb468535a73f5e002d3, type: 2}
-        water: {fileID: 11400000, guid: 6fda24f112e68544698f53b80a391944, type: 2}
+        surface: {fileID: 11400000, guid: b7dfaa99fdcc4d83814f42203a9e0b84, type: 2}
+        subsoil: {fileID: 11400000, guid: 9cb5e29038d442bd8f14ae82ffc9ec5f, type: 2}
+        stone: {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+        ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
+        beach: {fileID: 11400000, guid: b7dfaa99fdcc4d83814f42203a9e0b84, type: 2}
+        water: {fileID: 11400000, guid: ae58f48d49af494092ee134c713acc1c, type: 2}
         plants:
-        - plant: {fileID: 11400000, guid: b2000000000000000000000000000016, type: 2}
+        - plant: {fileID: 11400000, guid: a5ae96736390421581aa850eca8f6467, type: 2}
           weight: 1
         trees:
-        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
-          leaves: {fileID: 11400000, guid: b2000000000000000000000000000018, type: 2}
+        - trunk: {fileID: 11400000, guid: ec7373a2229642859dabfed8e0441b4e, type: 2}
+          leaves: {fileID: 11400000, guid: 14864e4cc9d143d09acc3c41ca7bf00f, type: 2}
           weight: 1
           minTrunk: 4
           maxTrunk: 6
         ores:
-        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        - ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
           host: {fileID: 0}
           veinsPerChunk: 7
           minHeight: 2
@@ -233,25 +233,25 @@ MonoBehaviour:
           oreThreshold: 0.76
           treeDensity: 0.025
           grassDensity: 0.3
-        surface: {fileID: 11400000, guid: b2000000000000000000000000000012, type: 2}
-        subsoil: {fileID: 11400000, guid: b2000000000000000000000000000013, type: 2}
-        stone: {fileID: 11400000, guid: d71d42dd4487c794ea43102bd37070d4, type: 2}
-        ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
-        beach: {fileID: 11400000, guid: b2000000000000000000000000000013, type: 2}
-        water: {fileID: 11400000, guid: b2000000000000000000000000000014, type: 2}
+        surface: {fileID: 11400000, guid: 62ae9117529e4b7b8e811248eba35dd4, type: 2}
+        subsoil: {fileID: 11400000, guid: e161049d249f4d6b9534ccf87ff2a900, type: 2}
+        stone: {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+        ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
+        beach: {fileID: 11400000, guid: e161049d249f4d6b9534ccf87ff2a900, type: 2}
+        water: {fileID: 11400000, guid: da6d3b45f93c4f76a609c1871441dc09, type: 2}
         plants:
-        - plant: {fileID: 11400000, guid: 06e8e345dda475d4da8eadd31ab8a87f, type: 2}
+        - plant: {fileID: 11400000, guid: 6b333d2be5d44802b77b3d14ac240bd5, type: 2}
           weight: 5
-        - plant: {fileID: 11400000, guid: b2000000000000000000000000000011, type: 2}
+        - plant: {fileID: 11400000, guid: 60117da67b4a4f58a4ba33d48308ec34, type: 2}
           weight: 2
         trees:
-        - trunk: {fileID: 11400000, guid: 68756fbcdcadf5b489c9904947f73b98, type: 2}
-          leaves: {fileID: 11400000, guid: 527ccd08e0036cb4cb5fef4c9d0a9212, type: 2}
+        - trunk: {fileID: 11400000, guid: ec7373a2229642859dabfed8e0441b4e, type: 2}
+          leaves: {fileID: 11400000, guid: 2d299bb7374a485b8698ef675c6ecc67, type: 2}
           weight: 1
           minTrunk: 3
           maxTrunk: 4
         ores:
-        - ore: {fileID: 11400000, guid: e36d526ac6a57514880b4965176a6583, type: 2}
+        - ore: {fileID: 11400000, guid: e5bfa02631d04932b8bc5dfd3ff24001, type: 2}
           host: {fileID: 0}
           veinsPerChunk: 4
           minHeight: 2

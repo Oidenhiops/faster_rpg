@@ -518,7 +518,7 @@ public static class VoxelGenerator
         return Mathf.Lerp(h0, h1, tz);
     }
 
-    static byte Resolve(VoxelWorld w, VoxelTypeSO type, byte fallback)
+    static byte Resolve(VoxelWorld w, BlockItemSO type, byte fallback)
     {
         if (type == null) return fallback;
         byte id = w.IdOf(type);

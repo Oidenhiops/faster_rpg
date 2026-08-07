@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a2f7892ed77917418edf27b659a4205, type: 3}
+  m_Name: 02_Tierra
+  m_EditorClassIdentifier: 
+  id: 3
+  idText: 
+  modelInfo:
+    colors: []
+    useTexture: 0
+    textures: []
+    originalMesh: []
+    occludedModels: 
+  icon: {fileID: 0}
+  typeObject: 20
+  canalizationEffect: {fileID: 0}
+  typeWeapon: 0
+  animationValueName: 0
+  costPerUse: 0
+  animationValue: 0
+  useEnergy: 0
+  itemStatistics:
+    _serializedList: []
+  hardness: 1
+  indestructible: 0
+  isPlant: 0

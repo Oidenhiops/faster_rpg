@@ -7,7 +7,7 @@ public class ReusableItemSO : ItemBaseSO
     public GameObject useEffectPrefab;
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
-        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), useItemInfo.characterItem.itemBaseSO.animationValue);
+        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.GetHandLayer(useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
         useItemInfo.character.isUsingFastItem = true;
         float elapsedTime = 0f;
         bool cancelAction = false;
@@ -24,7 +24,7 @@ public class ReusableItemSO : ItemBaseSO
             await Awaitable.NextFrameAsync();
         }
         useItemInfo.character.isUsingFastItem = false;
-        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.animationValueName.ToString(), 0);
+        useItemInfo.character.characterAnimator.SetFloat(useItemInfo.characterItem.itemBaseSO.GetHandLayer(useItemInfo.isFastItem), 0);
         if (!cancelAction)
         {
             if (useItemInfo.characterItem.itemStatistics.ContainsKey(CharacterData.TypeStatistic.Durability))

@@ -11,8 +11,6 @@ public class ItemBaseSO : ScriptableObject
     public Sprite icon;
     public ItemsDBSO.TypeModel typeObject;
     public StatusEffectBaseSO canalizationEffect;
-    public TypeWeapon typeWeapon;
-    public TypeAnimationLayer animationValueName;
     public float costPerUse;
     public int animationValue;
     public bool useEnergy;
@@ -106,13 +104,9 @@ public class ItemBaseSO : ScriptableObject
 
         return clone;
     }
-    public string GetHandLayer(TypeAnimationLayer typeAnimationLayer, bool isFastItem)
+    public string GetHandLayer(bool isFastItem)
     {
-        if (typeAnimationLayer == TypeAnimationLayer.DecideByHand)
-        {
-            return !isFastItem ? TypeAnimationLayer.RightHand.ToString() : TypeAnimationLayer.LeftHand.ToString();
-        }
-        else return typeAnimationLayer.ToString();
+        return !isFastItem ? "RightHand" : "LeftHand";
     }
     [Serializable]
     public class ItemModelInfo
@@ -154,12 +148,5 @@ public class ItemBaseSO : ScriptableObject
         Hammer = 12,
         Hoe = 11,
         FishingRod = 13
-    }
-    public enum TypeAnimationLayer
-    {
-        Base = 0,
-        LeftHand = 1,
-        RightHand = 2,
-        DecideByHand = 3
     }
 }
