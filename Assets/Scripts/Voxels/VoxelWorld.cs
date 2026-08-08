@@ -135,7 +135,11 @@ public class VoxelWorld : MonoBehaviour
     int ringPointer;
     Vector2Int lastTargetCol = new Vector2Int(int.MinValue, int.MinValue);
     int unloadTimer;
-    int rescanTimer;
+    // columnas con terreno listo pero cuyos vecinos aún no estaban generados cuando les
+    // tocó su turno en el anillo; se reintentan cada frame (barato) en vez de esperar a
+    // que el barrido completo termine y se reinicie (eso hacía tardar mucho más la
+    // decoración — árboles/maleza — que el terreno).
+    readonly List<Vector2Int> pendingDecoration = new List<Vector2Int>();
     bool columnWorkBusy;
     Vector2Int busyColumn; // columna que LoadColumnAsync/DecorateColumnAsync está procesando
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
@@ -374,12 +378,19 @@ public class VoxelWorld : MonoBehaviour
                 chunks[cc] = c;
             }
         }
-        if (c.go == null) BuildChunkObjects(c); // GameObjects: siempre en el hilo principal
+        // el GameObject (malla, collider) se crea recién en el primer remesh que
+        // encuentre geometría real — ver EnsureChunkObjects. Muchos chunks (cielo por
+        // encima del terreno, roca enterrada sin caras visibles) nunca lo necesitan.
+        c.loaded = true;
         return c;
     }
 
-    void BuildChunkObjects(VoxelChunk c)
+    /// <summary>Crea los GameObjects/Mesh/Collider de un chunk si todavía no los tiene.
+    /// Se llama solo cuando ApplyMeshData encuentra que el chunk sí tiene geometría que
+    /// mostrar (antes se creaban siempre, aunque el chunk terminara sin ninguna cara).</summary>
+    void EnsureChunkObjects(VoxelChunk c)
     {
+        if (c.go != null) return;
         c.go = new GameObject($"Chunk {c.coord.x},{c.coord.y},{c.coord.z}") { layer = LayerMask.NameToLayer("Map") };
         c.go.transform.SetParent(transform, false);
         c.go.transform.localPosition = LocalOrigin + (Vector3)(c.coord * VoxelChunk.SIZE);
@@ -436,8 +447,11 @@ public class VoxelWorld : MonoBehaviour
         if (!InBounds(bx, by, bz)) return null;
         VoxelChunk c = ChunkAt(bx, by, bz);
         if (c == null) return null;
-        c.microBlocks.TryGetValue(VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15), out byte[] micro);
-        return micro;
+        lock (c.microLock)
+        {
+            c.microBlocks.TryGetValue(VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15), out byte[] micro);
+            return micro;
+        }
     }
 
     /// <summary>Convierte el bloque uniforme en parcial (asigna sus 16³ voxels).</summary>
@@ -446,12 +460,15 @@ public class VoxelWorld : MonoBehaviour
         VoxelChunk c = ChunkAt(bx, by, bz);
         if (c == null) return null;
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
-        if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
-        var micro = new byte[VoxelChunk.MICRO3];
-        if (fillType != 0)
-            for (int i = 0; i < micro.Length; i++) micro[i] = fillType;
-        c.microBlocks[idx] = micro;
-        return micro;
+        lock (c.microLock)
+        {
+            if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
+            var micro = new byte[VoxelChunk.MICRO3];
+            if (fillType != 0)
+                for (int i = 0; i < micro.Length; i++) micro[i] = fillType;
+            c.microBlocks[idx] = micro;
+            return micro;
+        }
     }
 
     /// <summary>Deja el bloque uniforme con el tipo dado (borra sus micro-voxels).</summary>
@@ -462,7 +479,7 @@ public class VoxelWorld : MonoBehaviour
         if (c == null) return; // fuera del área cargada
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         c.blockTypes[idx] = typeId;
-        c.microBlocks.Remove(idx);
+        lock (c.microLock) { c.microBlocks.Remove(idx); }
         var pos = new Vector3Int(bx, by, bz);
         blockDamage.Remove(pos); // el daño acumulado no sobrevive al bloque
         blockLastHitTime.Remove(pos);
@@ -487,7 +504,7 @@ public class VoxelWorld : MonoBehaviour
         if (c == null || c.edited) return;
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
         c.blockTypes[idx] = typeId;
-        c.microBlocks.Remove(idx); // un bloque uniforme no debe conservar micro-voxels
+        lock (c.microLock) { c.microBlocks.Remove(idx); } // un bloque uniforme no debe conservar micro-voxels
     }
 
     /// <summary>Como AllocateMicro pero sin eventos ni remesh. Para detalle en la generación.</summary>
@@ -497,12 +514,15 @@ public class VoxelWorld : MonoBehaviour
         VoxelChunk c = ChunkAt(bx, by, bz);
         if (c == null || c.edited) return null;
         int idx = VoxelChunk.BlockIndex(bx & 15, by & 15, bz & 15);
-        if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
-        var micro = new byte[VoxelChunk.MICRO3];
-        if (fillType != 0)
-            for (int i = 0; i < micro.Length; i++) micro[i] = fillType;
-        c.microBlocks[idx] = micro;
-        return micro;
+        lock (c.microLock)
+        {
+            if (c.microBlocks.TryGetValue(idx, out byte[] existing)) return existing;
+            var micro = new byte[VoxelChunk.MICRO3];
+            if (fillType != 0)
+                for (int i = 0; i < micro.Length; i++) micro[i] = fillType;
+            c.microBlocks[idx] = micro;
+            return micro;
+        }
     }
 
     public void NotifyBlockEdited(int bx, int by, int bz)
@@ -683,7 +703,9 @@ public class VoxelWorld : MonoBehaviour
 
     void MarkDirty(VoxelChunk c, bool priority = false)
     {
-        if (c == null || c.dirty || c.go == null) return; // descargado: se mesheará al recargar
+        // ojo: se comprueba c.loaded, NO c.go — un chunk puede estar cargado y sin
+        // GameObject todavía (ver EnsureChunkObjects) y de todos modos necesitar remesh.
+        if (c == null || c.dirty || !c.loaded) return; // descargado: se mesheará al recargar
         c.dirty = true;
         (priority ? priorityDirtyQueue : dirtyQueue).Enqueue(c);
     }
@@ -733,22 +755,32 @@ public class VoxelWorld : MonoBehaviour
         // una a la vez, para no tener dos workers escribiendo bloques al mismo tiempo.
         if (!columnWorkBusy)
         {
-            int scan = columnsPerFrame; // cuántas posiciones del anillo se revisan por frame
-            while (scan > 0 && ringPointer < ringOffsets.Count)
+            // primero, las que ya tienen terreno pero estaban esperando a sus vecinas:
+            // se revisan cada frame (es barato, solo son chequeos de diccionario) en vez
+            // de esperar a que el barrido del anillo entero termine y se reinicie.
+            bool startedPending = false;
+            for (int i = pendingDecoration.Count - 1; i >= 0; i--)
             {
-                Vector2Int c2 = col + ringOffsets[ringPointer];
-                if (!ColumnInWorld(c2)) { ringPointer++; scan--; continue; }
-                if (StreamColumn(c2)) break; // encoló trabajo en background (columnWorkBusy=true)
-                ringPointer++;               // esa columna ya está lista: seguir buscando
-                scan--;
+                Vector2Int pc = pendingDecoration[i];
+                if (!loadedColumns.Contains(pc)) { pendingDecoration.RemoveAt(i); continue; } // se descargó
+                if (!NeighborsGenerated(pc)) continue;
+                pendingDecoration.RemoveAt(i);
+                _ = DecorateColumnAsync(pc);
+                startedPending = true;
+                break;
             }
 
-            // re-escanear de vez en cuando: algunas columnas quedan pendientes de
-            // decorar hasta que sus vecinas terminan de generarse
-            if (ringPointer >= ringOffsets.Count && ++rescanTimer >= 30)
+            if (!startedPending)
             {
-                rescanTimer = 0;
-                ringPointer = 0;
+                int scan = columnsPerFrame; // cuántas posiciones del anillo se revisan por frame
+                while (scan > 0 && ringPointer < ringOffsets.Count)
+                {
+                    Vector2Int c2 = col + ringOffsets[ringPointer];
+                    if (!ColumnInWorld(c2)) { ringPointer++; scan--; continue; }
+                    if (StreamColumn(c2)) break; // encoló trabajo en background (columnWorkBusy=true)
+                    ringPointer++;               // esa columna ya está lista: seguir buscando
+                    scan--;
+                }
             }
         }
 
@@ -780,10 +812,16 @@ public class VoxelWorld : MonoBehaviour
             _ = LoadColumnAsync(c2, st);
             return true;
         }
-        if (st < 2 && NeighborsGenerated(c2))
+        if (st < 2)
         {
-            _ = DecorateColumnAsync(c2);
-            return true;
+            if (NeighborsGenerated(c2))
+            {
+                _ = DecorateColumnAsync(c2);
+                return true;
+            }
+            // vecinos aún no listos: no bloquear el barrido por esta columna, pero no
+            // perderla — pendingDecoration la reintenta cada frame más adelante.
+            if (!pendingDecoration.Contains(c2)) pendingDecoration.Add(c2);
         }
         return false;
     }
@@ -931,6 +969,7 @@ public class VoxelWorld : MonoBehaviour
                 c.plantGo = null; c.plantMesh = null; c.plantFilter = null;
                 c.dirty = false;
             }
+            c.loaded = false;
 
             // sin ediciones del jugador: los datos se regeneran al volver
             if (!c.edited) lock (chunksLock) { chunks.Remove(cc); }
@@ -975,7 +1014,7 @@ public class VoxelWorld : MonoBehaviour
         {
             VoxelChunk c = dirtyQueue.Dequeue();
             c.dirty = false;
-            if (c.go != null) RemeshImmediate(c);
+            if (c.loaded) RemeshImmediate(c);
         }
     }
 
@@ -1945,12 +1984,14 @@ public class VoxelWorld : MonoBehaviour
             VoxelMesher.Snapshot snapshot = BuildSnapshot(c.coord, neighbors);
             VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId, plantFlags);
             await Awaitable.MainThreadAsync();
-            if (this == null || c.go == null) return;
+            // se comprueba c.loaded, no c.go: un chunk sin geometría todavía no tiene
+            // GameObject (ver ApplyMeshData/EnsureChunkObjects) y aun así es válido.
+            if (this == null || !c.loaded) return;
 
             // los vértices/triángulos hay que asignarlos en el hilo principal (API de Mesh),
             // pero eso es barato; lo caro es el cocinado de PhysX del MeshCollider.
             bool hasSolid = result.solid.vertices.Count > 0;
-            ApplyMeshData(c, result);
+            ApplyMeshData(c, result); // crea el GameObject recién aquí, si hace falta
 
             if (hasSolid)
             {
@@ -1961,7 +2002,7 @@ public class VoxelWorld : MonoBehaviour
                 await Awaitable.BackgroundThreadAsync();
                 Physics.BakeMesh(meshId, false);
                 await Awaitable.MainThreadAsync();
-                if (this == null || c.go == null) return;
+                if (this == null || !c.loaded) return;
             }
             ApplyCollider(c, hasSolid);
         }
@@ -2035,7 +2076,7 @@ public class VoxelWorld : MonoBehaviour
                     {
                         int idx = VoxelChunk.BlockIndex(lx, ly, lz);
                         type = nc.blockTypes[idx];
-                        nc.microBlocks.TryGetValue(idx, out micro);
+                        lock (nc.microLock) { nc.microBlocks.TryGetValue(idx, out micro); }
                     }
                     s.types[i] = type;
                     s.micro[i] = micro != null ? (byte[])micro.Clone() : null;
@@ -2072,6 +2113,14 @@ public class VoxelWorld : MonoBehaviour
     /// la colisión en background entre ambos pasos (ver RemeshAsync).</summary>
     void ApplyMeshData(VoxelChunk c, VoxelMesher.BuildResult result)
     {
+        if (c.go == null)
+        {
+            bool hasAnything = result.solid.vertices.Count > 0 || result.water.vertices.Count > 0
+                || result.plants.vertices.Count > 0;
+            if (!hasAnything) return; // nunca tuvo geometría y este resultado tampoco: no crear nada
+            EnsureChunkObjects(c); // primera vez que este chunk muestra algo
+        }
+
         // terreno sólido
         VoxelMesher.MeshData md = result.solid;
         Mesh mesh = c.mesh;
@@ -2120,6 +2169,7 @@ public class VoxelWorld : MonoBehaviour
     /// esta asignación es barata: PhysX reutiliza el bake en caché en vez de recocinar.</summary>
     void ApplyCollider(VoxelChunk c, bool hasSolid)
     {
+        if (c.collider == null) return; // nunca se creó el GameObject: nunca tuvo geometría
         if (!hasSolid) { c.collider.sharedMesh = null; return; }
         c.collider.sharedMesh = null; // forzar re-cook / descartar el bake de una malla distinta
         c.collider.sharedMesh = c.mesh;

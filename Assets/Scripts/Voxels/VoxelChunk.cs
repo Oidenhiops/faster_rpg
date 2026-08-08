@@ -16,11 +16,22 @@ public sealed class VoxelChunk
     // Solo los bloques parcialmente excavados asignan sus 16³ voxels (4 KB c/u).
     // Clave: BlockIndex local. Si un bloque queda vacío del todo, se elimina de aquí.
     public readonly Dictionary<int, byte[]> microBlocks = new Dictionary<int, byte[]>();
+    // protege microBlocks: la generación (background), las ediciones del jugador
+    // (hilo principal) y el remesh (background) pueden tocar el mismo chunk casi al
+    // mismo tiempo. Un Dictionary no tolera lectura y escritura estructural concurrentes
+    // (Add/Remove mientras otro hilo hace TryGetValue) — sin este lock eso corrompe o
+    // tira NullReferenceException dentro de Dictionary.FindEntry.
+    public readonly object microLock = new object();
 
     public Vector3Int coord;
     public bool dirty;
     public bool remeshing;
     public bool edited; // tiene cambios del jugador: sus datos se conservan al descargar
+    // true mientras el chunk está cargado (entre GetOrCreateChunk y UnloadColumn), sin
+    // importar si ya tiene GameObject. `go` se crea recién cuando el primer remesh
+    // encuentra geometría real — muchos chunks (cielo vacío, roca enterrada sin caras
+    // visibles) nunca llegan a necesitarlo. Ver VoxelWorld.EnsureChunkObjects.
+    public bool loaded;
 
     public GameObject go;
     public Mesh mesh;
