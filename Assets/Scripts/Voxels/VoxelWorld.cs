@@ -114,6 +114,9 @@ public class VoxelWorld : MonoBehaviour
 
     readonly Dictionary<Vector3Int, VoxelChunk> chunks = new Dictionary<Vector3Int, VoxelChunk>();
     readonly Queue<VoxelChunk> dirtyQueue = new Queue<VoxelChunk>();
+    // ediciones del jugador (minar/construir): se atienden antes que dirtyQueue
+    // (streaming ambiental), así no esperan detrás de cientos de chunks en carga.
+    readonly Queue<VoxelChunk> priorityDirtyQueue = new Queue<VoxelChunk>();
 
     // streaming
     VoxelGenerator.GenContext genContext;
@@ -192,14 +195,12 @@ public class VoxelWorld : MonoBehaviour
     {
         if (Ready && genContext != null) UpdateStreaming();
 
-        int n = Mathf.Min(remeshBudgetPerFrame, dirtyQueue.Count);
-        for (int i = 0; i < n; i++)
-        {
-            VoxelChunk c = dirtyQueue.Dequeue();
-            if (c.remeshing) { dirtyQueue.Enqueue(c); continue; } // ocupado, reintentar
-            c.dirty = false;
-            _ = RemeshAsync(c);
-        }
+        // las ediciones del jugador (priorityDirtyQueue) van primero, para que se
+        // sientan instantáneas aunque el streaming ambiental tenga cientos de chunks
+        // esperando turno en dirtyQueue.
+        int slots = remeshBudgetPerFrame;
+        slots -= DrainDirtyQueue(priorityDirtyQueue, slots);
+        if (slots > 0) DrainDirtyQueue(dirtyQueue, slots);
 
         // tick de flujo de agua
         if (waterFlowEnabled && Ready && flowQueue.Count > 0 && Time.time >= nextFlowTime)
@@ -213,6 +214,22 @@ public class VoxelWorld : MonoBehaviour
                 ProcessFlow(p);
             }
         }
+    }
+
+    // procesa hasta maxItems elementos de la cola dada; devuelve cuántos se examinaron
+    // (incluye los que se reencolaron por estar ya en remesh), para repartir el
+    // presupuesto del frame entre la cola de prioridad y la normal sin bucles infinitos.
+    int DrainDirtyQueue(Queue<VoxelChunk> queue, int maxItems)
+    {
+        int n = Mathf.Min(maxItems, queue.Count);
+        for (int i = 0; i < n; i++)
+        {
+            VoxelChunk c = queue.Dequeue();
+            if (c.remeshing) { queue.Enqueue(c); continue; } // ocupado, reintentar
+            c.dirty = false;
+            _ = RemeshAsync(c);
+        }
+        return n;
     }
 
     // ------------------------------------------------------------------ setup
@@ -473,15 +490,17 @@ public class VoxelWorld : MonoBehaviour
         VoxelChunk c = ChunkAt(bx, by, bz);
         if (c == null) return;
         c.edited = true; // sus datos se conservarán al descargar la columna
-        MarkDirty(c);
+        // prioridad alta: es una edición directa del jugador, no debe esperar detrás
+        // del streaming ambiental (ver DrainDirtyQueue en Update).
+        MarkDirty(c, priority: true);
         // un bloque en el borde del chunk cambia las caras visibles del chunk vecino
         int lx = bx & 15, ly = by & 15, lz = bz & 15;
-        if (lx == 0) MarkDirtyAt(c.coord + Vector3Int.left);
-        if (lx == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + Vector3Int.right);
-        if (ly == 0) MarkDirtyAt(c.coord + Vector3Int.down);
-        if (ly == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + Vector3Int.up);
-        if (lz == 0) MarkDirtyAt(c.coord + new Vector3Int(0, 0, -1));
-        if (lz == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + new Vector3Int(0, 0, 1));
+        if (lx == 0) MarkDirtyAt(c.coord + Vector3Int.left, priority: true);
+        if (lx == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + Vector3Int.right, priority: true);
+        if (ly == 0) MarkDirtyAt(c.coord + Vector3Int.down, priority: true);
+        if (ly == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + Vector3Int.up, priority: true);
+        if (lz == 0) MarkDirtyAt(c.coord + new Vector3Int(0, 0, -1), priority: true);
+        if (lz == VoxelChunk.SIZE - 1) MarkDirtyAt(c.coord + new Vector3Int(0, 0, 1), priority: true);
         OnBlockChanged?.Invoke(new Vector3Int(bx, by, bz));
 
         // cualquier edición despierta la simulación de agua en la vecindad
@@ -638,17 +657,17 @@ public class VoxelWorld : MonoBehaviour
         return changed;
     }
 
-    void MarkDirty(VoxelChunk c)
+    void MarkDirty(VoxelChunk c, bool priority = false)
     {
         if (c == null || c.dirty || c.go == null) return; // descargado: se mesheará al recargar
         c.dirty = true;
-        dirtyQueue.Enqueue(c);
+        (priority ? priorityDirtyQueue : dirtyQueue).Enqueue(c);
     }
 
-    void MarkDirtyAt(Vector3Int chunkCoord)
+    void MarkDirtyAt(Vector3Int chunkCoord, bool priority = false)
     {
         chunks.TryGetValue(chunkCoord, out VoxelChunk c);
-        MarkDirty(c);
+        MarkDirty(c, priority);
     }
 
     // ------------------------------------------------------------------ streaming
@@ -1812,6 +1831,13 @@ public class VoxelWorld : MonoBehaviour
             await Awaitable.MainThreadAsync();
             if (this == null || c.go == null) return;
             Apply(c, result);
+        }
+        catch (Exception ex)
+        {
+            // Diagnóstico temporal: si esto aparece en consola, el remesh de este chunk
+            // está fallando y por eso su malla/collider quedan desactualizados aunque
+            // los datos (blockTypes) ya se hayan editado correctamente.
+            Debug.LogError($"VoxelWorld: falló el remesh del chunk {c.coord} — su malla y collider quedaron desactualizados. Excepción: {ex}");
         }
         finally
         {
