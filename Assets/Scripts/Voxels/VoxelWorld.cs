@@ -77,7 +77,11 @@ public class VoxelWorld : MonoBehaviour
     public int viewDistanceColumns = 8;
     [Tooltip("Columnas generadas por frame")]
     public int columnsPerFrame = 2;
-    [Tooltip("Radio cargado de golpe al arrancar (para que haya piso bajo el player)")]
+    [Tooltip("Radio cargado de golpe (síncrono, bloqueante) al arrancar, solo para garantizar " +
+             "piso bajo el player en el primer frame. Se limita internamente a 1 (el propio " +
+             "chunk del player + sus 8 vecinos) — el resto del área visible la llena el streaming " +
+             "normal (async) apenas empieza el juego, así que subir este número ya no genera un " +
+             "freeze de carga más largo.")]
     public int warmupRadius = 3;
 
     [Header("Flujo de agua")]
@@ -113,6 +117,10 @@ public class VoxelWorld : MonoBehaviour
     public bool Ready { get; private set; }
 
     readonly Dictionary<Vector3Int, VoxelChunk> chunks = new Dictionary<Vector3Int, VoxelChunk>();
+    // protege `chunks`: con la generación corriendo en background (ver LoadColumnAsync/
+    // DecorateColumnAsync), el hilo principal puede seguir escribiendo el diccionario
+    // (nuevas columnas, UnloadColumn) mientras el worker lo lee vía ChunkAt.
+    readonly object chunksLock = new object();
     readonly Queue<VoxelChunk> dirtyQueue = new Queue<VoxelChunk>();
     // ediciones del jugador (minar/construir): se atienden antes que dirtyQueue
     // (streaming ambiental), así no esperan detrás de cientos de chunks en carga.
@@ -128,6 +136,8 @@ public class VoxelWorld : MonoBehaviour
     Vector2Int lastTargetCol = new Vector2Int(int.MinValue, int.MinValue);
     int unloadTimer;
     int rescanTimer;
+    bool columnWorkBusy;
+    Vector2Int busyColumn; // columna que LoadColumnAsync/DecorateColumnAsync está procesando
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
     readonly Dictionary<Vector3Int, float> blockLastHitTime = new Dictionary<Vector3Int, float>();
     // daño acumulado por micro-voxel (modo Perfect): clave = (bloque, índice micro)
@@ -141,6 +151,9 @@ public class VoxelWorld : MonoBehaviour
     readonly Queue<Vector3Int> flowQueue = new Queue<Vector3Int>();
     readonly HashSet<Vector3Int> flowQueued = new HashSet<Vector3Int>();
     readonly Dictionary<Vector3Int, byte> waterLevels = new Dictionary<Vector3Int, byte>(); // solo celdas en flujo
+    // protege `waterLevels`: CopySnapshot ahora la puede leer desde el hilo de background
+    // (ver BuildSnapshot) mientras ProcessFlow/TryFlow siguen escribiéndola en el principal.
+    readonly object waterLevelsLock = new object();
     float nextFlowTime;
 
     void Awake()
@@ -352,12 +365,16 @@ public class VoxelWorld : MonoBehaviour
 
     VoxelChunk GetOrCreateChunk(Vector3Int cc)
     {
-        if (!chunks.TryGetValue(cc, out VoxelChunk c))
+        VoxelChunk c;
+        lock (chunksLock)
         {
-            c = new VoxelChunk { coord = cc };
-            chunks[cc] = c;
+            if (!chunks.TryGetValue(cc, out c))
+            {
+                c = new VoxelChunk { coord = cc };
+                chunks[cc] = c;
+            }
         }
-        if (c.go == null) BuildChunkObjects(c);
+        if (c.go == null) BuildChunkObjects(c); // GameObjects: siempre en el hilo principal
         return c;
     }
 
@@ -393,8 +410,11 @@ public class VoxelWorld : MonoBehaviour
 
     VoxelChunk ChunkAt(int bx, int by, int bz)
     {
-        chunks.TryGetValue(new Vector3Int(bx >> 4, by >> 4, bz >> 4), out VoxelChunk c);
-        return c;
+        lock (chunksLock)
+        {
+            chunks.TryGetValue(new Vector3Int(bx >> 4, by >> 4, bz >> 4), out VoxelChunk c);
+            return c;
+        }
     }
 
     // ------------------------------------------------------------------ acceso a bloques
@@ -447,7 +467,7 @@ public class VoxelWorld : MonoBehaviour
         blockDamage.Remove(pos); // el daño acumulado no sobrevive al bloque
         blockLastHitTime.Remove(pos);
         RemoveMicroDamageIn(pos); // tampoco el de sus micro-voxels
-        if (typeId != waterTypeId) waterLevels.Remove(pos); // el nivel de flujo tampoco
+        if (typeId != waterTypeId) lock (waterLevelsLock) { waterLevels.Remove(pos); } // el nivel de flujo tampoco
         NotifyBlockEdited(bx, by, bz);
 
         // las plantas no flotan: si el soporte desaparece, la maleza de arriba se rompe
@@ -540,7 +560,7 @@ public class VoxelWorld : MonoBehaviour
     {
         if (!IsWaterCell(p.x, p.y, p.z)) return 0;
         if (GetMicroArray(p.x, p.y, p.z) != null) return 8; // agua micro (orillas): estática, cuenta llena
-        return waterLevels.TryGetValue(p, out byte l) ? l : 8; // sin entrada = fuente
+        lock (waterLevelsLock) { return waterLevels.TryGetValue(p, out byte l) ? l : 8; } // sin entrada = fuente
     }
 
     static readonly Vector3Int[] FlowSides =
@@ -557,7 +577,9 @@ public class VoxelWorld : MonoBehaviour
         bool waterAbove = EffectiveWaterLevel(p + Vector3Int.up) > 0;
 
         // ---- celdas en flujo: recomputar nivel según su alimentación ----
-        if (microP == null && waterLevels.ContainsKey(p))
+        bool pInFlow;
+        lock (waterLevelsLock) { pInFlow = waterLevels.ContainsKey(p); }
+        if (microP == null && pInFlow)
         {
             int support;
             if (waterAbove) support = 8; // alimentada desde arriba (columna de caída)
@@ -577,9 +599,11 @@ public class VoxelWorld : MonoBehaviour
             foreach (Vector3Int d in FlowSides)
             {
                 Vector3Int n = p + d;
+                bool nInFlow;
+                lock (waterLevelsLock) { nInFlow = waterLevels.ContainsKey(n); }
                 if (GetMicroArray(n.x, n.y, n.z) == null &&
                     GetBlockType(n.x, n.y, n.z) == waterTypeId &&
-                    !waterLevels.ContainsKey(n)) sourceNeighbors++;
+                    !nInFlow) sourceNeighbors++;
             }
             Vector3Int below = p + Vector3Int.down;
             bool firmFloor = !InBounds(below.x, below.y, below.z) ||
@@ -588,19 +612,19 @@ public class VoxelWorld : MonoBehaviour
 
             if (sourceNeighbors >= 2 && firmFloor)
             {
-                waterLevels.Remove(p); // ahora es fuente
+                lock (waterLevelsLock) { waterLevels.Remove(p); } // ahora es fuente
                 lvl = 8;
                 NotifyBlockEdited(p.x, p.y, p.z);
             }
             else if (support <= 0)
             {
-                waterLevels.Remove(p);
+                lock (waterLevelsLock) { waterLevels.Remove(p); }
                 SetBlockUniform(p.x, p.y, p.z, 0); // se seca (notifica y despierta vecinos)
                 return;
             }
             else if (support != lvl)
             {
-                waterLevels[p] = (byte)support;
+                lock (waterLevelsLock) { waterLevels[p] = (byte)support; }
                 lvl = support;
                 NotifyBlockEdited(p.x, p.y, p.z);
             }
@@ -635,7 +659,7 @@ public class VoxelWorld : MonoBehaviour
             if (bt != 0) return false; // sólido
 
             SetBlockUniform(t.x, t.y, t.z, waterTypeId); // notifica → remesh + vecinos a la cola
-            waterLevels[t] = (byte)Mathf.Clamp(newLvl, 1, 8); // toda agua nueva nace en flujo
+            lock (waterLevelsLock) { waterLevels[t] = (byte)Mathf.Clamp(newLvl, 1, 8); } // toda agua nueva nace en flujo
             return true;
         }
 
@@ -666,7 +690,8 @@ public class VoxelWorld : MonoBehaviour
 
     void MarkDirtyAt(Vector3Int chunkCoord, bool priority = false)
     {
-        chunks.TryGetValue(chunkCoord, out VoxelChunk c);
+        VoxelChunk c;
+        lock (chunksLock) { chunks.TryGetValue(chunkCoord, out c); }
         MarkDirty(c, priority);
     }
 
@@ -703,21 +728,28 @@ public class VoxelWorld : MonoBehaviour
         Vector2Int col = TargetColumn();
         if (col != lastTargetCol) { lastTargetCol = col; ringPointer = 0; }
 
-        int budget = columnsPerFrame;
-        while (budget > 0 && ringPointer < ringOffsets.Count)
+        // mientras haya una columna generándose/decorándose en background (columnWorkBusy)
+        // no se examinan más columnas: la generación queda deliberadamente serializada de
+        // una a la vez, para no tener dos workers escribiendo bloques al mismo tiempo.
+        if (!columnWorkBusy)
         {
-            Vector2Int c2 = col + ringOffsets[ringPointer];
-            if (!ColumnInWorld(c2)) { ringPointer++; continue; }
-            if (StreamColumn(c2)) budget--; // hizo trabajo este frame
-            else ringPointer++;             // esa columna ya está lista
-        }
+            int scan = columnsPerFrame; // cuántas posiciones del anillo se revisan por frame
+            while (scan > 0 && ringPointer < ringOffsets.Count)
+            {
+                Vector2Int c2 = col + ringOffsets[ringPointer];
+                if (!ColumnInWorld(c2)) { ringPointer++; scan--; continue; }
+                if (StreamColumn(c2)) break; // encoló trabajo en background (columnWorkBusy=true)
+                ringPointer++;               // esa columna ya está lista: seguir buscando
+                scan--;
+            }
 
-        // re-escanear de vez en cuando: algunas columnas quedan pendientes de
-        // decorar hasta que sus vecinas terminan de generarse
-        if (ringPointer >= ringOffsets.Count && ++rescanTimer >= 30)
-        {
-            rescanTimer = 0;
-            ringPointer = 0;
+            // re-escanear de vez en cuando: algunas columnas quedan pendientes de
+            // decorar hasta que sus vecinas terminan de generarse
+            if (ringPointer >= ringOffsets.Count && ++rescanTimer >= 30)
+            {
+                rescanTimer = 0;
+                ringPointer = 0;
+            }
         }
 
         // descarga periódica de columnas lejanas
@@ -727,29 +759,99 @@ public class VoxelWorld : MonoBehaviour
             int limit = viewDistanceColumns + 2;
             tmpUnload.Clear();
             foreach (Vector2Int lc in loadedColumns)
+            {
+                // nunca descargar la columna que DecorateColumnAsync está escribiendo en
+                // este momento en background (LoadColumnAsync no corre este riesgo: su
+                // columna todavía no entra a loadedColumns mientras genera).
+                if (columnWorkBusy && lc == busyColumn) continue;
                 if (Mathf.Max(Mathf.Abs(lc.x - col.x), Mathf.Abs(lc.y - col.y)) > limit)
                     tmpUnload.Add(lc);
+            }
             foreach (Vector2Int lc in tmpUnload) UnloadColumn(lc);
         }
     }
 
-    // devuelve true si generó o decoró algo (consumió presupuesto)
+    // devuelve true si encoló trabajo de generación/decoración en background
     bool StreamColumn(Vector2Int c2)
     {
         columnState.TryGetValue(c2, out byte st);
         if (!loadedColumns.Contains(c2))
         {
-            LoadColumn(c2, st);
+            _ = LoadColumnAsync(c2, st);
             return true;
         }
         if (st < 2 && NeighborsGenerated(c2))
         {
-            DecorateColumn(c2);
+            _ = DecorateColumnAsync(c2);
             return true;
         }
         return false;
     }
 
+    /// <summary>
+    /// Versión asíncrona de streaming normal (post-warmup): crea los GameObjects del
+    /// chunk en el hilo principal, pero el ruido pesado de VoxelGenerator.GenerateColumn
+    /// corre en background. columnWorkBusy asegura que solo una columna se esté
+    /// generando/decorando a la vez, así nunca hay dos workers tocando los mismos
+    /// datos de chunk (la decoración escribe a través de bordes de columna).
+    /// </summary>
+    async Awaitable LoadColumnAsync(Vector2Int c2, byte state)
+    {
+        columnWorkBusy = true;
+        busyColumn = c2;
+        try
+        {
+            for (int cy = 0; cy < ChunksY; cy++)
+                GetOrCreateChunk(new Vector3Int(c2.x, cy, c2.y)); // GameObjects: hilo principal
+
+            await Awaitable.BackgroundThreadAsync();
+            // generar terreno (idempotente: los chunks editados conservados se saltan)
+            VoxelGenerator.GenerateColumn(genContext, this, c2.x, c2.y);
+            // recarga de una columna ya decorada: reaplicar la decoración propia y la
+            // de las vecinas decoradas (sus árboles cruzan el borde hacia esta columna)
+            if (state >= 2) RedecorateAround(c2);
+            await Awaitable.MainThreadAsync();
+            if (this == null) return;
+
+            if (state == 0) columnState[c2] = 1;
+            loadedColumns.Add(c2);
+            MarkColumnDirty(c2, alsoNeighbors: true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"VoxelWorld: falló la generación de la columna {c2}. Excepción: {ex}");
+        }
+        finally
+        {
+            columnWorkBusy = false;
+        }
+    }
+
+    async Awaitable DecorateColumnAsync(Vector2Int c2)
+    {
+        columnWorkBusy = true;
+        busyColumn = c2;
+        try
+        {
+            await Awaitable.BackgroundThreadAsync();
+            VoxelGenerator.DecorateColumn(genContext, this, c2.x, c2.y);
+            await Awaitable.MainThreadAsync();
+            if (this == null) return;
+
+            columnState[c2] = 2;
+            MarkColumnDirty(c2, alsoNeighbors: true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"VoxelWorld: falló la decoración de la columna {c2}. Excepción: {ex}");
+        }
+        finally
+        {
+            columnWorkBusy = false;
+        }
+    }
+
+    /// <summary>Versión síncrona, usada solo por WarmupStreaming (que ya bloquea a propósito).</summary>
     void LoadColumn(Vector2Int c2, byte state)
     {
         for (int cy = 0; cy < ChunksY; cy++)
@@ -815,7 +917,8 @@ public class VoxelWorld : MonoBehaviour
         for (int cy = 0; cy < ChunksY; cy++)
         {
             var cc = new Vector3Int(c2.x, cy, c2.y);
-            if (!chunks.TryGetValue(cc, out VoxelChunk c)) continue;
+            VoxelChunk c;
+            lock (chunksLock) { if (!chunks.TryGetValue(cc, out c)) continue; }
 
             if (c.go != null)
             {
@@ -830,15 +933,24 @@ public class VoxelWorld : MonoBehaviour
             }
 
             // sin ediciones del jugador: los datos se regeneran al volver
-            if (!c.edited) chunks.Remove(cc);
+            if (!c.edited) lock (chunksLock) { chunks.Remove(cc); }
         }
         loadedColumns.Remove(c2);
     }
 
+    /// <summary>
+    /// Solo garantiza piso bajo el player en el primer frame — nada más. Antes esto
+    /// cargaba/mesheaba TODO warmupRadius de golpe en el hilo principal (con
+    /// warmupRadius=3 y 6 chunks de alto, hasta ~300 chunks síncronos antes del primer
+    /// frame: el freeze de arranque). Ahora el radio bloqueante queda fijo en 1 (el
+    /// chunk del player + sus 8 vecinos, ~54 chunks); el resto del área — incluyendo
+    /// lo que warmupRadius pedía de más — lo llena UpdateStreaming normal, en
+    /// background, apenas Ready es true (un par de frames después, sin freeze).
+    /// </summary>
     void WarmupStreaming()
     {
         Vector2Int col = TargetColumn();
-        int r = Mathf.Clamp(warmupRadius, 1, viewDistanceColumns);
+        const int r = 1;
 
         for (int dx = -r; dx <= r; dx++)
             for (int dz = -r; dz <= r; dz++)
@@ -858,7 +970,7 @@ public class VoxelWorld : MonoBehaviour
                     DecorateColumn(c2);
             }
 
-        // mesheado inmediato del área inicial: piso garantizado bajo el player
+        // mesheado inmediato del área mínima: piso garantizado bajo el player
         while (dirtyQueue.Count > 0)
         {
             VoxelChunk c = dirtyQueue.Dequeue();
@@ -1825,12 +1937,33 @@ public class VoxelWorld : MonoBehaviour
         c.remeshing = true;
         try
         {
-            VoxelMesher.Snapshot snapshot = CopySnapshot(c); // en main thread
+            // solo resolver los 27 vecinos toca `chunks` (con lock): eso sí debe quedarse
+            // en el hilo principal. Copiar los datos en sí (BuildSnapshot) ya no lo necesita,
+            // así que se mueve al background junto con el mesher.
+            VoxelChunk[] neighbors = ResolveNeighborChunks(c.coord);
             await Awaitable.BackgroundThreadAsync();
+            VoxelMesher.Snapshot snapshot = BuildSnapshot(c.coord, neighbors);
             VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId, plantFlags);
             await Awaitable.MainThreadAsync();
             if (this == null || c.go == null) return;
-            Apply(c, result);
+
+            // los vértices/triángulos hay que asignarlos en el hilo principal (API de Mesh),
+            // pero eso es barato; lo caro es el cocinado de PhysX del MeshCollider.
+            bool hasSolid = result.solid.vertices.Count > 0;
+            ApplyMeshData(c, result);
+
+            if (hasSolid)
+            {
+                // pre-cocina la colisión en background: al asignarla al collider más abajo,
+                // PhysX ya tiene el bake en caché (por id de malla) y la asignación es casi
+                // gratis en el hilo principal, en vez de cocinar ahí mismo.
+                int meshId = c.mesh.GetInstanceID();
+                await Awaitable.BackgroundThreadAsync();
+                Physics.BakeMesh(meshId, false);
+                await Awaitable.MainThreadAsync();
+                if (this == null || c.go == null) return;
+            }
+            ApplyCollider(c, hasSolid);
         }
         catch (Exception ex)
         {
@@ -1845,31 +1978,101 @@ public class VoxelWorld : MonoBehaviour
         }
     }
 
-    VoxelMesher.Snapshot CopySnapshot(VoxelChunk c)
+    /// <summary>
+    /// Resuelve los 27 VoxelChunk vecinos (3x3x3 alrededor de coord) una sola vez.
+    /// Es la única parte de la instantánea que necesita el diccionario `chunks` (con su
+    /// lock); una vez resueltos, BuildSnapshot indexa esos chunks directamente sin volver
+    /// a tocar el diccionario, así puede correr en un hilo de background.
+    /// </summary>
+    VoxelChunk[] ResolveNeighborChunks(Vector3Int coord)
     {
-        var s = new VoxelMesher.Snapshot();
-        Vector3Int b0 = c.coord * VoxelChunk.SIZE;
+        var arr = new VoxelChunk[27];
         int i = 0;
-        for (int y = -1; y <= VoxelChunk.SIZE; y++)
-            for (int z = -1; z <= VoxelChunk.SIZE; z++)
-                for (int x = -1; x <= VoxelChunk.SIZE; x++)
+        for (int dy = -1; dy <= 1; dy++)
+            for (int dz = -1; dz <= 1; dz++)
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    int bx = b0.x + x, by = b0.y + y, bz = b0.z + z;
-                    s.types[i] = GetBlockType(bx, by, bz);
-                    byte[] micro = GetMicroArray(bx, by, bz);
-                    s.micro[i] = micro != null ? (byte[])micro.Clone() : null;
-                    s.waterLvl[i] = 8;
-                    if (micro == null && s.types[i] == waterTypeId &&
-                        waterLevels.TryGetValue(new Vector3Int(bx, by, bz), out byte lvl))
-                        s.waterLvl[i] = lvl;
+                    lock (chunksLock) { chunks.TryGetValue(coord + new Vector3Int(dx, dy, dz), out arr[i]); }
                     i++;
                 }
+        return arr;
+    }
+
+    // ¿v cae en el vecino de antes (-1), el propio (0) o el de después (+1)? y su
+    // coordenada local (0..SIZE-1) dentro de ese vecino.
+    static void SplitAxis(int v, out int neighborOffset, out int local)
+    {
+        if (v < 0) { neighborOffset = -1; local = v + VoxelChunk.SIZE; }
+        else if (v >= VoxelChunk.SIZE) { neighborOffset = 1; local = v - VoxelChunk.SIZE; }
+        else { neighborOffset = 0; local = v; }
+    }
+
+    /// <summary>
+    /// Copia los datos de bloque a una instantánea, indexando directamente los 27
+    /// vecinos ya resueltos (sin tocar el diccionario `chunks`). Solo lee arreglos y el
+    /// diccionario `waterLevels` (con su propio lock) — no toca ninguna API de Unity, así
+    /// que es seguro llamarla desde un hilo de background (ver RemeshAsync).
+    /// </summary>
+    VoxelMesher.Snapshot BuildSnapshot(Vector3Int coord, VoxelChunk[] neighbors)
+    {
+        var s = new VoxelMesher.Snapshot();
+        Vector3Int b0 = coord * VoxelChunk.SIZE;
+        int i = 0;
+        for (int y = -1; y <= VoxelChunk.SIZE; y++)
+        {
+            SplitAxis(y, out int ny, out int ly);
+            for (int z = -1; z <= VoxelChunk.SIZE; z++)
+            {
+                SplitAxis(z, out int nz, out int lz);
+                for (int x = -1; x <= VoxelChunk.SIZE; x++)
+                {
+                    SplitAxis(x, out int nx, out int lx);
+                    VoxelChunk nc = neighbors[(nx + 1) + 3 * ((nz + 1) + 3 * (ny + 1))];
+
+                    byte type = 0;
+                    byte[] micro = null;
+                    if (nc != null)
+                    {
+                        int idx = VoxelChunk.BlockIndex(lx, ly, lz);
+                        type = nc.blockTypes[idx];
+                        nc.microBlocks.TryGetValue(idx, out micro);
+                    }
+                    s.types[i] = type;
+                    s.micro[i] = micro != null ? (byte[])micro.Clone() : null;
+
+                    s.waterLvl[i] = 8;
+                    if (micro == null && type == waterTypeId)
+                    {
+                        var wp = new Vector3Int(b0.x + x, b0.y + y, b0.z + z);
+                        lock (waterLevelsLock)
+                        {
+                            if (waterLevels.TryGetValue(wp, out byte lvl)) s.waterLvl[i] = lvl;
+                        }
+                    }
+                    i++;
+                }
+            }
+        }
         return s;
     }
 
+    /// <summary>Atajo síncrono: resuelve vecinos y copia todo de una, para RemeshImmediate.</summary>
+    VoxelMesher.Snapshot CopySnapshot(VoxelChunk c) => BuildSnapshot(c.coord, ResolveNeighborChunks(c.coord));
+
+    /// <summary>Aplica malla + collider de una (RemeshImmediate: todo síncrono, sin bake previo en background).</summary>
     void Apply(VoxelChunk c, VoxelMesher.BuildResult result)
     {
-        // terreno sólido (con collider)
+        bool hasSolid = result.solid.vertices.Count > 0;
+        ApplyMeshData(c, result);
+        ApplyCollider(c, hasSolid);
+    }
+
+    /// <summary>Sube vértices/triángulos a los Mesh (solo API de Mesh: debe correr en el hilo principal).
+    /// No toca el MeshCollider — eso lo hace ApplyCollider, aparte, para poder precocinar
+    /// la colisión en background entre ambos pasos (ver RemeshAsync).</summary>
+    void ApplyMeshData(VoxelChunk c, VoxelMesher.BuildResult result)
+    {
+        // terreno sólido
         VoxelMesher.MeshData md = result.solid;
         Mesh mesh = c.mesh;
         mesh.Clear();
@@ -1880,15 +2083,8 @@ public class VoxelWorld : MonoBehaviour
             mesh.SetUVs(0, md.uvs);
             mesh.SetTriangles(md.triangles, 0);
             mesh.RecalculateBounds();
-            c.filter.sharedMesh = mesh;
-            c.collider.sharedMesh = null; // forzar re-cook
-            c.collider.sharedMesh = mesh;
         }
-        else
-        {
-            c.filter.sharedMesh = mesh;
-            c.collider.sharedMesh = null;
-        }
+        c.filter.sharedMesh = mesh;
 
         // agua (sin collider)
         VoxelMesher.MeshData wd = result.water;
@@ -1917,5 +2113,15 @@ public class VoxelWorld : MonoBehaviour
             plantMesh.RecalculateBounds();
         }
         c.plantFilter.sharedMesh = plantMesh;
+    }
+
+    /// <summary>Asigna (o limpia) el MeshCollider. Si hasSolid es true y ya se llamó
+    /// Physics.BakeMesh para c.mesh de antemano (RemeshAsync lo hace en background),
+    /// esta asignación es barata: PhysX reutiliza el bake en caché en vez de recocinar.</summary>
+    void ApplyCollider(VoxelChunk c, bool hasSolid)
+    {
+        if (!hasSolid) { c.collider.sharedMesh = null; return; }
+        c.collider.sharedMesh = null; // forzar re-cook / descartar el bake de una malla distinta
+        c.collider.sharedMesh = c.mesh;
     }
 }
