@@ -25,8 +25,6 @@ MonoBehaviour:
   icon: {fileID: 478415271, guid: a5d60b521774e6b4fa75878bce8d2af1, type: 3}
   typeObject: 16
   canalizationEffect: {fileID: 0}
-  typeWeapon: 2
-  animationValueName: 3
   costPerUse: 10
   animationValue: 1
   useEnergy: 0
@@ -76,5 +74,7 @@ MonoBehaviour:
           _serializedList: []
         _currentValue: 0
         maxValue: 1
-  miningType: 0
-  cantRepeatUse: 1
+  typeWeapon: 2
+  miningInfo:
+    toolMode: 0
+    freeModePoints: []

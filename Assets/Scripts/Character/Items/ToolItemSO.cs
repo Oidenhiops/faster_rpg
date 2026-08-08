@@ -4,7 +4,7 @@ using UnityEngine;
 public class ToolItemSO : EquipableItemSO
 {
     public TypeWeapon typeWeapon;
-    public MiningType toolMode;
+    public MiningInfo miningInfo;
     public override async Awaitable UseItem(UseItemInfo useItemInfo)
     {
         useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.isFastItem), useItemInfo.characterItem.itemBaseSO.animationValue);
@@ -26,11 +26,11 @@ public class ToolItemSO : EquipableItemSO
         }
         if (useItemInfo.character is CharacterPlayer characterPlayer)
         {
-            VoxelWorld.MiningResult result = VoxelWorld.Instance.Mine(toolMode, characterPlayer.currentHit.point, characterPlayer.currentHit.normal, new VoxelWorld.MiningParams 
-            { 
+            VoxelWorld.MiningResult result = VoxelWorld.Instance.Mine(miningInfo.toolMode, characterPlayer.currentHit.point, characterPlayer.currentHit.normal, new VoxelWorld.MiningParams
+            {
                 radius = characterPlayer.GetItemStatistic(CharacterData.TypeStatistic.ItemRadius)?.currentValue ?? 0f,
-                power = characterPlayer.GetItemPower(typeWeapon).currentValue,
-                damage = 1
+                damage = 1, // ticks por golpe
+                miner = characterPlayer // sus estadísticas se comparan con las que cada bloque exige (itemStatistics)
             });
             if (result.changed)
             {
@@ -39,10 +39,17 @@ public class ToolItemSO : EquipableItemSO
         }
         useItemInfo.character.characterAnimator.SetFloat(GetHandLayer(useItemInfo.isFastItem), 0);
     }
+    [System.Serializable]
+    public class MiningInfo
+    {
+        public MiningType toolMode;
+        public Vector3[] freeModePoints;
+    }
     public enum MiningType
     {
         Block = 0,
         Sphere = 1,
-        Perfect = 2
+        Perfect = 2,
+        Free = 3
     }
 }

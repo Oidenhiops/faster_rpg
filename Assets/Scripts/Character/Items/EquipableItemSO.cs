@@ -7,10 +7,18 @@ public class EquipableItemSO : ItemBaseSO
     public override async Awaitable EquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem)
     {
         await EquipStats(character, characterItem, refreshModel, isFastItem, true);
+        if (!isFastItem && this is ToolItemSO toolItem && character is CharacterPlayer characterPlayer)
+        {
+            characterPlayer.currentMiningType = toolItem.miningInfo.toolMode;
+        }
     }
-    public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel,  bool isFastItem)
+    public override async Awaitable DesEquipItem(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem)
     {
         await EquipStats(character, characterItem, refreshModel, isFastItem, false);
+        if (!isFastItem && this is ToolItemSO && character is CharacterPlayer characterPlayer)
+        {
+            characterPlayer.currentMiningType = ToolItemSO.MiningType.Block;
+        }
     }
     async Awaitable EquipStats(CharacterBase character, CharacterData.CharacterItem characterItem, bool refreshModel, bool isFastItem, bool isAppend)
     {

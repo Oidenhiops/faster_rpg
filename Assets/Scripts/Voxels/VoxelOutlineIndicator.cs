@@ -18,6 +18,9 @@ using UnityEngine;
 ///   normal puede afectar miles de micro-voxels y recalcular esa forma cada
 ///   frame solo para la previsualización sería demasiado caro.
 ///
+/// El progreso de rotura (0-1, el daño acumulado guardado en VoxelWorld) tiñe
+/// el outline hacia damagedColor y lo engrosa: cuanto más roto, más rojo/grueso.
+///
 /// Los LineRenderers se crean una sola vez y se reutilizan (pool que crece
 /// según haga falta) para no generar basura de mallas cada frame.
 /// </summary>
@@ -31,6 +34,12 @@ public class VoxelOutlineIndicator : MonoBehaviour
     [Tooltip("Máximo de caras dibujadas a la vez en ShowContour, por rendimiento. " +
              "Con greedy meshing casi nunca se necesitan más que un puñado; esto es solo un seguro.")]
     public int maxContourFaces = 512;
+
+    [Header("Daño acumulado (progreso de rotura)")]
+    [Tooltip("Color del outline cuando el bloque está a punto de romperse (daño acumulado alto)")]
+    public Color damagedColor = new Color(1f, 0.15f, 0.1f, 1f);
+    [Tooltip("Cuánto crece el grosor de línea con el daño acumulado (1 = no crece)")]
+    [Range(1f, 5f)] public float damagedWidthMultiplier = 2.5f;
 
     readonly List<LineRenderer[]> facePool = new List<LineRenderer[]>(); // cada elemento = 4 aristas del borde de una cara
     int activeFaces;
@@ -93,44 +102,67 @@ public class VoxelOutlineIndicator : MonoBehaviour
     /// Dibuja el borde de cada cara recibida. Si vienen de PreviewPickaxeContour,
     /// ya están fusionadas por greedy meshing, así que esto traza el contorno
     /// externo real de la forma en vez de una rejilla de micro-voxels sueltos.
+    /// damageRatio01 (0-1, opcional): progreso de rotura del bloque
+    /// (VoxelWorld.GetBlockDamageRatio01) — a más daño, el outline se pone más
+    /// rojo y más grueso, así se nota que el bloque está a punto de romperse.
     /// </summary>
-    public void ShowContour(IReadOnlyList<VoxelWorld.MiningQuad> faces)
+    public void ShowContour(IReadOnlyList<VoxelWorld.MiningQuad> faces, float damageRatio01 = 0f)
     {
         HideAll();
         if (faces == null || faces.Count == 0) return;
 
+        Color c = Color.Lerp(color, damagedColor, damageRatio01);
+        float w = Mathf.Lerp(lineWidth, lineWidth * damagedWidthMultiplier, damageRatio01);
+
         int count = Mathf.Min(faces.Count, maxContourFaces);
         for (int i = 0; i < count; i++)
-            DrawFaceAt(GetFaceSlot(i), faces[i]);
+            DrawFaceAt(GetFaceSlot(i), faces[i], c, w);
         activeFaces = count;
     }
 
-    void DrawFaceAt(LineRenderer[] edges, VoxelWorld.MiningQuad q)
+    void DrawFaceAt(LineRenderer[] edges, VoxelWorld.MiningQuad q, Color c, float w)
     {
-        edges[0].enabled = true; edges[0].SetPosition(0, q.a); edges[0].SetPosition(1, q.b);
-        edges[1].enabled = true; edges[1].SetPosition(0, q.b); edges[1].SetPosition(1, q.c);
-        edges[2].enabled = true; edges[2].SetPosition(0, q.c); edges[2].SetPosition(1, q.d);
-        edges[3].enabled = true; edges[3].SetPosition(0, q.d); edges[3].SetPosition(1, q.a);
+        SetEdge(edges[0], q.a, q.b, c, w);
+        SetEdge(edges[1], q.b, q.c, c, w);
+        SetEdge(edges[2], q.c, q.d, c, w);
+        SetEdge(edges[3], q.d, q.a, c, w);
     }
 
-    /// <summary>Atajo para un único cubo (Perfect: siempre un solo micro-voxel).</summary>
-    public void ShowVoxel(Vector3 min, float size)
+    static void SetEdge(LineRenderer lr, Vector3 p0, Vector3 p1, Color c, float w)
+    {
+        lr.enabled = true;
+        lr.SetPosition(0, p0);
+        lr.SetPosition(1, p1);
+        lr.startColor = lr.endColor = c;
+        lr.widthMultiplier = w;
+    }
+
+    /// <summary>Atajo para un único cubo (Perfect: siempre un solo micro-voxel).
+    /// progress01: progreso de rotura de ese voxel — tiñe y engrosa el contorno.</summary>
+    public void ShowVoxel(Vector3 min, float size, float progress01 = 0f)
     {
         if (size <= 0f) { Hide(); return; }
         VoxelWorld.CubeQuads(min, size, singleVoxelBuf);
-        ShowContour(singleVoxelBuf);
+        ShowContour(singleVoxelBuf, progress01);
     }
 
-    /// <summary>Esfera de wireframe (Drill): centro y radio en metros.</summary>
-    public void ShowSphere(Vector3 center, float radius)
+    /// <summary>Esfera de wireframe (Drill): centro y radio en metros.
+    /// progress01: progreso de rotura del bloque bajo la mira — los anillos se
+    /// tiñen y engrosan a medida que el área se acerca a romperse.</summary>
+    public void ShowSphere(Vector3 center, float radius, float progress01 = 0f)
     {
         HideAll();
         if (radius <= 0f) return;
+
+        Color rc = Color.Lerp(color, damagedColor, progress01);
+        float rw = Mathf.Lerp(lineWidth, lineWidth * damagedWidthMultiplier, progress01);
 
         for (int i = 0; i < 3; i++)
         {
             LineRenderer lr = sphereRings[i];
             lr.enabled = true;
+            lr.startColor = lr.endColor = rc;
+            lr.widthMultiplier = rw;
             if (lr.positionCount != sphereSegments + 1) lr.positionCount = sphereSegments + 1;
 
             for (int s = 0; s <= sphereSegments; s++)

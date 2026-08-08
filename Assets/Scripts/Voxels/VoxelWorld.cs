@@ -90,6 +90,10 @@ public class VoxelWorld : MonoBehaviour
     [Header("Generación (respaldo si el DB no define la zona)")]
     public VoxelGenerator.Settings generation = new VoxelGenerator.Settings();
 
+    [Header("Daño acumulado (minado)")]
+    [Tooltip("Si un bloque/voxel dañado no recibe otro golpe dentro de este tiempo, su daño acumulado se olvida y hay que empezar de nuevo. Aplica a los 3 modos: pico (por bloque), taladro (por bloque) y perfecto (por micro-voxel).")]
+    public float damageResetSeconds = 3f;
+
     /// <summary>Coordenada del bloque (1m) editado. Útil para pathfinding, recursos, sonido.</summary>
     public event Action<Vector3Int> OnBlockChanged;
 
@@ -122,6 +126,10 @@ public class VoxelWorld : MonoBehaviour
     int unloadTimer;
     int rescanTimer;
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
+    readonly Dictionary<Vector3Int, float> blockLastHitTime = new Dictionary<Vector3Int, float>();
+    // daño acumulado por micro-voxel (modo Perfect): clave = (bloque, índice micro)
+    readonly Dictionary<(Vector3Int, int), (float dmg, float time)> microDamage = new Dictionary<(Vector3Int, int), (float, float)>();
+    static readonly List<(Vector3Int, int)> tmpMicroKeys = new List<(Vector3Int, int)>();
     Material runtimeMaterial;
     Rect[] typeRects;  // región de cada tipo dentro del atlas (índice = id)
     bool[] plantFlags; // qué ids son plantas (índice = id)
@@ -233,7 +241,7 @@ public class VoxelWorld : MonoBehaviour
             foreach (var d in defaults)
             {
                 var so = ScriptableObject.CreateInstance<BlockItemSO>();
-                so.name = d.n; so.modelInfo.colors[0] = d.c; so.hardness = d.h;
+                so.name = d.n; so.modelInfo.colors[0] = d.c; so.ticksPerBreak = d.h;
                 so.indestructible = d.n == "Agua";
                 so.isPlant = d.n == "Maleza";
                 types.Add(so);
@@ -266,7 +274,7 @@ public class VoxelWorld : MonoBehaviour
         {
             // alguna textura sin Read/Write: caer a colores planos para no romper
             Debug.LogError("VoxelWorld: falló el empaque del atlas (¿texturas sin Read/Write habilitado?). Usando colores planos.");
-            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].modelInfo.colors.Count > 0 ? types[i].modelInfo.colors[0] : Color.magenta);
+            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].modelInfo.colors[0]);
             typeRects = atlas.PackTextures(sources, 2, 4096);
         }
 
@@ -285,11 +293,9 @@ public class VoxelWorld : MonoBehaviour
         // material del agua: transparente simple si no se asignó uno
         if (waterMaterial == null)
         {
-            waterMaterial = new Material(Shader.Find("Sprites/Default"))
-            {
-                name = "WaterMaterial",
-                color = waterTypeId < types.Count ? types[waterTypeId].modelInfo.colors.Count > 0 ? types[waterTypeId].modelInfo.colors[0] : new Color(0.2f, 0.5f, 0.8f, 0.6f) : new Color(0.2f, 0.5f, 0.8f, 0.6f)
-            };
+            waterMaterial = new Material(Shader.Find("Sprites/Default")) { name = "WaterMaterial" };
+            waterMaterial.color = waterTypeId < types.Count ? types[waterTypeId].modelInfo.colors[0]
+                                                            : new Color(0.2f, 0.5f, 0.8f, 0.6f);
         }
 
         // material de plantas: cutout con el mismo atlas, doble cara
@@ -422,6 +428,8 @@ public class VoxelWorld : MonoBehaviour
         c.microBlocks.Remove(idx);
         var pos = new Vector3Int(bx, by, bz);
         blockDamage.Remove(pos); // el daño acumulado no sobrevive al bloque
+        blockLastHitTime.Remove(pos);
+        RemoveMicroDamageIn(pos); // tampoco el de sus micro-voxels
         if (typeId != waterTypeId) waterLevels.Remove(pos); // el nivel de flujo tampoco
         NotifyBlockEdited(bx, by, bz);
 
@@ -851,11 +859,18 @@ public class VoxelWorld : MonoBehaviour
     // ------------------------------------------------------------------ excavar / construir
 
     /// <summary>
-    /// Excava una esfera estilo DRG con precisión de 1/16 m. Respeta hardness e
-    /// indestructible, y deja una cáscara de 1 bloque en suelo y paredes (techo abierto).
-    /// Devuelve micro-voxels quitados por tipo (4096 = un bloque entero) para dar recursos.
+    /// Excava una esfera estilo DRG con precisión de 1/16 m. El daño se ACUMULA POR
+    /// BLOQUE entre golpes, guardado en el mundo (mismo store que el pico): cada
+    /// llamada suma ticksPerHit al acumulado de cada bloque tocado por la esfera, y
+    /// solo se tallan los voxels cuyos ticks efectivos (EffectiveBreakTicks: según el
+    /// poder del minero vs el que cada tipo exige) ya quedaron cubiertos por ese
+    /// acumulado. Tipos cuyo poder exigido no se alcanza no reciben daño. El
+    /// acumulado expira a los damageResetSeconds sin golpes, y se lee con
+    /// GetBlockDamageRatio01 (grietas del outline). Respeta indestructible y deja
+    /// una cáscara de 1 bloque en suelo y paredes (techo abierto). Devuelve
+    /// micro-voxels quitados por tipo (4096 = un bloque entero) para dar recursos.
     /// </summary>
-    public Dictionary<byte, int> DigSphere(Vector3 center, float radiusMeters, float digPower = 1f)
+    public Dictionary<byte, int> DigSphere(Vector3 center, float radiusMeters, CharacterPlayer miner, float ticksPerHit = 1f)
     {
         var removed = new Dictionary<byte, int>();
         Vector3 rel = center - Origin;
@@ -868,6 +883,16 @@ public class VoxelWorld : MonoBehaviour
         float r2 = radiusMeters * radiusMeters;
         const int M = VoxelChunk.MICRO;
         const float MV = 1f / M;
+
+        // ticks efectivos por tipo, calculados una sola vez por golpe (la esfera puede
+        // tocar miles de micro-voxels y EffectiveBreakTicks consulta estadísticas)
+        var effCache = new float[types.Count];
+        for (int i = 0; i < effCache.Length; i++) effCache[i] = float.NaN;
+        float EffFor(byte id)
+        {
+            if (float.IsNaN(effCache[id])) effCache[id] = EffectiveBreakTicks(types[id], miner);
+            return effCache[id];
+        }
 
         for (int by = minBy; by <= maxBy; by++)
             for (int bz = minBz; bz <= maxBz; bz++)
@@ -885,21 +910,36 @@ public class VoxelWorld : MonoBehaviour
                     Vector3 bMin = new Vector3(bx, by, bz);
                     if (AabbDist2(rel, bMin, bMin + Vector3.one) > r2) continue; // fuera de la esfera
 
+                    if (micro == null && IsPlantId(t))
+                    {
+                        // la maleza se rompe entera con solo rozarla
+                        SetBlockUniform(bx, by, bz, 0);
+                        AddCount(removed, t, 1);
+                        continue;
+                    }
+
+                    // daño acumulado del bloque (compartido con el pico): expira por inactividad
+                    var pos = new Vector3Int(bx, by, bz);
+                    blockDamage.TryGetValue(pos, out float acc);
+                    if (acc > 0f && blockLastHitTime.TryGetValue(pos, out float lastHit) &&
+                        Time.time - lastHit > damageResetSeconds) acc = 0f;
+                    acc += ticksPerHit;
+
                     if (micro == null)
                     {
-                        if (IsPlantId(t))
+                        float effTicks = EffFor(t);
+                        if (effTicks < 0f) continue; // indestructible o poder insuficiente: ni daño
+                        if (effTicks > acc)
                         {
-                            // la maleza se rompe entera con solo rozarla
-                            SetBlockUniform(bx, by, bz, 0);
-                            AddCount(removed, t, 1);
+                            // aún no alcanza: se guarda el progreso y este golpe no talla nada aquí
+                            blockDamage[pos] = acc;
+                            blockLastHitTime[pos] = Time.time;
                             continue;
                         }
-                        BlockItemSO vt = types[t];
-                        if (vt.indestructible || vt.hardness > digPower) continue;
                         if (FarthestCorner2(rel, bMin) <= r2)
                         {
                             // bloque completamente dentro: quitarlo entero sin materializar
-                            SetBlockUniform(bx, by, bz, 0);
+                            SetBlockUniform(bx, by, bz, 0); // limpia también el daño guardado
                             AddCount(removed, t, VoxelChunk.MICRO3);
                             continue;
                         }
@@ -914,9 +954,9 @@ public class VoxelWorld : MonoBehaviour
                                 int mi = VoxelChunk.MicroIndex(mx, my, mz);
                                 byte id = micro[mi];
                                 if (id == 0) continue;
-                                BlockItemSO vt = types[id];
+                                float effTicks = EffFor(id);
                                 Vector3 p = bMin + new Vector3((mx + 0.5f) * MV, (my + 0.5f) * MV, (mz + 0.5f) * MV);
-                                if (!vt.indestructible && vt.hardness <= digPower &&
+                                if (effTicks >= 0f && effTicks <= acc &&
                                     (p - rel).sqrMagnitude <= r2)
                                 {
                                     micro[mi] = 0;
@@ -926,9 +966,16 @@ public class VoxelWorld : MonoBehaviour
                                 else remaining++;
                             }
 
-                    if (cut == 0) continue;
-                    if (remaining == 0) SetBlockUniform(bx, by, bz, 0); // colapsa a aire
-                    else NotifyBlockEdited(bx, by, bz);
+                    if (remaining == 0 && cut > 0)
+                    {
+                        SetBlockUniform(bx, by, bz, 0); // colapsa a aire (limpia el daño)
+                        continue;
+                    }
+                    // quedaron voxels (más duros, o fuera de la esfera): conservar el
+                    // acumulado para que los próximos golpes sigan sumando sobre él
+                    blockDamage[pos] = acc;
+                    blockLastHitTime[pos] = Time.time;
+                    if (cut > 0) NotifyBlockEdited(bx, by, bz);
                 }
         return removed;
     }
@@ -937,10 +984,15 @@ public class VoxelWorld : MonoBehaviour
     /// Modo Perfect: mina un único micro-voxel (de voxel en voxel), la máxima precisión
     /// posible. Usa el punto de impacto empujado ligeramente hacia dentro del bloque
     /// (worldPos = hit.point - hit.normal * 0.01f, igual que DamageBlock) para ubicar
-    /// el micro-voxel exacto bajo la mira. Respeta hardness e indestructible.
+    /// el micro-voxel exacto bajo la mira. El daño se ACUMULA POR MICRO-VOXEL entre
+    /// golpes (guardado en el mundo, expira a los damageResetSeconds): el voxel se
+    /// rompe cuando el acumulado supera sus ticks efectivos (EffectiveBreakTicks:
+    /// ticksPerBreak ajustado por el poder del minero vs el que el tipo exige). Si el
+    /// minero no llega al poder exigido, no hay daño. Se lee con GetVoxelDamageRatio01
+    /// (grietas del outline).
     /// Devuelve true si quitó algo; removedType trae el tipo obtenido (para recursos).
     /// </summary>
-    public bool MineVoxel(Vector3 worldPos, float power, out byte removedType)
+    public bool MineVoxel(Vector3 worldPos, CharacterPlayer miner, float ticksPerHit, out byte removedType)
     {
         removedType = 0;
         Vector3 rel = worldPos - Origin;
@@ -965,26 +1017,34 @@ public class VoxelWorld : MonoBehaviour
         }
 
         const int M = VoxelChunk.MICRO;
-        if (micro == null)
-        {
-            BlockItemSO blockVt = types[t];
-            if (blockVt.indestructible || blockVt.hardness > power) return false;
-            micro = AllocateMicro(bx, by, bz, t);
-        }
 
         // micro-voxel exacto bajo la mira, dentro del bloque (0..M-1 por eje)
         Vector3 local = rel - new Vector3(bx, by, bz); // 0..1
         int mx = Mathf.Clamp(Mathf.FloorToInt(local.x * M), 0, M - 1);
         int my = Mathf.Clamp(Mathf.FloorToInt(local.y * M), 0, M - 1);
         int mz = Mathf.Clamp(Mathf.FloorToInt(local.z * M), 0, M - 1);
-
         int mi = VoxelChunk.MicroIndex(mx, my, mz);
-        byte id = micro[mi];
+
+        byte id = micro != null ? micro[mi] : t;
         if (id == 0) return false; // ya estaba vacío (hueco previo)
 
-        BlockItemSO vt = types[id];
-        if (vt.indestructible || vt.hardness > power) return false;
+        float effTicks = EffectiveBreakTicks(types[id], miner);
+        if (effTicks < 0f) return false; // indestructible, o el minero no llega al poder exigido
 
+        // acumular el daño de ESTE micro-voxel; se rompe al superar sus ticks efectivos
+        var key = (new Vector3Int(bx, by, bz), mi);
+        microDamage.TryGetValue(key, out (float dmg, float time) e);
+        float total = (e.time > 0f && Time.time - e.time > damageResetSeconds) ? 0f : e.dmg;
+        total += ticksPerHit;
+        if (total < effTicks)
+        {
+            microDamage[key] = (total, Time.time);
+            return false; // dañado pero entero (el outline lo muestra vía GetVoxelDamageRatio01)
+        }
+        microDamage.Remove(key);
+
+        // recién ahora se materializa el bloque (si era uniforme): el daño parcial no aloca
+        if (micro == null) micro = AllocateMicro(bx, by, bz, t);
         micro[mi] = 0;
         removedType = id;
 
@@ -1007,12 +1067,12 @@ public class VoxelWorld : MonoBehaviour
     [Serializable]
     public struct MiningParams
     {
-        [Tooltip("Pickaxe: daño por golpe (se acumula hasta superar la hardness)")]
+        [Tooltip("Ticks de rotura que aporta cada golpe (normalmente 1; se acumulan hasta superar los ticks efectivos del bloque/voxel)")]
         public float damage;
-        [Tooltip("Drill: radio de la esfera en metros")]
+        [Tooltip("Drill: tamaño de la esfera en micro-voxels de DIÁMETRO (5 = una esfera de 5 voxels de ancho). Mine la convierte a metros con SphereRadiusMeters.")]
         public float radius;
-        [Tooltip("Drill/Perfect: mina materiales con hardness <= power")]
-        public float power;
+        [Tooltip("Quien mina: de sus estadísticas (GetItemStatistic) sale el poder que cada tipo de bloque exige vía su itemStatistics")]
+        public CharacterPlayer miner;
     }
 
     /// <summary>Resultado uniforme de Mine(), sin importar el MiningType usado.</summary>
@@ -1046,6 +1106,47 @@ public class VoxelWorld : MonoBehaviour
     }
 
     /// <summary>
+    /// Convierte el tamaño de esfera del taladro (stat ItemRadius, en micro-voxels
+    /// de DIÁMETRO: 5 = esfera de 5 voxels de ancho) al radio en metros que usan
+    /// DigSphere y el outline. Con MICRO = 8, ItemRadius 5 → radio 0.3125 m.
+    /// </summary>
+    public static float SphereRadiusMeters(float diameterInVoxels) =>
+        Mathf.Max(diameterInVoxels, 0f) * 0.5f / VoxelChunk.MICRO;
+
+    /// <summary>
+    /// Ticks que este minero necesita para romper un voxel/bloque de este tipo, o
+    /// -1 si no puede dañarlo. El tipo exige poder vía su itemStatistics (ej. una
+    /// entrada PicaxePower con baseValue 50); el poder del minero sale de
+    /// GetItemStatistic (incluye la herramienta equipada). Reglas:
+    /// - alguna estadística exigida no alcanzada → -1 (ni un rasguño)
+    /// - poder justo (100%) → ticksPerBreak completos
+    /// - exceso: los ticks bajan linealmente (a +50%, la mitad)
+    /// - el doble o más (+100%) → 0 (rotura instantánea)
+    /// Con varias entradas exigidas manda la peor (menor ratio). Sin entradas (o con
+    /// baseValue 0) no hay requisito: ticks completos para cualquiera. Sin minero
+    /// (llamadas de sistema) cuenta como poder justo.
+    /// </summary>
+    public float EffectiveBreakTicks(BlockItemSO vt, CharacterPlayer miner)
+    {
+        if (vt == null || vt.indestructible) return -1f;
+        float ticks = Mathf.Max(vt.ticksPerBreak, 0f);
+        if (miner == null || vt.itemStatistics == null || vt.itemStatistics.Count == 0) return ticks;
+
+        float minRatio = float.MaxValue;
+        foreach (KeyValuePair<CharacterData.TypeStatistic, CharacterData.Statistic> req in vt.itemStatistics)
+        {
+            float required = req.Value != null ? req.Value.baseValue : 0f;
+            if (required <= 0f) continue;
+            float power = miner.GetItemStatistic(req.Key)?.currentValue ?? 0f;
+            if (power < required) return -1f; // no llega al poder exigido: no le hace daño
+            minRatio = Mathf.Min(minRatio, power / required);
+        }
+        if (minRatio == float.MaxValue) return ticks; // solo había requisitos vacíos
+        if (minRatio >= 2f) return 0f;                // +100% de poder: rotura instantánea
+        return ticks * (2f - minRatio);               // el exceso reduce los ticks linealmente
+    }
+
+    /// <summary>
     /// Punto de entrada único para minar: dado el tipo de herramienta y los
     /// parámetros que ese tipo necesita, hace el trabajo correspondiente
     /// (DamageBlock/DigSphere/MineVoxel) y devuelve un resultado uniforme.
@@ -1054,19 +1155,20 @@ public class VoxelWorld : MonoBehaviour
     /// </summary>
     public MiningResult Mine(ToolItemSO.MiningType type, Vector3 hitPoint, Vector3 hitNormal, MiningParams p)
     {
+        float ticksPerHit = p.damage > 0f ? p.damage : 1f;
         MiningResult result;
         switch (type)
         {
             case ToolItemSO.MiningType.Sphere:
             {
-                Dictionary<byte, int> removed = DigSphere(hitPoint, p.radius, p.power);
+                Dictionary<byte, int> removed = DigSphere(hitPoint, SphereRadiusMeters(p.radius), p.miner, ticksPerHit);
                 result = new MiningResult { changed = removed.Count > 0, removed = removed };
                 break;
             }
             case ToolItemSO.MiningType.Perfect:
             {
                 Vector3 worldPos = hitPoint - hitNormal * 0.01f;
-                bool mined = MineVoxel(worldPos, p.power, out byte removedType);
+                bool mined = MineVoxel(worldPos, p.miner, ticksPerHit, out byte removedType);
                 Dictionary<byte, int> removed = mined ? new Dictionary<byte, int> { [removedType] = 1 } : null;
                 result = new MiningResult { changed = mined, removed = removed };
                 break;
@@ -1074,7 +1176,7 @@ public class VoxelWorld : MonoBehaviour
             default: // Pickaxe
             {
                 Vector3Int block = WorldToBlock(hitPoint - hitNormal * 0.01f);
-                bool broken = DamageBlock(block, p.damage, out var removed);
+                bool broken = DamageBlock(block, p.miner, ticksPerHit, out var removed);
                 result = new MiningResult { changed = broken, removed = removed };
                 break;
             }
@@ -1131,6 +1233,106 @@ public class VoxelWorld : MonoBehaviour
     bool[,] contourVisited;
     readonly List<(int u0, int v0, int u1, int v1)> contourRects = new List<(int, int, int, int)>(32);
     readonly MiningQuad[] cubeQuadBuf = new MiningQuad[6];
+
+    // scratch reutilizado por PreviewSphereContour (se realoca solo si cambia el radio)
+    bool[,,] sphereOcc;
+    bool[,] sphereMask, sphereVisited;
+    int sphereGridN = -1;
+
+    /// <summary>
+    /// Sin modificar el mundo: el contorno VOXELIZADO de la esfera del taladro —
+    /// las caras externas del conjunto de micro-voxels (alineados al grid mundial)
+    /// cuyos centros caen dentro de la esfera, exactamente el mismo criterio con el
+    /// que DigSphere decide qué tallar. Las caras coplanares se fusionan con greedy
+    /// meshing (igual que PreviewPickaxeContour) para dibujar pocas líneas.
+    /// Rellena results (se limpia primero); dibujar con ShowContour.
+    /// </summary>
+    public void PreviewSphereContour(Vector3 center, float radiusMeters, List<MiningQuad> results)
+    {
+        results.Clear();
+        const int M = VoxelChunk.MICRO;
+        float cellSize = 1f / M;
+        float rv = radiusMeters * M; // radio en unidades de voxel
+        if (rv <= 0f) return;
+
+        Vector3 relV = (center - Origin) * M; // centro de la esfera en unidades de voxel
+        int reach = Mathf.CeilToInt(rv);
+        int n = reach * 2 + 2; // celdas por eje (holgura por el floor del centro)
+        int gx0 = Mathf.FloorToInt(relV.x) - reach;
+        int gy0 = Mathf.FloorToInt(relV.y) - reach;
+        int gz0 = Mathf.FloorToInt(relV.z) - reach;
+
+        if (n != sphereGridN)
+        {
+            sphereGridN = n;
+            sphereOcc = new bool[n, n, n];
+            sphereMask = new bool[n, n];
+            sphereVisited = new bool[n, n];
+        }
+
+        float r2 = rv * rv;
+        for (int x = 0; x < n; x++)
+            for (int y = 0; y < n; y++)
+                for (int z = 0; z < n; z++)
+                {
+                    float dx = gx0 + x + 0.5f - relV.x;
+                    float dy = gy0 + y + 0.5f - relV.y;
+                    float dz = gz0 + z + 0.5f - relV.z;
+                    sphereOcc[x, y, z] = dx * dx + dy * dy + dz * dz <= r2;
+                }
+
+        Vector3 gridOrigin = Origin + new Vector3(gx0, gy0, gz0) * cellSize;
+        bool Occ(int x, int y, int z) =>
+            x >= 0 && x < n && y >= 0 && y < n && z >= 0 && z < n && sphereOcc[x, y, z];
+
+        // +X / -X: máscara indexada (u = z, v = y), igual que BuildFaceMaskX/QuadX
+        for (int x = 0; x < n; x++)
+        {
+            for (int z = 0; z < n; z++)
+                for (int y = 0; y < n; y++)
+                    sphereMask[z, y] = Occ(x, y, z) && !Occ(x + 1, y, z);
+            GreedyMerge(sphereMask, sphereVisited, n, contourRects);
+            foreach (var r in contourRects) results.Add(QuadX(gridOrigin, x + 1, r, cellSize));
+
+            for (int z = 0; z < n; z++)
+                for (int y = 0; y < n; y++)
+                    sphereMask[z, y] = Occ(x, y, z) && !Occ(x - 1, y, z);
+            GreedyMerge(sphereMask, sphereVisited, n, contourRects);
+            foreach (var r in contourRects) results.Add(QuadX(gridOrigin, x, r, cellSize));
+        }
+
+        // +Y / -Y: máscara (u = x, v = z)
+        for (int y = 0; y < n; y++)
+        {
+            for (int x = 0; x < n; x++)
+                for (int z = 0; z < n; z++)
+                    sphereMask[x, z] = Occ(x, y, z) && !Occ(x, y + 1, z);
+            GreedyMerge(sphereMask, sphereVisited, n, contourRects);
+            foreach (var r in contourRects) results.Add(QuadY(gridOrigin, y + 1, r, cellSize));
+
+            for (int x = 0; x < n; x++)
+                for (int z = 0; z < n; z++)
+                    sphereMask[x, z] = Occ(x, y, z) && !Occ(x, y - 1, z);
+            GreedyMerge(sphereMask, sphereVisited, n, contourRects);
+            foreach (var r in contourRects) results.Add(QuadY(gridOrigin, y, r, cellSize));
+        }
+
+        // +Z / -Z: máscara (u = x, v = y)
+        for (int z = 0; z < n; z++)
+        {
+            for (int x = 0; x < n; x++)
+                for (int y = 0; y < n; y++)
+                    sphereMask[x, y] = Occ(x, y, z) && !Occ(x, y, z + 1);
+            GreedyMerge(sphereMask, sphereVisited, n, contourRects);
+            foreach (var r in contourRects) results.Add(QuadZ(gridOrigin, z + 1, r, cellSize));
+
+            for (int x = 0; x < n; x++)
+                for (int y = 0; y < n; y++)
+                    sphereMask[x, y] = Occ(x, y, z) && !Occ(x, y, z - 1);
+            GreedyMerge(sphereMask, sphereVisited, n, contourRects);
+            foreach (var r in contourRects) results.Add(QuadZ(gridOrigin, z, r, cellSize));
+        }
+    }
 
     /// <summary>
     /// Sin modificar el mundo: el contorno externo exacto de lo que el pico se
@@ -1333,11 +1535,12 @@ public class VoxelWorld : MonoBehaviour
     }
 
     /// <summary>
-    /// Sin modificar el mundo: si el modo Perfect pudiera minar el micro-voxel
-    /// bajo worldPos con esta power (respeta hardness/indestructible igual que
-    /// MineVoxel), devuelve true y la celda exacta de ese micro-voxel.
+    /// Sin modificar el mundo: si el minero pudiera dañar el micro-voxel bajo
+    /// worldPos con el modo Perfect (EffectiveBreakTicks >= 0: no indestructible y
+    /// con el poder que el tipo exige), devuelve true y la celda exacta de ese
+    /// micro-voxel.
     /// </summary>
-    public bool PreviewPerfect(Vector3 worldPos, float power, out MiningCell cell)
+    public bool PreviewPerfect(Vector3 worldPos, CharacterPlayer miner, out MiningCell cell)
     {
         cell = default;
         Vector3 rel = worldPos - Origin;
@@ -1361,8 +1564,7 @@ public class VoxelWorld : MonoBehaviour
         byte id = micro != null ? micro[VoxelChunk.MicroIndex(mx, my, mz)] : t;
         if (id == 0) return false;
 
-        BlockItemSO vt = types[id];
-        if (vt.indestructible || vt.hardness > power) return false;
+        if (EffectiveBreakTicks(types[id], miner) < 0f) return false; // indestructible o poder insuficiente
 
         Vector3 min = Origin + new Vector3(bx, by, bz) + new Vector3(mx, my, mz) / M;
         cell = new MiningCell { min = min, size = 1f / M };
@@ -1382,10 +1584,12 @@ public class VoxelWorld : MonoBehaviour
     /// <summary>
     /// Golpea un bloque entero (modo por defecto: el bloque de 1m se rompe completo,
     /// con todos sus micro-voxels juntos). El daño se acumula entre golpes hasta
-    /// superar la hardness del tipo. Devuelve true si el bloque se rompió; en ese
+    /// superar los ticks efectivos del tipo (EffectiveBreakTicks: ticksPerBreak
+    /// ajustado por el poder del minero vs el que el bloque exige en su
+    /// itemStatistics). Devuelve true si el bloque se rompió; en ese
     /// caso removed trae los micro-voxels obtenidos por tipo (para recursos).
     /// </summary>
-    public bool DamageBlock(Vector3Int blockPos, float damage, out Dictionary<byte, int> removed)
+    public bool DamageBlock(Vector3Int blockPos, CharacterPlayer miner, float ticks, out Dictionary<byte, int> removed)
     {
         removed = null;
         int bx = blockPos.x, by = blockPos.y, bz = blockPos.z;
@@ -1400,17 +1604,25 @@ public class VoxelWorld : MonoBehaviour
 
         // el tipo del bloque se conserva en blockTypes aunque esté parcial
         BlockItemSO vt = types[t != 0 ? t : (byte)1];
-        if (vt.indestructible) return false;
+        float effTicks = EffectiveBreakTicks(vt, miner);
+        if (effTicks < 0f) return false; // indestructible, o el minero no llega al poder exigido
+
+        // si pasó demasiado tiempo desde el último golpe a este bloque, el daño acumulado se olvida
+        if (blockLastHitTime.TryGetValue(blockPos, out float lastHit) &&
+            Time.time - lastHit > damageResetSeconds)
+            blockDamage.Remove(blockPos);
+        blockLastHitTime[blockPos] = Time.time;
 
         blockDamage.TryGetValue(blockPos, out float total);
-        total += damage;
-        if (total < vt.hardness)
+        total += ticks;
+        if (total < effTicks)
         {
             blockDamage[blockPos] = total;
-            return false; // dañado pero entero (aquí puedes disparar VFX de grietas)
+            return false; // dañado pero entero (el outline ya muestra las grietas vía GetBlockDamageRatio01)
         }
 
         blockDamage.Remove(blockPos);
+        blockLastHitTime.Remove(blockPos);
         removed = new Dictionary<byte, int>();
         bool hasWater = false;
         if (micro == null)
@@ -1430,6 +1642,99 @@ public class VoxelWorld : MonoBehaviour
         // si el bloque contenía agua, el hueco queda inundado en vez de seco
         SetBlockUniform(bx, by, bz, hasWater ? waterTypeId : (byte)0);
         return true;
+    }
+
+    /// <summary>
+    /// Progreso de rotura de este bloque (0-1 de sus ticks efectivos para el minero
+    /// dado), leído del daño acumulado que Mine() guardó en el mundo (pico y
+    /// taladro). Expira a los damageResetSeconds sin golpes, igual que en
+    /// DamageBlock/DigSphere. 0 si el minero no puede dañarlo (poder insuficiente) o
+    /// si se rompe al instante. Sin minero se usa ticksPerBreak completo.
+    /// Solo lectura: no modifica el estado. Pensado para pintar grietas en el outline.
+    /// </summary>
+    public float GetBlockDamageRatio01(Vector3Int blockPos, CharacterPlayer miner = null)
+    {
+        if (!blockDamage.TryGetValue(blockPos, out float total)) return 0f;
+        if (blockLastHitTime.TryGetValue(blockPos, out float lastHit) &&
+            Time.time - lastHit > damageResetSeconds) return 0f;
+
+        byte t = GetBlockType(blockPos.x, blockPos.y, blockPos.z);
+        if (t == 0) return 0f;
+        float effTicks = EffectiveBreakTicks(types[t], miner);
+        if (effTicks <= 0f) return 0f; // no dañable, o rotura instantánea: sin progreso que mostrar
+        return Mathf.Clamp01(total / effTicks);
+    }
+
+    /// <summary>
+    /// Progreso de rotura (0-1) del micro-voxel bajo worldPos (modo Perfect), leído
+    /// del daño acumulado que MineVoxel guardó. Con un RaycastHit usa
+    /// hit.point - hit.normal * 0.01f. Expira a los damageResetSeconds sin golpes.
+    /// </summary>
+    public float GetVoxelDamageRatio01(Vector3 worldPos, CharacterPlayer miner = null)
+    {
+        if (!TryLocateMicro(worldPos, out Vector3Int blockPos, out int microIndex, out byte id)) return 0f;
+        if (id == 0) return 0f;
+        if (!microDamage.TryGetValue((blockPos, microIndex), out (float dmg, float time) e)) return 0f;
+        if (Time.time - e.time > damageResetSeconds) return 0f;
+
+        float effTicks = EffectiveBreakTicks(types[id], miner);
+        if (effTicks <= 0f) return 0f;
+        return Mathf.Clamp01(e.dmg / effTicks);
+    }
+
+    /// <summary>
+    /// Bloque + índice de micro-voxel bajo una posición de mundo (con un RaycastHit
+    /// usa hit.point - hit.normal * 0.01f). typeId es el tipo de ese micro-voxel (el
+    /// del bloque si es uniforme; 0 = aire). False solo fuera del mundo.
+    /// </summary>
+    public bool TryLocateMicro(Vector3 worldPos, out Vector3Int blockPos, out int microIndex, out byte typeId)
+    {
+        Vector3 rel = worldPos - Origin;
+        int bx = Mathf.FloorToInt(rel.x);
+        int by = Mathf.FloorToInt(rel.y);
+        int bz = Mathf.FloorToInt(rel.z);
+        blockPos = new Vector3Int(bx, by, bz);
+        microIndex = 0;
+        typeId = 0;
+        if (!InBounds(bx, by, bz)) return false;
+
+        const int M = VoxelChunk.MICRO;
+        Vector3 local = rel - new Vector3(bx, by, bz); // 0..1
+        int mx = Mathf.Clamp(Mathf.FloorToInt(local.x * M), 0, M - 1);
+        int my = Mathf.Clamp(Mathf.FloorToInt(local.y * M), 0, M - 1);
+        int mz = Mathf.Clamp(Mathf.FloorToInt(local.z * M), 0, M - 1);
+        microIndex = VoxelChunk.MicroIndex(mx, my, mz);
+
+        byte[] micro = GetMicroArray(bx, by, bz);
+        typeId = micro != null ? micro[microIndex] : GetBlockType(bx, by, bz);
+        return true;
+    }
+
+    /// <summary>
+    /// Olvida el daño acumulado sobre este bloque (y el de sus micro-voxels), como si
+    /// nunca lo hubieras golpeado. La usa CharacterPlayer cuando dejás de apuntarle
+    /// sin haberlo roto (cambiaste de bloque, de modo, o dejaste de mirar algo
+    /// minable), así el reinicio es inmediato en vez de esperar damageResetSeconds.
+    /// No hace nada si el bloque no tenía daño pendiente.
+    /// </summary>
+    public void ResetBlockDamage(Vector3Int blockPos)
+    {
+        blockDamage.Remove(blockPos);
+        blockLastHitTime.Remove(blockPos);
+        RemoveMicroDamageIn(blockPos);
+    }
+
+    /// <summary>Olvida el daño acumulado de un único micro-voxel (modo Perfect).</summary>
+    public void ResetVoxelDamage(Vector3Int blockPos, int microIndex) =>
+        microDamage.Remove((blockPos, microIndex));
+
+    void RemoveMicroDamageIn(Vector3Int blockPos)
+    {
+        if (microDamage.Count == 0) return;
+        tmpMicroKeys.Clear();
+        foreach ((Vector3Int, int) key in microDamage.Keys)
+            if (key.Item1 == blockPos) tmpMicroKeys.Add(key);
+        foreach ((Vector3Int, int) key in tmpMicroKeys) microDamage.Remove(key);
     }
 
     /// <summary>

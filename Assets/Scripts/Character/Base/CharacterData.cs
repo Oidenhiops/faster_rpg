@@ -65,13 +65,20 @@ public class CharacterData
             statistic.Value.SetMaxValue();
         }
     }
-    public void InitializeItems()
+    public void InitializeItems(CharacterBase character)
     {
         foreach (KeyValuePair<ItemsDBSO.TypeModel, CharacterItem> item in equipments)
         {
             if (item.Value.itemId != 0)
             {
                 item.Value.itemBaseSO = GameData.Instance.itemsDBSO.data[item.Value.typeObject][item.Value.itemId];
+                if (item.Key == ItemsDBSO.TypeModel.Weapon && item.Value.itemBaseSO is ToolItemSO toolItem)
+                {
+                    if (character is CharacterPlayer characterPlayer)
+                    {
+                        characterPlayer.currentMiningType = toolItem.miningInfo.toolMode;
+                    }
+                }
             }
         }
     }

@@ -29,7 +29,7 @@ MonoBehaviour:
   useEnergy: 0
   itemStatistics:
     _serializedList: []
-  hardness: 999
+  ticksPerBreak: 999
   indestructible: 1
   isPlant: 0
   oreHost: {fileID: 0}

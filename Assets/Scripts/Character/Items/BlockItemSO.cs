@@ -3,9 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BlockItem", menuName = "ScriptableObjects/Items/BlockItem", order = 1)]
 public class BlockItemSO : ItemBaseSO
 {
-    [Header("Dureza")]
-    [Tooltip("Daño acumulado necesario para romper el bloque entero (pico). Para el taladro se necesita drillPower >= hardness.")]
-    public float hardness = 1f;
+    [Header("Rotura")]
+    [Tooltip("Ticks (golpes) para romper el bloque con el poder justo. El poder que este bloque exige se define en itemStatistics (heredado): ej. una entrada PicaxePower con baseValue 50. Con menos poder que el exigido no recibe daño; con el doble o más (+100%) se rompe al instante; el exceso intermedio reduce los ticks linealmente (a +50% de poder, la mitad de ticks). Sin entradas en itemStatistics, cualquier herramienta lo rompe en estos ticks.")]
+    public float ticksPerBreak = 1f;
     public bool indestructible;
 
     [Header("Planta (maleza, flores...)")]

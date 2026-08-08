@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR;
 
 public class CharacterPlayer : CharacterBase
 {
@@ -21,9 +20,63 @@ public class CharacterPlayer : CharacterBase
     [Tooltip("Segundos que tarda la barra de Str en pasar de 0 a maxValue.")]
     public float strFullRecoverTime = 2f;
     public VoxelOutlineIndicator outline;
-    public RaycastHit currentHit;
+    RaycastHit _currentHit;
+    Vector3Int lastDamageBlock;
+    int lastDamageMicro = -1;
+    bool hadDamageTarget;
+    public RaycastHit currentHit
+    {
+        get => _currentHit;
+        set
+        {
+            bool hadTarget = hadDamageTarget;
+            Vector3Int oldBlock = lastDamageBlock;
+            int oldMicro = lastDamageMicro;
+
+            _currentHit = value;
+            isSeeingBlock = value.collider != null &&
+                            value.collider.GetComponentInParent<VoxelWorld>() != null &&
+                            LayerMask.LayerToName(value.collider.gameObject.layer) == "Map";
+
+            VoxelWorld world = VoxelWorld.Instance;
+            bool hasTarget = false;
+            Vector3Int newBlock = default;
+            int newMicro = -1;
+            if (isSeeingBlock && world != null)
+            {
+                Vector3 inside = value.point - value.normal * 0.01f;
+                switch (currentMiningType)
+                {
+                    case ToolItemSO.MiningType.Perfect:
+                        hasTarget = world.TryLocateMicro(inside, out newBlock, out newMicro, out _);
+                        break;
+                    case ToolItemSO.MiningType.Sphere:
+                        break; // daño por área: sin reset al mover la mira (expira por tiempo)
+                    default: // Block / Free
+                        hasTarget = true;
+                        newBlock = world.WorldToBlock(inside);
+                        break;
+                }
+            }
+
+            if (hadTarget && world != null && (!hasTarget || newBlock != oldBlock || newMicro != oldMicro))
+            {
+                if (oldMicro >= 0) world.ResetVoxelDamage(oldBlock, oldMicro);
+                else world.ResetBlockDamage(oldBlock);
+            }
+
+            hadDamageTarget = hasTarget;
+            lastDamageBlock = newBlock;
+            lastDamageMicro = newMicro;
+
+            if (outline != null && world != null)
+                UpdateOutline(world, isSeeingBlock, value, currentMiningType, GetItemStatistic(CharacterData.TypeStatistic.ItemRadius)?.currentValue ?? 0f);
+        }
+    }
     public bool isSeeingBlock;
+    public ToolItemSO.MiningType currentMiningType;
     readonly List<VoxelWorld.MiningQuad> pickaxePreviewBuf = new List<VoxelWorld.MiningQuad>(64);
+    readonly List<VoxelWorld.MiningQuad> spherePreviewBuf = new List<VoxelWorld.MiningQuad>(128);
     public override void OnEnableHandle()
     {
         inputActions = new InputSystem_Actions();
@@ -112,7 +165,7 @@ public class CharacterPlayer : CharacterBase
     }
     async Awaitable InitializeItems()
     {
-        characterData.InitializeItems();
+        characterData.InitializeItems(this);
     }
     async Awaitable InitialiceActions()
     {
@@ -154,19 +207,8 @@ public class CharacterPlayer : CharacterBase
     public override void SetHitPoint()
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f));
-        bool hasHit = Physics.Raycast(ray, out RaycastHit hit, GetItemStatistic(CharacterData.TypeStatistic.ItemRange)?.currentValue ?? 0f, ~0) &&
-                      hit.collider.GetComponentInParent<VoxelWorld>() != null;
-        isSeeingBlock = hasHit && LayerMask.LayerToName(hit.collider.gameObject.layer) == "Map";
-        currentHit = hit;
-        UpdateOutline(VoxelWorld.Instance, hasHit, hit, GetCurrentMiningType(), GetItemStatistic(CharacterData.TypeStatistic.ItemRadius)?.currentValue ?? 0f);
-    }
-    public ToolItemSO.MiningType GetCurrentMiningType()
-    {
-        if (characterData.equipments[ItemsDBSO.TypeModel.Weapon].itemBaseSO is ToolItemSO toolItem)
-        {
-            return toolItem.toolMode;
-        }
-        return ToolItemSO.MiningType.Block;
+        Physics.Raycast(ray, out RaycastHit hit, GetItemStatistic(CharacterData.TypeStatistic.ItemRange)?.currentValue ?? 0f, ~0);
+        currentHit = hit; // el setter recalcula isSeeingBlock/currentMiningType, actualiza el outline y resetea el daño si corresponde
     }
     public CharacterData.Statistic GetItemStatistic(CharacterData.TypeStatistic statistic)
     {
@@ -216,16 +258,28 @@ public class CharacterPlayer : CharacterBase
         switch (toolMode)
         {
             case ToolItemSO.MiningType.Sphere:
-                outline.ShowSphere(hit.point, radius);
-                break;
+                {
+                    // contorno voxelizado: las caras externas de los voxels exactos que la esfera
+                    // tallaría (mismo criterio que DigSphere). radius (stat ItemRadius) viene en
+                    // voxels de diámetro: misma conversión que Mine. El tinte usa el daño guardado
+                    // del bloque bajo la mira (representativo del área).
+                    Vector3Int block = world.WorldToBlock(hit.point - hit.normal * 0.01f);
+                    world.PreviewSphereContour(hit.point, VoxelWorld.SphereRadiusMeters(radius), spherePreviewBuf);
+                    if (spherePreviewBuf.Count > 0)
+                        outline.ShowContour(spherePreviewBuf, world.GetBlockDamageRatio01(block, this));
+                    else
+                        outline.Hide();
+                    break;
+                }
 
             case ToolItemSO.MiningType.Perfect:
                 {
                     Vector3 worldPos = hit.point - hit.normal * 0.01f;
-                    if (world.PreviewPerfect(worldPos, characterData.statistics[CharacterData.TypeStatistic.PicaxePower].currentValue, out VoxelWorld.MiningCell cell))
-                        outline.ShowVoxel(cell.min, cell.size);
+                    if (world.PreviewPerfect(worldPos, this, out VoxelWorld.MiningCell cell))
+                        // grietas según el daño guardado de ESE micro-voxel
+                        outline.ShowVoxel(cell.min, cell.size, world.GetVoxelDamageRatio01(worldPos, this));
                     else
-                        outline.Hide(); // material demasiado duro para perfectPower: sin highlight
+                        outline.Hide(); // indestructible o poder insuficiente: sin highlight
                     break;
                 }
 
@@ -234,7 +288,8 @@ public class CharacterPlayer : CharacterBase
                     Vector3Int block = world.WorldToBlock(hit.point - hit.normal * 0.01f);
                     world.PreviewPickaxeContour(block, pickaxePreviewBuf);
                     if (pickaxePreviewBuf.Count > 0)
-                        outline.ShowContour(pickaxePreviewBuf); // contorno externo: el bloque entero, o solo el borde de lo que le queda si ya fue minado a medias
+                        // grietas según el daño guardado del bloque (lo escribe Mine → DamageBlock)
+                        outline.ShowContour(pickaxePreviewBuf, world.GetBlockDamageRatio01(block, this));
                     else
                         outline.Hide();
                     break;
