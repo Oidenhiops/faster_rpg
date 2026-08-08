@@ -77,6 +77,16 @@ public class VoxelWorld : MonoBehaviour
     public int viewDistanceColumns = 8;
     [Tooltip("Columnas generadas por frame")]
     public int columnsPerFrame = 2;
+    [Tooltip("Cuántas columnas pueden generar su terreno en paralelo (hilos de background " +
+             "distintos). GenerateColumn (ruido/alturas) solo escribe bloques dentro de su " +
+             "propia columna, así que varias columnas nuevas pueden correr a la vez sin " +
+             "pisarse — esto acelera sobre todo el llenado de área nunca visitada, el caso " +
+             "más común al explorar o al subir viewDistanceColumns. Recargar una columna que " +
+             "ya estaba decorada sí puede escribir en sus 8 vecinas (RedecorateAround), así " +
+             "que esas se coordinan con un lock por-columna (ver busyColumns) para no chocar " +
+             "entre sí ni con la decoración. Súbelo si tienes CPU libre; 1 = comportamiento " +
+             "anterior (todo serializado).")]
+    public int maxConcurrentGeneration = 3;
     [Tooltip("Radio cargado de golpe (síncrono, bloqueante) al arrancar, solo para garantizar " +
              "piso bajo el player en el primer frame. Se limita internamente a 1 (el propio " +
              "chunk del player + sus 8 vecinos) — el resto del área visible la llena el streaming " +
@@ -140,8 +150,15 @@ public class VoxelWorld : MonoBehaviour
     // que el barrido completo termine y se reinicie (eso hacía tardar mucho más la
     // decoración — árboles/maleza — que el terreno).
     readonly List<Vector2Int> pendingDecoration = new List<Vector2Int>();
-    bool columnWorkBusy;
-    Vector2Int busyColumn; // columna que LoadColumnAsync/DecorateColumnAsync está procesando
+    // columnas "reservadas" por una generación/recarga/decoración en curso: quien escribe
+    // en una columna primero la reserva (a veces también sus 8 vecinas, si va a escribir
+    // ahí — ver TryReserve) y nadie más puede tocarla hasta que la libere. Esto reemplaza
+    // el viejo flag único columnWorkBusy: ahora varias generaciones nuevas (que solo tocan
+    // su propia columna) pueden correr al mismo tiempo, mientras que las que sí cruzan
+    // bordes (recarga con RedecorateAround, decoración) siguen coordinadas entre sí.
+    readonly HashSet<Vector2Int> busyColumns = new HashSet<Vector2Int>();
+    int activeGenerations; // cuántas LoadColumnAsync hay en vuelo (tope: maxConcurrentGeneration)
+    bool decorateBusy;     // la decoración va 1 a la vez: siempre escribe en sus 8 vecinas
     readonly Dictionary<Vector3Int, float> blockDamage = new Dictionary<Vector3Int, float>();
     readonly Dictionary<Vector3Int, float> blockLastHitTime = new Dictionary<Vector3Int, float>();
     // daño acumulado por micro-voxel (modo Perfect): clave = (bloque, índice micro)
@@ -411,7 +428,9 @@ public class VoxelWorld : MonoBehaviour
         c.waterGo.AddComponent<MeshRenderer>().sharedMaterial = waterMaterial;
         c.waterMesh = new Mesh { name = c.go.name + " Water" };
 
-        // malla de plantas: hijo sin collider, material cutout
+        // malla de plantas: hijo sin collider, material cutout. Sin collider a
+        // propósito (se pueden pisar, no bloquean movimiento); el minado las detecta
+        // por datos, no por física — ver DamageBlock/MineVoxel.
         c.plantGo = new GameObject("Plants");
         c.plantGo.transform.SetParent(c.go.transform, false);
         c.plantFilter = c.plantGo.AddComponent<MeshFilter>();
@@ -750,38 +769,37 @@ public class VoxelWorld : MonoBehaviour
         Vector2Int col = TargetColumn();
         if (col != lastTargetCol) { lastTargetCol = col; ringPointer = 0; }
 
-        // mientras haya una columna generándose/decorándose en background (columnWorkBusy)
-        // no se examinan más columnas: la generación queda deliberadamente serializada de
-        // una a la vez, para no tener dos workers escribiendo bloques al mismo tiempo.
-        if (!columnWorkBusy)
+        // decoración: 1 a la vez (siempre escribe en las 8 vecinas), pero ya no bloquea que
+        // otras columnas nuevas generen su terreno en paralelo mientras tanto — ver más abajo.
+        if (!decorateBusy)
         {
-            // primero, las que ya tienen terreno pero estaban esperando a sus vecinas:
-            // se revisan cada frame (es barato, solo son chequeos de diccionario) en vez
-            // de esperar a que el barrido del anillo entero termine y se reinicie.
-            bool startedPending = false;
+            // las que ya tienen terreno pero estaban esperando a sus vecinas: se revisan
+            // cada frame (es barato, solo son chequeos de diccionario) en vez de esperar a
+            // que el barrido del anillo entero termine y se reinicie.
             for (int i = pendingDecoration.Count - 1; i >= 0; i--)
             {
                 Vector2Int pc = pendingDecoration[i];
                 if (!loadedColumns.Contains(pc)) { pendingDecoration.RemoveAt(i); continue; } // se descargó
                 if (!NeighborsGenerated(pc)) continue;
+                if (!TryReserve(pc, true)) continue; // alguna vecina está ocupada por otra generación/recarga
                 pendingDecoration.RemoveAt(i);
+                decorateBusy = true;
                 _ = DecorateColumnAsync(pc);
-                startedPending = true;
                 break;
             }
+        }
 
-            if (!startedPending)
-            {
-                int scan = columnsPerFrame; // cuántas posiciones del anillo se revisan por frame
-                while (scan > 0 && ringPointer < ringOffsets.Count)
-                {
-                    Vector2Int c2 = col + ringOffsets[ringPointer];
-                    if (!ColumnInWorld(c2)) { ringPointer++; scan--; continue; }
-                    if (StreamColumn(c2)) break; // encoló trabajo en background (columnWorkBusy=true)
-                    ringPointer++;               // esa columna ya está lista: seguir buscando
-                    scan--;
-                }
-            }
+        // generación de terreno: hasta maxConcurrentGeneration columnas en paralelo. Se
+        // detiene apenas una columna no consigue cupo/reserva, para reintentarla desde el
+        // mismo punto del anillo el próximo frame (en vez de saltársela).
+        int scan = columnsPerFrame; // cuántas posiciones del anillo se revisan por frame
+        while (scan > 0 && ringPointer < ringOffsets.Count)
+        {
+            Vector2Int c2 = col + ringOffsets[ringPointer];
+            if (!ColumnInWorld(c2)) { ringPointer++; scan--; continue; }
+            if (!TryStreamColumn(c2)) break;
+            ringPointer++; // esta posición ya quedó resuelta (lista, o encoló su trabajo): seguir
+            scan--;
         }
 
         // descarga periódica de columnas lejanas
@@ -792,10 +810,9 @@ public class VoxelWorld : MonoBehaviour
             tmpUnload.Clear();
             foreach (Vector2Int lc in loadedColumns)
             {
-                // nunca descargar la columna que DecorateColumnAsync está escribiendo en
-                // este momento en background (LoadColumnAsync no corre este riesgo: su
-                // columna todavía no entra a loadedColumns mientras genera).
-                if (columnWorkBusy && lc == busyColumn) continue;
+                // nunca descargar una columna con generación/decoración escribiéndole
+                // ahora mismo en background.
+                if (busyColumns.Contains(lc)) continue;
                 if (Mathf.Max(Mathf.Abs(lc.x - col.x), Mathf.Abs(lc.y - col.y)) > limit)
                     tmpUnload.Add(lc);
             }
@@ -803,40 +820,76 @@ public class VoxelWorld : MonoBehaviour
         }
     }
 
-    // devuelve true si encoló trabajo de generación/decoración en background
-    bool StreamColumn(Vector2Int c2)
+    // reserva c2 (y, si footprint3x3, también sus 8 vecinas) para quien la vaya a escribir;
+    // devuelve false sin reservar nada si cualquiera de esas columnas ya estaba reservada.
+    bool TryReserve(Vector2Int c2, bool footprint3x3)
+    {
+        if (busyColumns.Contains(c2)) return false;
+        if (footprint3x3)
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    if (dx == 0 && dz == 0) continue;
+                    if (busyColumns.Contains(new Vector2Int(c2.x + dx, c2.y + dz))) return false;
+                }
+
+        busyColumns.Add(c2);
+        if (footprint3x3)
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    if (dx == 0 && dz == 0) continue;
+                    busyColumns.Add(new Vector2Int(c2.x + dx, c2.y + dz));
+                }
+        return true;
+    }
+
+    void ReleaseReservation(Vector2Int c2, bool footprint3x3)
+    {
+        busyColumns.Remove(c2);
+        if (!footprint3x3) return;
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++)
+            {
+                if (dx == 0 && dz == 0) continue;
+                busyColumns.Remove(new Vector2Int(c2.x + dx, c2.y + dz));
+            }
+    }
+
+    // intenta arrancar el trabajo de esta columna (generar o encolar su decoración);
+    // devuelve false solo cuando no hay cupo/reserva disponible *ahora* — en ese caso el
+    // anillo se detiene en esta posición para reintentarla el próximo frame.
+    bool TryStreamColumn(Vector2Int c2)
     {
         columnState.TryGetValue(c2, out byte st);
         if (!loadedColumns.Contains(c2))
         {
+            if (activeGenerations >= maxConcurrentGeneration) return false; // sin cupo de hilos
+            bool footprint = st >= 2; // recarga con RedecorateAround: escribe también en las vecinas
+            if (!TryReserve(c2, footprint)) return false; // una vecina tiene trabajo en vuelo
+            activeGenerations++;
             _ = LoadColumnAsync(c2, st);
             return true;
         }
-        if (st < 2)
-        {
-            if (NeighborsGenerated(c2))
-            {
-                _ = DecorateColumnAsync(c2);
-                return true;
-            }
-            // vecinos aún no listos: no bloquear el barrido por esta columna, pero no
-            // perderla — pendingDecoration la reintenta cada frame más adelante.
-            if (!pendingDecoration.Contains(c2)) pendingDecoration.Add(c2);
-        }
-        return false;
+        if (st < 2 && !pendingDecoration.Contains(c2)) pendingDecoration.Add(c2);
+        return true; // ya generada (o ya en cola de decoración): seguir con la siguiente
     }
 
     /// <summary>
     /// Versión asíncrona de streaming normal (post-warmup): crea los GameObjects del
     /// chunk en el hilo principal, pero el ruido pesado de VoxelGenerator.GenerateColumn
-    /// corre en background. columnWorkBusy asegura que solo una columna se esté
-    /// generando/decorando a la vez, así nunca hay dos workers tocando los mismos
-    /// datos de chunk (la decoración escribe a través de bordes de columna).
+    /// corre en background. Varias columnas nuevas (state == 0/1) pueden estar en esta
+    /// función a la vez, en hilos distintos — cada una solo escribe dentro de su propia
+    /// columna, así que no chocan entre sí. Una recarga (state >= 2) además llama a
+    /// RedecorateAround, que sí escribe en las 8 vecinas; por eso TryStreamColumn la
+    /// reserva junto con ellas antes de llamar aquí (ver busyColumns).
     /// </summary>
     async Awaitable LoadColumnAsync(Vector2Int c2, byte state)
     {
-        columnWorkBusy = true;
-        busyColumn = c2;
+        // recarga de una columna ya decorada: reaplica la decoración propia y la de las
+        // vecinas decoradas (sus árboles cruzan el borde) → reserva también esas 8 vecinas
+        // (ver TryStreamColumn, que ya hizo esta misma cuenta antes de llamar aquí).
+        bool footprint = state >= 2;
         try
         {
             for (int cy = 0; cy < ChunksY; cy++)
@@ -847,7 +900,7 @@ public class VoxelWorld : MonoBehaviour
             VoxelGenerator.GenerateColumn(genContext, this, c2.x, c2.y);
             // recarga de una columna ya decorada: reaplicar la decoración propia y la
             // de las vecinas decoradas (sus árboles cruzan el borde hacia esta columna)
-            if (state >= 2) RedecorateAround(c2);
+            if (footprint) RedecorateAround(c2);
             await Awaitable.MainThreadAsync();
             if (this == null) return;
 
@@ -861,14 +914,13 @@ public class VoxelWorld : MonoBehaviour
         }
         finally
         {
-            columnWorkBusy = false;
+            activeGenerations--;
+            ReleaseReservation(c2, footprint);
         }
     }
 
     async Awaitable DecorateColumnAsync(Vector2Int c2)
     {
-        columnWorkBusy = true;
-        busyColumn = c2;
         try
         {
             await Awaitable.BackgroundThreadAsync();
@@ -885,7 +937,8 @@ public class VoxelWorld : MonoBehaviour
         }
         finally
         {
-            columnWorkBusy = false;
+            decorateBusy = false;
+            ReleaseReservation(c2, true);
         }
     }
 
@@ -1173,6 +1226,19 @@ public class VoxelWorld : MonoBehaviour
 
         // cáscara indestructible: suelo y paredes, techo abierto
         if (by < 1 || bx < 1 || bz < 1 || bx >= BlockDims.x - 1 || bz >= BlockDims.z - 1) return false;
+
+        // si hay una planta justo encima, el golpe se la lleva a ella primero — igual
+        // que en DamageBlock/DigSphere (ver comentario ahí).
+        if (InBounds(bx, by + 1, bz) && GetMicroArray(bx, by + 1, bz) == null)
+        {
+            byte above = GetBlockType(bx, by + 1, bz);
+            if (IsPlantId(above))
+            {
+                SetBlockUniform(bx, by + 1, bz, 0);
+                removedType = above;
+                return true;
+            }
+        }
 
         byte t = GetBlockType(bx, by, bz);
         byte[] micro = GetMicroArray(bx, by, bz);
@@ -1768,6 +1834,21 @@ public class VoxelWorld : MonoBehaviour
         // cáscara indestructible: suelo y paredes, techo abierto
         if (by < 1 || bx < 1 || bz < 1 || bx >= BlockDims.x - 1 || bz >= BlockDims.z - 1) return false;
 
+        // si hay una planta (maleza, flor) justo encima, el golpe se la lleva a ella
+        // primero — igual que en Minecraft: se rompe entera de un toque (sin acumular
+        // daño) y el bloque de soporte no recibe nada en este golpe. Recién cuando ya
+        // no quede planta arriba, los golpes empiezan a dañar el bloque de verdad.
+        if (InBounds(bx, by + 1, bz) && GetMicroArray(bx, by + 1, bz) == null)
+        {
+            byte above = GetBlockType(bx, by + 1, bz);
+            if (IsPlantId(above))
+            {
+                SetBlockUniform(bx, by + 1, bz, 0);
+                removed = new Dictionary<byte, int> { [above] = 1 };
+                return true;
+            }
+        }
+
         byte t = GetBlockType(bx, by, bz);
         byte[] micro = GetMicroArray(bx, by, bz);
         if (t == 0 && micro == null) return false; // aire
@@ -1968,7 +2049,11 @@ public class VoxelWorld : MonoBehaviour
 
     void RemeshImmediate(VoxelChunk c)
     {
-        Apply(c, VoxelMesher.Build(CopySnapshot(c), typeRects, waterTypeId, plantFlags));
+        VoxelMesher.Snapshot snapshot = CopySnapshot(c);
+        VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId, plantFlags);
+        VoxelMesher.ReturnSnapshot(snapshot); // Build ya lo consumió por completo: se puede reciclar
+        Apply(c, result);
+        VoxelMesher.ReturnResult(result); // Apply ya subió los vértices al Mesh de Unity
     }
 
     async Awaitable RemeshAsync(VoxelChunk c)
@@ -1983,6 +2068,7 @@ public class VoxelWorld : MonoBehaviour
             await Awaitable.BackgroundThreadAsync();
             VoxelMesher.Snapshot snapshot = BuildSnapshot(c.coord, neighbors);
             VoxelMesher.BuildResult result = VoxelMesher.Build(snapshot, typeRects, waterTypeId, plantFlags);
+            VoxelMesher.ReturnSnapshot(snapshot); // Build ya lo consumió por completo: se puede reciclar
             await Awaitable.MainThreadAsync();
             // se comprueba c.loaded, no c.go: un chunk sin geometría todavía no tiene
             // GameObject (ver ApplyMeshData/EnsureChunkObjects) y aun así es válido.
@@ -1992,6 +2078,7 @@ public class VoxelWorld : MonoBehaviour
             // pero eso es barato; lo caro es el cocinado de PhysX del MeshCollider.
             bool hasSolid = result.solid.vertices.Count > 0;
             ApplyMeshData(c, result); // crea el GameObject recién aquí, si hace falta
+            VoxelMesher.ReturnResult(result); // Mesh.SetVertices ya copió los datos: se puede reciclar
 
             if (hasSolid)
             {
@@ -2056,7 +2143,7 @@ public class VoxelWorld : MonoBehaviour
     /// </summary>
     VoxelMesher.Snapshot BuildSnapshot(Vector3Int coord, VoxelChunk[] neighbors)
     {
-        var s = new VoxelMesher.Snapshot();
+        var s = VoxelMesher.RentSnapshot();
         Vector3Int b0 = coord * VoxelChunk.SIZE;
         int i = 0;
         for (int y = -1; y <= VoxelChunk.SIZE; y++)

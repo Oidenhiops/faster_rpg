@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +30,36 @@ public static class VoxelMesher
         public static int Idx(int x, int y, int z) => (x + 1) + P * ((z + 1) + P * (y + 1));
     }
 
+    // ---- pools: cada remesh (uno por chunk que cambia) creaba un Snapshot y un
+    // BuildResult nuevos y los tiraba a la basura al terminar. Con streaming + ediciones
+    // frecuentes eso genera bastante presión de GC (arreglos de ~5800 elementos varias
+    // veces por segundo), lo cual se siente como micro-cortes de frame. Reutilizar las
+    // mismas instancias entre remeshes elimina esas asignaciones. Son ConcurrentBag
+    // porque varios RemeshAsync corren a la vez en hilos de background distintos
+    // (ver VoxelWorld.RemeshAsync) y pueden pedir/devolver al mismo tiempo.
+    static readonly ConcurrentBag<Snapshot> snapshotPool = new ConcurrentBag<Snapshot>();
+    static readonly ConcurrentBag<BuildResult> resultPool = new ConcurrentBag<BuildResult>();
+
+    /// <summary>Toma un Snapshot reciclado del pool, o crea uno nuevo si no hay ninguno libre.
+    /// BuildSnapshot sobrescribe sus 3 arreglos por completo (todas las P3 celdas), así que
+    /// no hace falta limpiar los datos de un uso anterior antes de reusarlo.</summary>
+    public static Snapshot RentSnapshot() => snapshotPool.TryTake(out Snapshot s) ? s : new Snapshot();
+
+    /// <summary>Devuelve un Snapshot al pool. Llamar solo cuando ya nadie más lo va a leer
+    /// (Build ya lo consumió por completo, no guarda referencias a sus arreglos).</summary>
+    public static void ReturnSnapshot(Snapshot s) => snapshotPool.Add(s);
+
+    static BuildResult RentResult()
+    {
+        if (resultPool.TryTake(out BuildResult r)) { r.Clear(); return r; }
+        return new BuildResult();
+    }
+
+    /// <summary>Devuelve un BuildResult al pool. Llamar solo después de que sus vértices ya
+    /// se subieron a los Mesh de Unity (Mesh.SetVertices copia los datos; no se queda con
+    /// una referencia a estas listas), para no reciclar algo que todavía está en uso.</summary>
+    public static void ReturnResult(BuildResult r) => resultPool.Add(r);
+
     // altura visual del agua según su nivel
     static float WaterHeight(byte lvl) => lvl >= 8 ? WATER_TOP : Mathf.Max((int)lvl, 1) / (float)M;
 
@@ -38,6 +69,17 @@ public static class VoxelMesher
         public List<Vector3> normals = new List<Vector3>();
         public List<Vector2> uvs = new List<Vector2>();
         public List<int> triangles = new List<int>();
+
+        // vacía las listas pero conserva su capacidad interna (el arreglo reservado no se
+        // libera), así que reusar un MeshData reciclado del pool no vuelve a pagar el costo
+        // de ir agrandando las listas desde 0 cada vez.
+        public void Clear()
+        {
+            vertices.Clear();
+            normals.Clear();
+            uvs.Clear();
+            triangles.Clear();
+        }
     }
 
     public class BuildResult
@@ -45,6 +87,13 @@ public static class VoxelMesher
         public MeshData solid = new MeshData();
         public MeshData water = new MeshData();
         public MeshData plants = new MeshData();
+
+        public void Clear()
+        {
+            solid.Clear();
+            water.Clear();
+            plants.Clear();
+        }
     }
 
     static readonly Vector3Int[] Dirs =
@@ -75,7 +124,7 @@ public static class VoxelMesher
 
     public static BuildResult Build(Snapshot s, Rect[] typeRects, byte waterId, bool[] plants)
     {
-        var result = new BuildResult();
+        var result = RentResult();
         MeshData solid = result.solid;
         MeshData water = result.water;
 

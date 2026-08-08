@@ -43,7 +43,8 @@ public sealed class VoxelChunk
     public Mesh waterMesh;
     public MeshFilter waterFilter;
 
-    // malla de plantas (cutout, sin collider)
+    // malla de plantas (cutout, sin collider — ver VoxelWorld.DamageBlock/MineVoxel:
+    // si un bloque tiene una planta encima, el golpe se la lleva a ella primero)
     public GameObject plantGo;
     public Mesh plantMesh;
     public MeshFilter plantFilter;
