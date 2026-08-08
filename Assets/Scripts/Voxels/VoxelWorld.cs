@@ -1645,12 +1645,12 @@ public class VoxelWorld : MonoBehaviour
     }
 
     /// <summary>
-    /// Progreso de rotura de este bloque (0-1 de sus ticks efectivos para el minero
-    /// dado), leído del daño acumulado que Mine() guardó en el mundo (pico y
-    /// taladro). Expira a los damageResetSeconds sin golpes, igual que en
-    /// DamageBlock/DigSphere. 0 si el minero no puede dañarlo (poder insuficiente) o
-    /// si se rompe al instante. Sin minero se usa ticksPerBreak completo.
-    /// Solo lectura: no modifica el estado. Pensado para pintar grietas en el outline.
+    /// Progreso de rotura de este bloque (0-1), leído del daño acumulado que Mine()
+    /// guardó en el mundo (pico y taladro). Expira a los damageResetSeconds sin
+    /// golpes, igual que en DamageBlock/DigSphere. 0 si el minero no puede dañarlo
+    /// (poder insuficiente) o si se rompe al instante. Sin minero se usa
+    /// ticksPerBreak completo. Solo lectura: no modifica el estado.
+    /// Pensado para tintar el outline (ver DamageProgress01).
     /// </summary>
     public float GetBlockDamageRatio01(Vector3Int blockPos, CharacterPlayer miner = null)
     {
@@ -1660,9 +1660,7 @@ public class VoxelWorld : MonoBehaviour
 
         byte t = GetBlockType(blockPos.x, blockPos.y, blockPos.z);
         if (t == 0) return 0f;
-        float effTicks = EffectiveBreakTicks(types[t], miner);
-        if (effTicks <= 0f) return 0f; // no dañable, o rotura instantánea: sin progreso que mostrar
-        return Mathf.Clamp01(total / effTicks);
+        return DamageProgress01(total, EffectiveBreakTicks(types[t], miner));
     }
 
     /// <summary>
@@ -1677,9 +1675,22 @@ public class VoxelWorld : MonoBehaviour
         if (!microDamage.TryGetValue((blockPos, microIndex), out (float dmg, float time) e)) return 0f;
         if (Time.time - e.time > damageResetSeconds) return 0f;
 
-        float effTicks = EffectiveBreakTicks(types[id], miner);
-        if (effTicks <= 0f) return 0f;
-        return Mathf.Clamp01(e.dmg / effTicks);
+        return DamageProgress01(e.dmg, EffectiveBreakTicks(types[id], miner));
+    }
+
+    /// <summary>
+    /// Normaliza el daño acumulado a 0-1 para el outline, con la regla de "a falta
+    /// de 1 tick, rojo pleno": el progreso se divide entre effTicks - 1, así cuando
+    /// al bloque le queda un solo golpe el ratio ya es 1 (ej. madera de 2 ticks: al
+    /// primer golpe el outline queda rojo). Bloques de 1 tick o rotura instantánea
+    /// no tienen estado intermedio que mostrar → 0.
+    /// </summary>
+    static float DamageProgress01(float accumulated, float effTicks)
+    {
+        if (effTicks <= 0f || accumulated <= 0f) return 0f; // no dañable, instantáneo o sin daño
+        float lastTick = effTicks - 1f; // con este acumulado (o más), falta un golpe o menos
+        if (lastTick <= 0f) return 0f;  // se rompe en 1 tick: nunca hay estado intermedio
+        return Mathf.Clamp01(accumulated / lastTick);
     }
 
     /// <summary>
