@@ -23,8 +23,6 @@ MonoBehaviour:
   icon: {fileID: 0}
   typeObject: 20
   canalizationEffect: {fileID: 0}
-  typeWeapon: 0
-  animationValueName: 0
   costPerUse: 0
   animationValue: 0
   useEnergy: 0
@@ -33,3 +31,5 @@ MonoBehaviour:
   hardness: 999
   indestructible: 1
   isPlant: 0
+  oreHost: {fileID: 0}
+  oreYield: 0.25

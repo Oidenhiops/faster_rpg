@@ -17,14 +17,13 @@ MonoBehaviour:
   modelInfo:
     colors: []
     useTexture: 0
-    textures: []
+    textures:
+    - {fileID: 21300000, guid: 6c505534a29f1a74d8e8ae550476cda4, type: 3}
     originalMesh: []
     occludedModels: 
   icon: {fileID: 0}
   typeObject: 20
   canalizationEffect: {fileID: 0}
-  typeWeapon: 0
-  animationValueName: 0
   costPerUse: 0
   animationValue: 0
   useEnergy: 0
@@ -33,3 +32,5 @@ MonoBehaviour:
   hardness: 5
   indestructible: 0
   isPlant: 0
+  oreHost: {fileID: 11400000, guid: a8ed2a5398134f649054b48fd56f71a4, type: 2}
+  oreYield: 0.25

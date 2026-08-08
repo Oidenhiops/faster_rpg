@@ -254,7 +254,7 @@ public class VoxelWorld : MonoBehaviour
         // atlas: una textura por tipo; si el tipo no tiene, se genera una de color plano
         var sources = new Texture2D[types.Count];
         for (int i = 0; i < types.Count; i++)
-            sources[i] = types[i].modelInfo.textures.Count > 0 ? types[i].modelInfo.textures[0].texture : SolidTexture(types[i].modelInfo.colors[0]);
+            sources[i] = types[i].modelInfo.textures.Count > 0 ? types[i].modelInfo.textures[0].texture : SolidTexture(types[i].modelInfo.colors.Count > 0 ? types[i].modelInfo.colors[0] : Color.magenta);
 
         var atlas = new Texture2D(64, 64, TextureFormat.RGBA32, false)
         {
@@ -266,7 +266,7 @@ public class VoxelWorld : MonoBehaviour
         {
             // alguna textura sin Read/Write: caer a colores planos para no romper
             Debug.LogError("VoxelWorld: falló el empaque del atlas (¿texturas sin Read/Write habilitado?). Usando colores planos.");
-            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].modelInfo.colors[0]);
+            for (int i = 0; i < sources.Length; i++) sources[i] = SolidTexture(types[i].modelInfo.colors.Count > 0 ? types[i].modelInfo.colors[0] : Color.magenta);
             typeRects = atlas.PackTextures(sources, 2, 4096);
         }
 
@@ -285,9 +285,11 @@ public class VoxelWorld : MonoBehaviour
         // material del agua: transparente simple si no se asignó uno
         if (waterMaterial == null)
         {
-            waterMaterial = new Material(Shader.Find("Sprites/Default")) { name = "WaterMaterial" };
-            waterMaterial.color = waterTypeId < types.Count ? types[waterTypeId].modelInfo.colors[0]
-                                                            : new Color(0.2f, 0.5f, 0.8f, 0.6f);
+            waterMaterial = new Material(Shader.Find("Sprites/Default"))
+            {
+                name = "WaterMaterial",
+                color = waterTypeId < types.Count ? types[waterTypeId].modelInfo.colors.Count > 0 ? types[waterTypeId].modelInfo.colors[0] : new Color(0.2f, 0.5f, 0.8f, 0.6f) : new Color(0.2f, 0.5f, 0.8f, 0.6f)
+            };
         }
 
         // material de plantas: cutout con el mismo atlas, doble cara
@@ -1052,27 +1054,76 @@ public class VoxelWorld : MonoBehaviour
     /// </summary>
     public MiningResult Mine(ToolItemSO.MiningType type, Vector3 hitPoint, Vector3 hitNormal, MiningParams p)
     {
+        MiningResult result;
         switch (type)
         {
             case ToolItemSO.MiningType.Sphere:
             {
                 Dictionary<byte, int> removed = DigSphere(hitPoint, p.radius, p.power);
-                return new MiningResult { changed = removed.Count > 0, removed = removed };
+                result = new MiningResult { changed = removed.Count > 0, removed = removed };
+                break;
             }
             case ToolItemSO.MiningType.Perfect:
             {
                 Vector3 worldPos = hitPoint - hitNormal * 0.01f;
                 bool mined = MineVoxel(worldPos, p.power, out byte removedType);
                 Dictionary<byte, int> removed = mined ? new Dictionary<byte, int> { [removedType] = 1 } : null;
-                return new MiningResult { changed = mined, removed = removed };
+                result = new MiningResult { changed = mined, removed = removed };
+                break;
             }
             default: // Pickaxe
             {
                 Vector3Int block = WorldToBlock(hitPoint - hitNormal * 0.01f);
                 bool broken = DamageBlock(block, p.damage, out var removed);
-                return new MiningResult { changed = broken, removed = removed };
+                result = new MiningResult { changed = broken, removed = removed };
+                break;
             }
         }
+        if (result.changed) result.removed = ApplyOreYield(result.removed);
+        return result;
+    }
+
+    /// <summary>
+    /// Reparte el botín de vetas: de lo minado de un tipo con oreHost asignado, solo
+    /// una fracción (oreYield) cae como ese mineral; el resto se convierte en su
+    /// bloque anfitrión (ej. Piedra). Así "solo la parte con color" del bloque
+    /// realmente da mineral; el resto cuenta como piedra común. No toca tipos sin
+    /// oreHost (se comportan igual que antes).
+    /// </summary>
+    Dictionary<byte, int> ApplyOreYield(Dictionary<byte, int> removed)
+    {
+        if (removed == null || removed.Count == 0) return removed;
+
+        List<byte> oreIds = null;
+        foreach (byte id in removed.Keys)
+        {
+            BlockItemSO vt = types[id];
+            if (vt != null && vt.oreHost != null)
+                (oreIds ??= new List<byte>()).Add(id);
+        }
+        if (oreIds == null) return removed;
+
+        foreach (byte oreId in oreIds)
+        {
+            BlockItemSO vt = types[oreId];
+            byte hostId = IdOf(vt.oreHost);
+            if (hostId == 0 || hostId == oreId) continue; // sin anfitrión válido: no reparte
+
+            int total = removed[oreId];
+            int keep = 0;
+            for (int i = 0; i < total; i++)
+                if (UnityEngine.Random.value < vt.oreYield) keep++;
+
+            if (keep == total) continue; // todo cayó como mineral, nada que convertir
+
+            if (keep > 0) removed[oreId] = keep;
+            else removed.Remove(oreId);
+
+            int toHost = total - keep;
+            removed.TryGetValue(hostId, out int cur);
+            removed[hostId] = cur + toHost;
+        }
+        return removed;
     }
 
     // scratch reutilizado por PreviewPickaxeContour para no generar basura cada frame
